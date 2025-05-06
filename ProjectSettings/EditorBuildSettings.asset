@@ -4,5 +4,14 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 0
+    path: Assets/Resources/Scenes/Playgrounds/Playground_Jona.unity
+    guid: 8d00572a4f20daa48b794e9eba759291
+  - enabled: 1
+    path: Assets/Resources/Scenes/0_InitialSetup.unity
+    guid: 6ebe04178fac82f4a9beb97be9ccb4dd
+  - enabled: 1
+    path: Assets/Resources/Scenes/1_MainMenu.unity
+    guid: b75ebe787d02d7b48a213e791d807005
   m_configObjects: {}

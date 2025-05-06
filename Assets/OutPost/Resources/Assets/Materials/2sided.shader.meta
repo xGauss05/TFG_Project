@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 4942220b1f525be4a984c42da0f5a5b1
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16272
+  packageName: NYC Block #6
+  packageVersion: 1.1
+  assetPath: Assets/OutPost/Resources/Assets/Materials/2sided.shader
+  uploadId: 219610

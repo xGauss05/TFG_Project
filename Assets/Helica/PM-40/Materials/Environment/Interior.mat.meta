@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3b86f3d9082096647bc2469dfd6419ad
+timeCreated: 1449770207
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 51604
+  packageName: PM-40 Gun
+  packageVersion: 1.0
+  assetPath: Assets/Helica/PM-40/Materials/Environment/Interior.mat
+  uploadId: 93647

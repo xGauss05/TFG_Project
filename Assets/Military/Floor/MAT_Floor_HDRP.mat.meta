@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 03c0b94cd9685824dbd259e44c5949c5
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 181470
+  packageName: Survivalist character
+  packageVersion: 1.1
+  assetPath: Assets/Military/Floor/MAT_Floor_HDRP.mat
+  uploadId: 693203

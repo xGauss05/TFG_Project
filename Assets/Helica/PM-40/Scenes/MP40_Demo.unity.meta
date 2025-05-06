@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e7c1ebc798f9c034a92ed3bf9aebffde
+timeCreated: 1449695784
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 51604
+  packageName: PM-40 Gun
+  packageVersion: 1.0
+  assetPath: Assets/Helica/PM-40/Scenes/MP40_Demo.unity
+  uploadId: 93647

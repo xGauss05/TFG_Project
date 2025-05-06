@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0f599fa355e018c47bd698bd6bdf7e90
+timeCreated: 1449787976
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 51604
+  packageName: PM-40 Gun
+  packageVersion: 1.0
+  assetPath: Assets/Helica/PM-40/Prefabs/PM-40_Variant3.prefab
+  uploadId: 93647

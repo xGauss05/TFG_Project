@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 51f2fcbfe07906f499180db912fb3f29
+labels:
+- Wall
+- Water
+NativeFormatImporter:
+  mainObjectFileID: -1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16272
+  packageName: NYC Block #6
+  packageVersion: 1.1
+  assetPath: Assets/OutPost/Resources/Trees/Tree02.prefab
+  uploadId: 219610

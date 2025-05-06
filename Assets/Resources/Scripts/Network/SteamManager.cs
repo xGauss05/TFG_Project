@@ -11,10 +11,11 @@ public class SteamManager : MonoBehaviour
     [SerializeField] int maxPlayers;
     [SerializeField] TMP_InputField LobbyIDInputField;
 
-    [SerializeField] TextMeshProUGUI LobbyID;
+    [SerializeField] TextMeshProUGUI LobbyIDText;
 
     [SerializeField] GameObject MainMenu;
     [SerializeField] GameObject InLobbyMenu;
+    [SerializeField] GameObject LobbyChat;
 
     [SerializeField] TextMeshProUGUI PlayerFeedback;
 
@@ -47,10 +48,11 @@ public class SteamManager : MonoBehaviour
     void LobbyEntered(Lobby lobby)
     {
         LobbyReference.Singleton.currentLobby = lobby;
-        LobbyID.text = lobby.Id.ToString();
+        LobbyIDText.text = lobby.Id.ToString();
 
         MainMenu.SetActive(false);
         InLobbyMenu.SetActive(true);
+        LobbyChat.SetActive(true);
 
         Debug.Log($"Entered lobby {lobby.Id}");
     }
@@ -88,5 +90,28 @@ public class SteamManager : MonoBehaviour
                 return;
             }
         }
+    }
+
+    public void CopyID()
+    {
+        TextEditor tEditor = new TextEditor();
+        tEditor.text = LobbyIDText.text;
+        tEditor.SelectAll();
+        tEditor.Copy();
+
+        Debug.Log($"Successfully copied lobby ID: {LobbyIDText.text}.");
+        PlayerFeedback.text = $"Successfully copied lobby ID: {LobbyIDText.text}.";
+    }
+
+    public void LeaveLobby()
+    {
+        LobbyReference.Singleton.currentLobby?.Leave();
+        LobbyReference.Singleton.currentLobby = null;
+
+        MainMenu.SetActive(true);
+        InLobbyMenu.SetActive(false);
+        LobbyChat.SetActive(false);
+
+        if (PlayerFeedback.text.Length > 0) PlayerFeedback.text = "";
     }
 }

@@ -128,7 +128,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Death
+  m_Name: Telepathic
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -142,7 +142,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -5104446916028052583, guid: c3d73ba06daaeef40b556c623d33fc02, type: 3}
+  m_Motion: {fileID: -3086563374589961049, guid: c3d73ba06daaeef40b556c623d33fc02, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 

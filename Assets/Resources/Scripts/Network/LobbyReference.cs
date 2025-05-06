@@ -7,8 +7,8 @@ public class LobbyReference : MonoBehaviour
 {
     public static LobbyReference Singleton { get; private set; }
 
-    public Lobby currentLobby;
-    
+    public Lobby? currentLobby;
+
     void Awake()
     {
         #region Singleton

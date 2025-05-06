@@ -13,13 +13,16 @@ public class MainMenu : MonoBehaviour
     {
         MainScreen.SetActive(false);
         JoinLobbyScreen.SetActive(true);
+
+        if (PlayerFeedback.text.Length > 0) PlayerFeedback.text = "";
     }
 
     public void ReturnToMainMenu()
     {
         MainScreen.SetActive(true);
         JoinLobbyScreen.SetActive(false);
-        PlayerFeedback.text = "";
+
+        if (PlayerFeedback.text.Length > 0) PlayerFeedback.text = "";
     }
 
     public void ExitGame()

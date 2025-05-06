@@ -11,35 +11,31 @@ public class ChatManager : MonoBehaviour
     [SerializeField] TMP_InputField ChatInputField;
     [SerializeField] GameObject ChatGameObject;
 
-    void Start()
-    {
-        ChatGameObject.GetComponent<TextMeshProUGUI>().text = "";
-    }
-
     void OnEnable()
     {
         SteamMatchmaking.OnChatMessage += ChatSent;
         SteamMatchmaking.OnLobbyEntered += LobbyEntered;
         SteamMatchmaking.OnLobbyMemberJoined += LobbyMemberJoined;
         SteamMatchmaking.OnLobbyMemberLeave += LobbyMemberLeave;
+        ChatGameObject.GetComponent<TextMeshProUGUI>().text = "";
     }
 
-    private void LobbyMemberLeave(Lobby lobby, Friend friend)
+    void LobbyMemberLeave(Lobby lobby, Friend friend)
     {
         ChatGameObject.GetComponent<TextMeshProUGUI>().text += friend.Name + " left the lobby.\n";
     }
 
-    private void LobbyMemberJoined(Lobby lobby, Friend friend)
+    void LobbyMemberJoined(Lobby lobby, Friend friend)
     {
         ChatGameObject.GetComponent<TextMeshProUGUI>().text += friend.Name + " joined the lobby.\n";
     }
 
-    private void LobbyEntered(Lobby lobby)
+    void LobbyEntered(Lobby lobby)
     {
         ChatGameObject.GetComponent<TextMeshProUGUI>().text += "You entered the lobby.\n";
     }
 
-    private void ChatSent(Lobby lobby, Friend friend, string msg)
+    void ChatSent(Lobby lobby, Friend friend, string msg)
     {
         ChatGameObject.GetComponent<TextMeshProUGUI>().text += friend.Name + ": " + msg + "\n";
     }

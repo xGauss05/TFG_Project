@@ -19,6 +19,8 @@ public class SteamManager : MonoBehaviour
 
     [SerializeField] TextMeshProUGUI PlayerFeedback;
 
+    [SerializeField] AudioClip buttonSfx;
+
     void OnEnable()
     {
         SteamMatchmaking.OnLobbyCreated += LobbyCreated;
@@ -64,11 +66,15 @@ public class SteamManager : MonoBehaviour
 
     public async void HostLobby()
     {
+        SFXManager.Singleton.PlaySound(buttonSfx);
+
         await SteamMatchmaking.CreateLobbyAsync(maxPlayers);
     }
 
     public async void JoinLobbyWithID()
     {
+        SFXManager.Singleton.PlaySound(buttonSfx);
+
         ulong ID;
 
         // Steam lobby IDs are 'ulong' type of variable
@@ -94,6 +100,8 @@ public class SteamManager : MonoBehaviour
 
     public void CopyID()
     {
+        SFXManager.Singleton.PlaySound(buttonSfx);
+
         TextEditor tEditor = new TextEditor();
         tEditor.text = LobbyIDText.text;
         tEditor.SelectAll();
@@ -105,6 +113,8 @@ public class SteamManager : MonoBehaviour
 
     public void LeaveLobby()
     {
+        SFXManager.Singleton.PlaySound(buttonSfx);
+
         LobbyReference.Singleton.currentLobby?.Leave();
         LobbyReference.Singleton.currentLobby = null;
 

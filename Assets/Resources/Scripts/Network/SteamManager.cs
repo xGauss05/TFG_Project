@@ -16,6 +16,7 @@ public class SteamManager : MonoBehaviour
     [SerializeField] GameObject MainMenu;
     [SerializeField] GameObject InLobbyMenu;
     [SerializeField] GameObject LobbyChat;
+    [SerializeField] GameObject LobbyIDScreen;
 
     [SerializeField] TextMeshProUGUI PlayerFeedback;
 
@@ -52,6 +53,7 @@ public class SteamManager : MonoBehaviour
         MainMenu.SetActive(false);
         InLobbyMenu.SetActive(true);
         LobbyChat.SetActive(true);
+        LobbyIDScreen.SetActive(true);
 
         Debug.Log($"Entered lobby {lobby.Id}");
     }
@@ -110,7 +112,9 @@ public class SteamManager : MonoBehaviour
         MainMenu.SetActive(true);
         InLobbyMenu.SetActive(false);
         LobbyChat.SetActive(false);
+        LobbyIDScreen.SetActive(false);
 
         if (PlayerFeedback.text.Length > 0) PlayerFeedback.text = "";
     }
 }
+

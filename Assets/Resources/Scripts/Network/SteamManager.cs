@@ -5,6 +5,9 @@ using Steamworks;
 using TMPro;
 using Steamworks.Data;
 using System;
+using Unity.Netcode;
+using Netcode.Transports.Facepunch;
+using UnityEngine.SceneManagement;
 
 public class SteamManager : MonoBehaviour
 {
@@ -17,6 +20,7 @@ public class SteamManager : MonoBehaviour
     [SerializeField] GameObject InLobbyMenu;
     [SerializeField] GameObject LobbyChat;
     [SerializeField] GameObject LobbyIDScreen;
+    [SerializeField] GameObject StartGameButton;
 
     [SerializeField] TextMeshProUGUI PlayerFeedback;
 
@@ -41,6 +45,9 @@ public class SteamManager : MonoBehaviour
             lobby.SetPublic();
             lobby.SetJoinable(true);
 
+            NetworkManager.Singleton.StartHost();
+            StartGameButton.SetActive(true);
+
             Debug.Log($"Created lobby {lobby.Id}");
         }
     }
@@ -54,6 +61,11 @@ public class SteamManager : MonoBehaviour
         InLobbyMenu.SetActive(true);
         LobbyChat.SetActive(true);
         LobbyIDScreen.SetActive(true);
+
+        if (NetworkManager.Singleton.IsHost) return;
+
+        NetworkManager.Singleton.gameObject.GetComponent<FacepunchTransport>().targetSteamId = lobby.Owner.Id;
+        NetworkManager.Singleton.StartClient();
 
         Debug.Log($"Entered lobby {lobby.Id}");
     }
@@ -109,12 +121,23 @@ public class SteamManager : MonoBehaviour
         LobbyReference.Singleton.currentLobby?.Leave();
         LobbyReference.Singleton.currentLobby = null;
 
+        NetworkManager.Singleton.Shutdown();
+
         MainMenu.SetActive(true);
         InLobbyMenu.SetActive(false);
         LobbyChat.SetActive(false);
         LobbyIDScreen.SetActive(false);
+        StartGameButton.SetActive(false);
 
         if (PlayerFeedback.text.Length > 0) PlayerFeedback.text = "";
     }
-}
 
+    public void StartGame()
+    {
+        if (NetworkManager.Singleton.IsHost)
+        {
+            NetworkManager.Singleton.SceneManager.LoadScene("2_Gameplay", LoadSceneMode.Single);
+        }
+    }
+
+}

@@ -7,13 +7,13 @@ public class BGMManager : MonoBehaviour
     public static BGMManager Singleton { get; private set; }
 
     public AudioSource currentBgm;
-    public AudioClip[] musicTracks;
+    [SerializeField] AudioClip[] musicTracks;
 
     [Header("Do not modify these parameters")]
-    public int musicTracksSize = 0;
-    public int currentTrackIndex = 0;
+    [SerializeField, HideInInspector] int musicTracksSize = 0;
+    [SerializeField, HideInInspector] int currentTrackIndex = 0;
 
-    private void Awake()
+    void Awake()
     {
         #region Singleton
 
@@ -59,7 +59,6 @@ public class BGMManager : MonoBehaviour
 
     public void ChangeBGM(AudioClip musicToChange)
     {
-
         currentBgm.Stop();
         currentBgm.clip = musicToChange;
         currentBgm.Play();

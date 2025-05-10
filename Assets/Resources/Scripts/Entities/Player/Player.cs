@@ -17,45 +17,56 @@ public class Player : NetworkBehaviour
         OpenDoor,
     }
 
-    public NetworkVariable<string> ownerName = new NetworkVariable<string>();
-    private float moveSpeed = 5f;
+    //public NetworkVariable<string> ownerName = new NetworkVariable<string>();
+    float moveSpeed = 5f;
 
     [SerializeField] float sensitivity = 100.0f;
     [SerializeField] float verticalRotation = 0f;
-    private const float maxAngle = 90f;
+    const float maxAngle = 90f;
 
-    //[SerializeField] PlayerCamera playerCam;
     [SerializeField] Transform gunPivot;
     public Transform camPivot;
     public bool lockCamera = false;
 
     //private Gun currentGun;
-    private Vector3 lastPosition;
 
-    private void Awake()
+    void Awake()
     {
-        //if (IsOwner)
-        //{
-        //    playerCam = Camera.main.GetComponent<PlayerCamera>();
-        //}
-
         //GameObject gunGO = (GameObject)Instantiate(Resources.Load("Prefabs/Gun"), gunPivot);
         //currentGun = gunGO.GetComponent<Gun>();
     }
 
-    void Start()
+    public override void OnNetworkSpawn()
     {
-        if (IsOwner)
+        if (!IsOwner)
         {
-            //Camera.main.GetComponent<PlayerCamera>().SetParent(camPivot);
-            Camera.main.transform.rotation = transform.rotation;
-
-            GetComponentInChildren<Canvas>().gameObject.SetActive(false);
+            this.enabled = false;
         }
         else
         {
-            GetComponentInChildren<TMPro.TextMeshProUGUI>().text = ownerName.Value;
+            // Currently hardcoded
+            // Check player spawn points in map then choose 1 random
+            this.transform.position = new Vector3(20, 2, -20);
+
+            Camera.main.GetComponent<PlayerCamera>().SetParent(camPivot);
+            Camera.main.transform.rotation = transform.rotation;
+            GetComponentInChildren<Canvas>().gameObject.SetActive(false);
         }
+    }
+
+    void Start()
+    {
+        //if (IsOwner)
+        //{
+        //    //Camera.main.GetComponent<PlayerCamera>().SetParent(camPivot);
+        //    Camera.main.transform.rotation = transform.rotation;
+
+        //    GetComponentInChildren<Canvas>().gameObject.SetActive(false);
+        //}
+        //else
+        //{
+        //    //GetComponentInChildren<TMPro.TextMeshProUGUI>().text = ownerName.Value;
+        //}
     }
 
     void Update()

@@ -63,7 +63,7 @@ public class SteamManager : MonoBehaviour
             StartGameButton.SetActive(true);
             LobbyReference.Singleton.currentLobby = lobby;
 
-            UpdateUI();
+            UpdatePlayerListUI();
             Debug.Log($"Created lobby {lobby.Id}");
         }
     }
@@ -85,7 +85,7 @@ public class SteamManager : MonoBehaviour
         NetworkManager.Singleton.gameObject.GetComponent<FacepunchTransport>().targetSteamId = lobby.Owner.Id;
         NetworkManager.Singleton.StartClient();
 
-        UpdateUI();
+        UpdatePlayerListUI();
         Debug.Log($"Entered lobby {lobby.Id}");
 
     }
@@ -97,12 +97,30 @@ public class SteamManager : MonoBehaviour
 
     void LobbyMemberLeave(Lobby lobby, Friend friend)
     {
-        UpdateUI();
+        bool ownerStillInLobby = false;
+
+        foreach (var member in lobby.Members)
+        {
+            if (member.Id == lobby.Owner.Id)
+            {
+                ownerStillInLobby = true;
+                break;
+            }
+        }
+
+        if (!ownerStillInLobby)
+        {
+            LeaveLobby();
+            PlayerFeedback.text = "The host has disconnected.";
+            return;
+        }
+
+        UpdatePlayerListUI();
     }
 
     void LobbyMemberJoined(Lobby lobby, Friend friend)
     {
-        UpdateUI();
+        UpdatePlayerListUI();
     }
 
     public async void HostLobby()
@@ -152,15 +170,13 @@ public class SteamManager : MonoBehaviour
         LobbyReference.Singleton.currentLobby = null;
 
         NetworkManager.Singleton.Shutdown();
-
+        
         MainMenu.SetActive(true);
         LobbyScreen.SetActive(false);
         LobbyChat.SetActive(false);
         LobbyIDScreen.SetActive(false);
         StartGameButton.SetActive(false);
         LobbyPlayersList.SetActive(false);
-
-        if (PlayerFeedback.text.Length > 0) PlayerFeedback.text = "";
     }
 
     public void StartGame()
@@ -171,7 +187,7 @@ public class SteamManager : MonoBehaviour
         }
     }
 
-    async void UpdateUI()
+    async void UpdatePlayerListUI()
     {
         foreach (var player in currentPlayers)
         {

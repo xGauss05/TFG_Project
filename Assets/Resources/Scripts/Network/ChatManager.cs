@@ -20,6 +20,15 @@ public class ChatManager : MonoBehaviour
         ChatGameObject.GetComponent<TextMeshProUGUI>().text = "";
     }
 
+    void OnDisable()
+    {
+        SteamMatchmaking.OnChatMessage -= ChatSent;
+        SteamMatchmaking.OnLobbyEntered -= LobbyEntered;
+        SteamMatchmaking.OnLobbyMemberJoined -= LobbyMemberJoined;
+        SteamMatchmaking.OnLobbyMemberLeave -= LobbyMemberLeave;
+        ChatGameObject.GetComponent<TextMeshProUGUI>().text = "";
+    }
+
     void LobbyMemberLeave(Lobby lobby, Friend friend)
     {
         ChatGameObject.GetComponent<TextMeshProUGUI>().text += friend.Name + " left the lobby.\n";

@@ -8,27 +8,39 @@ using System;
 using Unity.Netcode;
 using Netcode.Transports.Facepunch;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class SteamManager : MonoBehaviour
 {
     [SerializeField] int maxPlayers;
-    [SerializeField] TMP_InputField LobbyIDInputField;
 
-    [SerializeField] TextMeshProUGUI LobbyIDText;
-
+    [Header("Main Menu")]
     [SerializeField] GameObject MainMenu;
-    [SerializeField] GameObject InLobbyMenu;
-    [SerializeField] GameObject LobbyChat;
+    [SerializeField] TextMeshProUGUI PlayerFeedback;
+
+    [Header("Lobby Menu")]
+    [SerializeField] GameObject LobbyScreen;
     [SerializeField] GameObject LobbyIDScreen;
+    [SerializeField] TextMeshProUGUI LobbyIDText;
+    [SerializeField] GameObject LobbyChat;
+    [SerializeField] GameObject LobbyPlayersList;
+    List<GameObject> currentPlayers = new List<GameObject>();
     [SerializeField] GameObject StartGameButton;
 
-    [SerializeField] TextMeshProUGUI PlayerFeedback;
+    [Header("Join Lobby Menu")]
+    [SerializeField] GameObject JoinLobbyScreen;
+    [SerializeField] TMP_InputField LobbyIDInputField;
+
+    [Header("Prefabs")]
+    [SerializeField] GameObject playerInfoPrefab;
 
     void OnEnable()
     {
         SteamMatchmaking.OnLobbyCreated += LobbyCreated;
         SteamMatchmaking.OnLobbyEntered += LobbyEntered;
         SteamFriends.OnGameLobbyJoinRequested += GameLobbyJoinRequested;
+        SteamMatchmaking.OnLobbyMemberJoined += LobbyMemberJoined;
+        SteamMatchmaking.OnLobbyMemberLeave += LobbyMemberLeave;
     }
 
     void OnDisable()
@@ -36,6 +48,8 @@ public class SteamManager : MonoBehaviour
         SteamMatchmaking.OnLobbyCreated -= LobbyCreated;
         SteamMatchmaking.OnLobbyEntered -= LobbyEntered;
         SteamFriends.OnGameLobbyJoinRequested -= GameLobbyJoinRequested;
+        SteamMatchmaking.OnLobbyMemberJoined -= LobbyMemberJoined;
+        SteamMatchmaking.OnLobbyMemberLeave -= LobbyMemberLeave;
     }
 
     void LobbyCreated(Result result, Lobby lobby)
@@ -47,7 +61,9 @@ public class SteamManager : MonoBehaviour
 
             NetworkManager.Singleton.StartHost();
             StartGameButton.SetActive(true);
+            LobbyReference.Singleton.currentLobby = lobby;
 
+            UpdateUI();
             Debug.Log($"Created lobby {lobby.Id}");
         }
     }
@@ -58,21 +74,35 @@ public class SteamManager : MonoBehaviour
         LobbyIDText.text = lobby.Id.ToString();
 
         MainMenu.SetActive(false);
-        InLobbyMenu.SetActive(true);
+        JoinLobbyScreen.SetActive(false);
+        LobbyScreen.SetActive(true);
         LobbyChat.SetActive(true);
         LobbyIDScreen.SetActive(true);
+        LobbyPlayersList.SetActive(true);
 
         if (NetworkManager.Singleton.IsHost) return;
 
         NetworkManager.Singleton.gameObject.GetComponent<FacepunchTransport>().targetSteamId = lobby.Owner.Id;
         NetworkManager.Singleton.StartClient();
 
+        UpdateUI();
         Debug.Log($"Entered lobby {lobby.Id}");
+
     }
 
     async void GameLobbyJoinRequested(Lobby lobby, SteamId steamId)
     {
         await lobby.Join();
+    }
+
+    void LobbyMemberLeave(Lobby lobby, Friend friend)
+    {
+        UpdateUI();
+    }
+
+    void LobbyMemberJoined(Lobby lobby, Friend friend)
+    {
+        UpdateUI();
     }
 
     public async void HostLobby()
@@ -92,17 +122,17 @@ public class SteamManager : MonoBehaviour
             return;
         }
 
-        // Asks for the lobbies with at least 1 spot available (1)
-        Lobby[] lobbies = await SteamMatchmaking.LobbyList.WithSlotsAvailable(1).RequestAsync();
-
-        foreach (Lobby l in lobbies)
+        try
         {
-            if (l.Id == ID)
-            {
-                await l.Join();
-                return;
-            }
+            Lobby l = new Lobby(ID);
+            await l.Join();
         }
+        catch (Exception ex)
+        {
+            Debug.Log($"Failed to join lobby: {ID}, {ex.Message}");
+            PlayerFeedback.text = $"Failed to join lobby: {ID}, {ex.Message}";
+        }
+
     }
 
     public void CopyID()
@@ -124,10 +154,11 @@ public class SteamManager : MonoBehaviour
         NetworkManager.Singleton.Shutdown();
 
         MainMenu.SetActive(true);
-        InLobbyMenu.SetActive(false);
+        LobbyScreen.SetActive(false);
         LobbyChat.SetActive(false);
         LobbyIDScreen.SetActive(false);
         StartGameButton.SetActive(false);
+        LobbyPlayersList.SetActive(false);
 
         if (PlayerFeedback.text.Length > 0) PlayerFeedback.text = "";
     }
@@ -138,6 +169,39 @@ public class SteamManager : MonoBehaviour
         {
             NetworkManager.Singleton.SceneManager.LoadScene("2_Gameplay", LoadSceneMode.Single);
         }
+    }
+
+    async void UpdateUI()
+    {
+        foreach (var player in currentPlayers)
+        {
+            Destroy(player);
+        }
+        currentPlayers.Clear();
+
+        foreach (var player in LobbyReference.Singleton.currentLobby?.Members)
+        {
+            GameObject playerItem = Instantiate(playerInfoPrefab, LobbyPlayersList.transform);
+            PlayerInfoUI playerInfo = playerItem.GetComponentInChildren<PlayerInfoUI>();
+
+            playerInfo.playerName.text = player.Name;
+
+            Steamworks.Data.Image? image = await player.GetLargeAvatarAsync();
+
+            if (image != null)
+            {
+                Texture2D tex2d = new Texture2D((int)image.Value.Width, (int)image.Value.Height, TextureFormat.RGBA32, false);
+                tex2d.LoadRawTextureData(image.Value.Data);
+                tex2d.Apply();
+
+                playerInfo.playerImage.texture = tex2d;
+            }
+
+            currentPlayers.Add(playerItem);
+        }
+
+        Canvas.ForceUpdateCanvases();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(LobbyPlayersList.GetComponent<RectTransform>());
     }
 
 }

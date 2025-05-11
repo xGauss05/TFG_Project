@@ -15,11 +15,17 @@ public class Gun : MonoBehaviour
     Vector3 reticleDebugHit = Vector3.zero;
     Vector3 furtherReticleDebugHit = Vector3.zero;
 
+    AudioSource audioSource;
     [SerializeField] AudioClip gunShotSfx;
     [SerializeField] AudioClip emptyClipSfx;
     [SerializeField] AudioClip reloadSfx;
 
     bool isReloading = false;
+
+    void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
 
     public (Vector3 origin, Vector3 direction) CalculateShot()
     {
@@ -79,11 +85,11 @@ public class Gun : MonoBehaviour
 
         if (currentAmmo <= 0)
         {
-            SFXManager.Singleton.PlaySound(emptyClipSfx);
+            audioSource.PlayOneShot(emptyClipSfx);
             return;
         }
 
-        SFXManager.Singleton.PlaySound(gunShotSfx);
+        audioSource.PlayOneShot(gunShotSfx);
         currentAmmo--;
 
         GameObject trail = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/BulletTrail"));
@@ -98,7 +104,7 @@ public class Gun : MonoBehaviour
 
             trail.GetComponent<BulletTrail>().SetTrailPositions(gunMuzzle.position, bulletHit.point);
 
-            //bulletHit.collider.GetComponent<BasicZombie>()?.TakeDamage(gunDamage);
+            bulletHit.collider.GetComponent<BasicZombie>()?.TakeDamageServerRpc(gunDamage);
         }
         else
         {
@@ -126,7 +132,7 @@ public class Gun : MonoBehaviour
     {
         isReloading = true;
 
-        SFXManager.Singleton.PlaySound(reloadSfx);
+        audioSource.PlayOneShot(reloadSfx);
         yield return new WaitForSeconds(reloadSfx.length);
 
         currentAmmo = maxCapacity;

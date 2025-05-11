@@ -28,6 +28,14 @@ public class Player : NetworkBehaviour
 
     Gun currentGun;
 
+    const int maxHealth = 100;
+    public NetworkVariable<int> currentHealth = new NetworkVariable<int>(maxHealth);
+
+    bool isDead = false;
+
+    AudioSource audioSource;
+    [SerializeField] AudioClip playerHurtSfx;
+
     void Awake()
     {
         GameObject gunGO = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Gun"), gunPivot);
@@ -58,11 +66,13 @@ public class Player : NetworkBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
     {
-        if (!IsOwner) return;
+        if (!IsOwner || isDead) return;
 
         HandleInput();
     }
@@ -190,6 +200,21 @@ public class Player : NetworkBehaviour
         if (actionType == PlayerAction.OpenDoor)
         {
             OpenDoor();
+        }
+    }
+
+    [ServerRpc]
+    public void TakeDamageServerRpc(int amount)
+    {
+        if (currentHealth.Value <= 0) return;
+
+        currentHealth.Value -= amount;
+        audioSource.PlayOneShot(playerHurtSfx);
+
+        if (currentHealth.Value <= 0)
+        {
+            isDead = true;
+            Debug.Log("Player dead!");
         }
     }
 }

@@ -14,30 +14,72 @@ public class BasicZombie : NetworkBehaviour
         Melee,
     }
 
-    const int maxHealth = 100;
+    const int maxHealth = 30;
     bool isDead = false;
 
     [SerializeField] float loseRadius = 15.0f;
     [SerializeField] float detectionRadius = 10.0f;
+    [SerializeField] float meleeRadius = 2.0f;
     [SerializeField] float movementSpeed = 0.25f;
+
+    [SerializeField] Animator zombieAnimator;
 
     NavMeshAgent agent;
     GameObject targetPlayer;
 
+    bool zombieSpawned = false;
+    bool isAttacking = false;
+
+    AudioSource audioSource;
+    [SerializeField] AudioClip zombieAttackSfx;
+    [SerializeField] AudioClip zombieScreechSfx;
+    [SerializeField] AudioClip zombieDeathSfx;
+
     // Variables that need to be updated in both Clients and Server
     public NetworkVariable<ZombieState> currentState = new NetworkVariable<ZombieState>(ZombieState.Idle);
     public NetworkVariable<int> currentHealth = new NetworkVariable<int>(maxHealth);
+    public int attackDamage = 5;
+
+    [SerializeField] GameObject meleeHitboxPrefab;
+    [SerializeField] Transform meleeSpawnpoint;
+
+    public override void OnNetworkSpawn()
+    {
+        GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("ZombieSpawnpoint");
+
+        if (spawnPoints.Length > 0)
+        {
+            int randomIndex = Random.Range(0, spawnPoints.Length);
+            Transform spawnTransform = spawnPoints[randomIndex].transform;
+
+            // Set the Zombie spawn point to the Spawnpoint position
+            transform.position = spawnTransform.position;
+            transform.rotation = spawnTransform.rotation;
+        }
+        else
+        {
+            Debug.LogWarning("No zombie spawn points found. Spawning at default position.");
+            this.transform.position = new Vector3(0, 0, 0); // Fallback position
+        }
+
+    }
 
     // Start is called before the first frame update
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         agent.speed = movementSpeed;
+
+        audioSource = GetComponent<AudioSource>();
+
+        StartCoroutine(WaitForSpawnAnimation());
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!IsHost || !zombieSpawned || isDead) return;
+
         CheckState();
         ExecuteState();
     }
@@ -56,6 +98,7 @@ public class BasicZombie : NetworkBehaviour
 
             if (distance < smallestDistance)
             {
+                smallestDistance = distance;
                 closestPlayer = player;
             }
         }
@@ -64,7 +107,11 @@ public class BasicZombie : NetworkBehaviour
 
         targetPlayer = closestPlayer;
 
-        if (currentState.Value != ZombieState.Chase && smallestDistance < detectionRadius)
+        if (smallestDistance < meleeRadius)
+        {
+            currentState.Value = ZombieState.Melee;
+        }
+        else if (currentState.Value != ZombieState.Chase && smallestDistance < detectionRadius)
         {
             currentState.Value = ZombieState.Chase;
         }
@@ -101,18 +148,64 @@ public class BasicZombie : NetworkBehaviour
         // Check if there is a target player, for safety measures
         if (targetPlayer != null)
         {
+            if (!CheckAnimationState("Chase")) zombieAnimator.SetTrigger("Chase");
+
             agent.SetDestination(targetPlayer.transform.position);
+            //Debug.Log("Basic Zombie Chase");
         }
     }
 
     void DoIdle()
     {
-        // Trigger idle animation
+        if (!CheckAnimationState("Idle")) zombieAnimator.SetTrigger("Idle");
+
+        //Debug.Log("Basic Zombie Idle");
     }
 
     void DoMelee()
     {
-        // Trigger Punch animation & check whether the Zombie hit the Player
+        agent.ResetPath();
+        if (!CheckAnimationState("Attack1") && !isAttacking)
+        {
+            if (IsServer) StartCoroutine(SpawnMeleeHitbox());
+
+            zombieAnimator.SetTrigger("Attack1");
+        }
+        //Debug.Log("Basic Zombie Attack");
+    }
+
+    IEnumerator SpawnMeleeHitbox()
+    {
+        isAttacking = true;
+
+        GameObject currentHitbox = Instantiate(meleeHitboxPrefab, meleeSpawnpoint.position, meleeSpawnpoint.rotation);
+        currentHitbox.GetComponent<NetworkObject>().Spawn();
+
+        currentHitbox.GetComponent<ZombieDamageHitbox>().attacker = this;
+
+        AnimatorStateInfo animatorStateInfo = zombieAnimator.GetCurrentAnimatorStateInfo(0);
+
+        while (!animatorStateInfo.IsName("Attack1"))
+        {
+            yield return null;
+            animatorStateInfo = zombieAnimator.GetCurrentAnimatorStateInfo(0);
+        }
+
+        yield return new WaitForSeconds(animatorStateInfo.length);
+
+        if (currentHitbox != null)
+        {
+            if (currentHitbox.TryGetComponent(out NetworkObject networkObj))
+            {
+                networkObj.Despawn();
+            }
+            else
+            {
+                Destroy(currentHitbox);
+            }
+        }
+
+        isAttacking = false;
     }
 
     [ServerRpc]
@@ -124,8 +217,58 @@ public class BasicZombie : NetworkBehaviour
         if (currentHealth.Value <= 0)
         {
             isDead = true;
-            // Trigger here the Death animation. On animation end, should despawn the NetworkObject
-            NetworkObject.Despawn();
+            if (!CheckAnimationState("Death")) zombieAnimator.SetTrigger("Death");
+
+            //Debug.Log("Basic Zombie Death");
+
+            agent.ResetPath();
+            audioSource.PlayOneShot(zombieDeathSfx);
+
+            StartCoroutine(WaitForDeathAnimation());
         }
+    }
+
+    IEnumerator WaitForDeathAnimation()
+    {
+        AnimatorStateInfo animatorStateInfo = zombieAnimator.GetCurrentAnimatorStateInfo(0);
+
+        while (!animatorStateInfo.IsName("Death"))
+        {
+            yield return null;
+            animatorStateInfo = zombieAnimator.GetCurrentAnimatorStateInfo(0);
+        }
+
+        yield return new WaitForSeconds(animatorStateInfo.length);
+
+        NetworkObject.Despawn();
+    }
+
+    IEnumerator WaitForSpawnAnimation()
+    {
+        AnimatorStateInfo animatorStateInfo = zombieAnimator.GetCurrentAnimatorStateInfo(0);
+
+        while (!animatorStateInfo.IsName("Spawn"))
+        {
+            yield return null;
+            animatorStateInfo = zombieAnimator.GetCurrentAnimatorStateInfo(0);
+        }
+
+        yield return new WaitForSeconds(animatorStateInfo.length);
+
+        zombieSpawned = true;
+    }
+
+    bool CheckAnimationState(string animName)
+    {
+        AnimatorStateInfo animatorStateInfo = zombieAnimator.GetCurrentAnimatorStateInfo(0);
+
+        return animatorStateInfo.IsName(animName);
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(transform.position, detectionRadius);
+        Gizmos.DrawWireSphere(transform.position, loseRadius);
+        Gizmos.DrawWireSphere(transform.position, meleeRadius);
     }
 }

@@ -11,6 +11,12 @@ public class MainMenu : MonoBehaviour
     [SerializeField] TextMeshProUGUI PlayerFeedback;
     [SerializeField] AudioClip buttonSfx;
 
+    void Awake()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
     public void ButtonPress()
     {
         SFXManager.Singleton.PlaySound(buttonSfx);

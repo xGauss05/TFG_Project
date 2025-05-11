@@ -8,12 +8,12 @@ public class BulletTrail : MonoBehaviour
     [SerializeField] LineRenderer lineRenderer;
     float currentTime;
 
-    private void Awake()
+    void Awake()
     {
         currentTime = trailLifeTime;
     }
 
-    private void Update()
+    void Update()
     {
         currentTime -= Time.deltaTime;
         if (currentTime <= 0f)

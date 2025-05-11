@@ -5,70 +5,95 @@ using UnityEngine;
 public class Gun : MonoBehaviour
 {
     [SerializeField] Transform gunMuzzle;
-    [SerializeField] int gunDamage = 20;
+    [SerializeField] const int gunDamage = 10;
+    [SerializeField] int currentAmmo = 20;
+    [SerializeField] const int maxCapacity = 20;
+    [SerializeField] Vector3 shotSpreadVariance = new Vector3(0.005f, 0.005f, 0.005f);
 
     Vector3 lastDebugOrigin;
     Vector3 debugHit = Vector3.zero;
     Vector3 reticleDebugHit = Vector3.zero;
     Vector3 furtherReticleDebugHit = Vector3.zero;
 
-    void Awake()
+    [SerializeField] AudioClip gunShotSfx;
+    [SerializeField] AudioClip emptyClipSfx;
+    [SerializeField] AudioClip reloadSfx;
+
+    bool isReloading = false;
+
+    public (Vector3 origin, Vector3 direction) CalculateShot()
     {
-        Cursor.lockState = CursorLockMode.Locked;
+        // Create the ray forward from the camera
+        Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
+        Ray ray = Camera.main.ScreenPointToRay(screenCenter);
+
+        // Create the gun plane
+        Plane gunPlane = new Plane(gunMuzzle.forward, gunMuzzle.position);
+
+        // Declare the final direction of the bullet, to be overwritten later
+        Vector3 bulletDirection = gunMuzzle.forward;
+
+        // Shoot rays FROM CAMERA for the target and for the plane
+        if (Physics.Raycast(ray, out RaycastHit reticleTarget, 999.0f) &&
+            gunPlane.Raycast(ray, out float distanceToPlane))
+        {
+            reticleDebugHit = reticleTarget.point;
+
+            // Check if the hit object is further that the hit on the gun plane
+            if (distanceToPlane < reticleTarget.distance)
+            {
+                Debug.Log("Shooting to reticle");
+                bulletDirection = (reticleTarget.point - gunMuzzle.position).normalized;
+            }
+            else
+            {
+                // Shoot the same ray but with the previously hit point as origin
+                if (Physics.Raycast(reticleTarget.point, ray.direction, out RaycastHit targetPastReticle, 999f))
+                {
+                    furtherReticleDebugHit = targetPastReticle.point;
+
+                    Debug.Log("Shooting past reticle");
+                    bulletDirection = (targetPastReticle.point - gunMuzzle.position).normalized;
+                }
+                else
+                {
+                    bulletDirection = ray.direction;
+                    Debug.Log("Aiming at infinite");
+                }
+            }
+        }
+        else
+        {
+            bulletDirection = ray.direction;
+            Debug.Log("Aiming at infinite");
+        }
+
+        bulletDirection = ShootSpread(bulletDirection);
+
+        return (gunMuzzle.position, bulletDirection);
     }
-
-    //public PlayerAction CalculateShot()
-    //{
-    //    //Create the ray forward from the camera
-    //    Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
-    //    Ray ray = Camera.main.ScreenPointToRay(screenCenter);
-
-    //    //Create the gun plane
-    //    Plane gunPlane = new Plane(gunMuzzle.forward, gunMuzzle.position);
-
-    //    Vector3 bulletDirection = gunMuzzle.forward; //declare the final directoin of the bullet, to be overwritten later
-
-    //    //Shoot rays FROM CAMERA for the target and for the plane
-    //    if (Physics.Raycast(ray, out RaycastHit reticleTarget, 999f) &&
-    //        gunPlane.Raycast(ray, out float distanceToPlane))
-    //    {
-    //        reticleDebugHit = reticleTarget.point;
-
-    //        if (distanceToPlane < reticleTarget.distance) //check if the hit object is further that the hit on the gun plane
-    //        {
-    //            Debug.Log("Shooting to reticle");
-    //            bulletDirection = reticleTarget.point - gunMuzzle.position;
-    //        }
-    //        else
-    //        {
-    //            if (Physics.Raycast(reticleTarget.point, ray.direction, out RaycastHit targetPastReticle, 999f)) //shoot the same ray but with the previously hit point as origin
-    //            {
-    //                furtherReticleDebugHit = targetPastReticle.point;
-
-    //                Debug.Log("Shooting past reticle");
-    //                bulletDirection = targetPastReticle.point - gunMuzzle.position;
-    //            }
-    //            else { Debug.Log("Aiming at infinite"); }
-    //        }
-    //    }
-    //    else { Debug.Log("Aiming at infinite"); }
-
-    //    return new PlayerAction(Wrappers.PlayerAction.ActionType.Shot, new List<string> { gunMuzzle.position.x.ToString(),
-    //                                                                                               gunMuzzle.position.y.ToString(),
-    //                                                                                               gunMuzzle.position.z.ToString(),
-    //                                                                                               bulletDirection.x.ToString(),
-    //                                                                                               bulletDirection.y.ToString(),
-    //                                                                                               bulletDirection.z.ToString() });
-    //}
 
     public void Shoot(Vector3 origin, Vector3 direction)
     {
-        GameObject trail = (GameObject)Instantiate(Resources.Load("Prefabs/BulletTrail"));
+        if (isReloading) return;
 
-        if (Physics.Raycast(origin, direction, out RaycastHit bulletHit, 999f))
+        if (currentAmmo <= 0)
+        {
+            SFXManager.Singleton.PlaySound(emptyClipSfx);
+            return;
+        }
+
+        SFXManager.Singleton.PlaySound(gunShotSfx);
+        currentAmmo--;
+
+        GameObject trail = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/BulletTrail"));
+
+        if (Physics.Raycast(origin, direction, out RaycastHit bulletHit, 999.0f))
         {
             lastDebugOrigin = gunMuzzle.position;
-            debugHit = bulletHit.point; //This is where the bullet must land
+
+            // This is where the bullet must land
+            debugHit = bulletHit.point;
             //Debug.Log($"Bullet hit {bulletHit.collider.gameObject.name}");
 
             trail.GetComponent<BulletTrail>().SetTrailPositions(gunMuzzle.position, bulletHit.point);
@@ -82,9 +107,35 @@ public class Gun : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmos()
+    Vector3 ShootSpread(Vector3 direction)
     {
-        //Green is muzzle to hitPoint
+        return direction += new Vector3(
+            Random.Range(-shotSpreadVariance.x, shotSpreadVariance.x),
+            Random.Range(-shotSpreadVariance.y, shotSpreadVariance.y),
+            Random.Range(-shotSpreadVariance.z, shotSpreadVariance.z)
+        );
+    }
+
+    public void Reload()
+    {
+        if (isReloading || currentAmmo >= maxCapacity) return;
+        StartCoroutine(ReloadCoroutine());
+    }
+
+    IEnumerator ReloadCoroutine()
+    {
+        isReloading = true;
+
+        SFXManager.Singleton.PlaySound(reloadSfx);
+        yield return new WaitForSeconds(reloadSfx.length);
+
+        currentAmmo = maxCapacity;
+        isReloading = false;
+    }
+
+    void OnDrawGizmos()
+    {
+        // Green is muzzle to hitPoint
         Debug.DrawLine(lastDebugOrigin, debugHit, Color.green);
 
         Gizmos.color = Color.red;

@@ -17,6 +17,9 @@ To check if it's registered correctly, go to Library and search for *Spacewar!*.
 - Shows a list of players in the current Lobby
 - Chat with the other player in the current Lobby
 - Loads the Gameplay scene for each Client connected
+- Zombies can attack Players
+- Shoot them down with your Gun to defend yourself
+- Reach the extraction zone (Green zone) to finish the level
   
 ## Controls
 | Key | Description |
@@ -25,7 +28,9 @@ To check if it's registered correctly, go to Library and search for *Spacewar!*.
 | <code>S</code> | Back movement | 
 | <code>A</code> | Left movement | 
 | <code>D</code> | Right movement | 
-| <code>MOUSE LMB</code> | Select button |
+| <code>R</code> | Reload Gun | 
+| <code>Z</code> | Change perspective | 
+| <code>MOUSE LMB</code> | Select button / Shoot |
 | <code>ENTER</code> | Chat in the Lobby |
 
 ## Developers and their Thesis

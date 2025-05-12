@@ -95,7 +95,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2525407607
+  GlobalObjectIdHash: 3178942962
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -119,7 +119,7 @@ MonoBehaviour:
   loseRadius: 15
   detectionRadius: 10
   meleeRadius: 2
-  movementSpeed: 1
+  movementSpeed: 3.5
   zombieAnimator: {fileID: 9048280090246497628}
   zombieAttackSfx: {fileID: 8300000, guid: 05d1b161910a9924d8a873e2c276fe17, type: 3}
   zombieScreechSfx: {fileID: 8300000, guid: 465ab330b4f3c3c41b27fe97760d4427, type: 3}

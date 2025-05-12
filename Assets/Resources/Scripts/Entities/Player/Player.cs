@@ -17,24 +17,29 @@ public class Player : NetworkBehaviour
         OpenDoor,
     }
 
-    float moveSpeed = 5.0f;
-
+    [Header("Player Parameters")]
+    [SerializeField] float moveSpeed = 5.0f;
     [SerializeField] float sensitivity = 100.0f;
     [SerializeField] float verticalRotation = 0.0f;
     const float maxAngle = 90.0f;
+    const int maxHealth = 100;
 
+    [Header("Player Audios")]
+    [SerializeField] AudioClip playerHurtSfx;
+
+    [Header("Player Network variables")]
+    public NetworkVariable<int> currentHealth = new NetworkVariable<int>(maxHealth);
+
+    [Header("Player Gun properties")]
     [SerializeField] Transform gunPivot;
     public Transform camPivot;
 
-    Gun currentGun;
-
-    const int maxHealth = 100;
-    public NetworkVariable<int> currentHealth = new NetworkVariable<int>(maxHealth);
-
+    // Flags for logic handling
     bool isDead = false;
 
+    // Helpers and Components
+    Gun currentGun;
     AudioSource audioSource;
-    [SerializeField] AudioClip playerHurtSfx;
 
     void Awake()
     {

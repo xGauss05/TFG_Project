@@ -21,7 +21,9 @@ public class BulletTrail : MonoBehaviour
             Destroy(gameObject);
         }
 
-        lineRenderer.material.SetColor("_Color", new Color(1f, 1f, 1f, currentTime / trailLifeTime));
+        Color currentColor = lineRenderer.material.GetColor("_Color");
+        currentColor.a = currentTime / trailLifeTime;
+        lineRenderer.material.SetColor("_Color", currentColor);
     }
 
     public void SetTrailPositions(Vector3 start, Vector3 end)

@@ -14,34 +14,40 @@ public class BasicZombie : NetworkBehaviour
         Melee,
     }
 
-    const int maxHealth = 30;
-    bool isDead = false;
-
+    [Header("Zombie Parameters")]
     [SerializeField] float loseRadius = 15.0f;
     [SerializeField] float detectionRadius = 10.0f;
     [SerializeField] float meleeRadius = 2.0f;
     [SerializeField] float movementSpeed = 0.25f;
+    public int attackDamage = 5;
+    const int maxHealth = 30;
 
+    [Header("Zombie Animator")]
     [SerializeField] Animator zombieAnimator;
 
-    NavMeshAgent agent;
-    GameObject targetPlayer;
-
-    bool zombieSpawned = false;
-    bool isAttacking = false;
-
-    AudioSource audioSource;
+    [Header("Zombie Audios")]
     [SerializeField] AudioClip zombieAttackSfx;
     [SerializeField] AudioClip zombieScreechSfx;
     [SerializeField] AudioClip zombieDeathSfx;
 
+    [Header("Zombie Network variables")]
     // Variables that need to be updated in both Clients and Server
     public NetworkVariable<ZombieState> currentState = new NetworkVariable<ZombieState>(ZombieState.Idle);
     public NetworkVariable<int> currentHealth = new NetworkVariable<int>(maxHealth);
-    public int attackDamage = 5;
 
+    [Header("Zombie Melee properties")]
     [SerializeField] GameObject meleeHitboxPrefab;
     [SerializeField] Transform meleeSpawnpoint;
+
+    // Flags for logic handling
+    bool zombieSpawned = false;
+    bool isAttacking = false;
+    bool isDead = false;
+
+    // Helpers and Components
+    NavMeshAgent agent;
+    GameObject targetPlayer;
+    AudioSource audioSource;
 
     public override void OnNetworkSpawn()
     {

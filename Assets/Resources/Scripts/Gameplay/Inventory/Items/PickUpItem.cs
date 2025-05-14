@@ -28,6 +28,28 @@ public abstract class PickupItem : NetworkBehaviour
         }
     }
 
+    public override void OnNetworkSpawn()
+    {
+        // Currently testing for ZombieSpawnpoints
+        GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("ZombieSpawnpoint");
+
+        if (spawnPoints.Length > 0)
+        {
+            int randomIndex = Random.Range(0, spawnPoints.Length);
+            Transform spawnTransform = spawnPoints[randomIndex].transform;
+
+            // Set the PickupItem spawn point to the Spawnpoint position
+            transform.position = spawnTransform.position;
+            transform.rotation = spawnTransform.rotation;
+        }
+        else
+        {
+            Debug.LogWarning("No zombie spawn points found. Spawning at default position.");
+            this.transform.position = new Vector3(0, 0, 0); // Fallback position
+        }
+
+    }
+
     void Update()
     {
         float newY = Mathf.Lerp(startY, endY, Mathf.PingPong(Time.time * upDownSpeed, 1.0f));

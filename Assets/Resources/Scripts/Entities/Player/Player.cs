@@ -38,13 +38,13 @@ public class Player : NetworkBehaviour
     bool isDead = false;
 
     // Helpers and Components
-    Gun currentGun;
+    GunBase currentGun;
     AudioSource audioSource;
 
     void Awake()
     {
-        GameObject gunGO = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Gun"), gunPivot);
-        currentGun = gunGO.GetComponent<Gun>();
+        GameObject gunGO = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Pistol"), gunPivot);
+        currentGun = gunGO.GetComponent<Pistol>();
     }
 
     public override void OnNetworkSpawn()
@@ -197,7 +197,7 @@ public class Player : NetworkBehaviour
     [ServerRpc]
     void SubmitShotServerRpc(Vector3 origin, Vector3 dir)
     {
-        currentGun.Shoot(origin, dir);
+        //currentGun.Shoot(origin, dir);
     }
 
     [ServerRpc]

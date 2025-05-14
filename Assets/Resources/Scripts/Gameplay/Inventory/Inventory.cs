@@ -9,9 +9,9 @@ public class Inventory : MonoBehaviour
 
     public int Medkits { get; private set; } = 0;
 
-    List<Gun> ownedGuns = new List<Gun>();
+    List<GunBase> ownedGuns = new List<GunBase>();
 
-    public Gun CurrentGun { get; private set; }
+    public GunBase CurrentGun { get; private set; }
 
     public void AddAmmo(int amount) => Ammo += amount;
 
@@ -25,7 +25,7 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    public void AddGun(Gun gun)
+    public void AddGun(GunBase gun)
     {
         if (!ownedGuns.Contains(gun))
         {
@@ -35,5 +35,5 @@ public class Inventory : MonoBehaviour
         CurrentGun = gun;
     }
 
-    public bool HasGun(Gun gun) => ownedGuns.Contains(gun);
+    public bool HasGun(GunBase gun) => ownedGuns.Contains(gun);
 }

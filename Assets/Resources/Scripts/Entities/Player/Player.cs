@@ -164,6 +164,7 @@ public class Player : NetworkBehaviour
 
     void OpenDoor()
     {
+        // NYI
         //GameObject.Find("SafeRoomDoor").GetComponentInChildren<SafeRoomDoor>()?.Open(transform.position);
     }
 

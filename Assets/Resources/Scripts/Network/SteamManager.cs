@@ -52,6 +52,30 @@ public class SteamManager : MonoBehaviour
         SteamMatchmaking.OnLobbyMemberLeave -= LobbyMemberLeave;
     }
 
+    void Start()
+    {
+        if (LobbyReference.Singleton.currentLobby != null)
+        {
+            LobbyIDText.text = LobbyReference.Singleton.currentLobby.Value.Id.ToString();
+
+            MainMenu.SetActive(false);
+            LobbyScreen.SetActive(true);
+            LobbyChat.SetActive(true);
+            LobbyIDScreen.SetActive(true);
+            LobbyPlayersList.SetActive(true);
+
+            if (!NetworkManager.Singleton.IsHost && !NetworkManager.Singleton.IsClient)
+            {
+                NetworkManager.Singleton.GetComponent<FacepunchTransport>().targetSteamId =
+                    LobbyReference.Singleton.currentLobby.Value.Owner.Id;
+
+                NetworkManager.Singleton.StartClient();
+            }
+
+            UpdatePlayerListUI();
+        }
+    }
+
     void LobbyCreated(Result result, Lobby lobby)
     {
         if (result == Result.OK)
@@ -170,7 +194,7 @@ public class SteamManager : MonoBehaviour
         LobbyReference.Singleton.currentLobby = null;
 
         NetworkManager.Singleton.Shutdown();
-        
+
         MainMenu.SetActive(true);
         LobbyScreen.SetActive(false);
         LobbyChat.SetActive(false);

@@ -58,7 +58,7 @@ public class ExtractionZone : MonoBehaviour
         if (playersInside >= requiredPlayers)
         {
             NetworkManager.Singleton.SceneManager.LoadScene("1_MainMenu", LoadSceneMode.Single);
-            NetworkManager.Singleton.Shutdown();
+            //NetworkManager.Singleton.Shutdown();
         }
     }
 }

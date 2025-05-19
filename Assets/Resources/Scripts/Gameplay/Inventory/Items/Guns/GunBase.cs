@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using Unity.Netcode;
 
 public abstract class GunBase : MonoBehaviour
 {
@@ -69,10 +70,7 @@ public abstract class GunBase : MonoBehaviour
         );
     }
 
-    public virtual void Shoot(Vector3 origin, Vector3 direction)
-    {
-
-    }
+    public abstract void Shoot(Vector3 origin, Vector3 direction);
 
     public virtual void Reload()
     {
@@ -87,6 +85,14 @@ public abstract class GunBase : MonoBehaviour
         yield return new WaitForSeconds(reloadSfx.length);
         currentAmmo = maxCapacity;
         isReloading = false;
+    }
+
+    // Client RPC functions -------------------------------------------------------------------------------------------
+    [ClientRpc]
+    protected void SpawnTrailClientRpc(Vector3 start, Vector3 end)
+    {
+        GameObject trail = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/BulletTrail"));
+        trail.GetComponent<BulletTrail>()?.SetTrailPositions(start, end);
     }
 
 }

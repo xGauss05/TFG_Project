@@ -31,4 +31,5 @@ public class BulletTrail : MonoBehaviour
         lineRenderer.SetPosition(0, start);
         lineRenderer.SetPosition(1, end);
     }
+
 }

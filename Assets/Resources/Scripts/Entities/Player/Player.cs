@@ -190,4 +190,5 @@ public class Player : NetworkBehaviour
             Debug.Log("Player dead!");
         }
     }
+
 }

@@ -17,17 +17,15 @@ public class Pistol : GunBase
         audioSource?.PlayOneShot(gunShotSfx);
         currentAmmo--;
 
-        GameObject trail = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/BulletTrail"));
+        Vector3 hitPoint = origin + direction * 999f;
 
         if (Physics.Raycast(origin, direction, out RaycastHit hit, 999.0f))
         {
-            trail.GetComponent<BulletTrail>()?.SetTrailPositions(origin, hit.point);
+            hitPoint = hit.point;
             hit.collider.GetComponent<BasicZombie>()?.TakeDamageServerRpc(gunDamage);
         }
-        else
-        {
-            trail.GetComponent<BulletTrail>()?.SetTrailPositions(origin, origin + direction * 999f);
-        }
+
+        SpawnTrailClientRpc(origin, hitPoint);
 
         lastShotTime = Time.time;
     }

@@ -630,8 +630,8 @@ MonoBehaviour:
   currentAmmo: 8
   gunDamage: 30
   shotSpreadVariance: {x: 0.015, y: 0.015, z: 0.015}
-  fireRate: 1
-  gunShotSfx: {fileID: 8300000, guid: 4999f89f9eb485040a744ea71195c242, type: 3}
+  fireRate: 1.15
+  gunShotSfx: {fileID: 8300000, guid: c00718cc19e6c284281eaf60772fb4cf, type: 3}
   emptyClipSfx: {fileID: 8300000, guid: 8f48ffbc4b451494490e3674b0559047, type: 3}
-  reloadSfx: {fileID: 8300000, guid: f1fbb718099e2d449a9d82cc40ba292e, type: 3}
+  reloadSfx: {fileID: 8300000, guid: 81db3d35edc35ce47831bd97ec876290, type: 3}
   pelletCount: 10

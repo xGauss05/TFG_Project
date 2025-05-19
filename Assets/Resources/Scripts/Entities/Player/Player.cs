@@ -5,18 +5,6 @@ using Unity.Netcode;
 
 public class Player : NetworkBehaviour
 {
-    public enum PlayerAction
-    {
-        None,
-        MoveF,
-        MoveB,
-        MoveL,
-        MoveR,
-        Rotate,
-        Shot,
-        OpenDoor,
-    }
-
     [Header("Player Parameters")]
     [SerializeField] float moveSpeed = 5.0f;
     [SerializeField] float sensitivity = 100.0f;
@@ -97,6 +85,7 @@ public class Player : NetworkBehaviour
 
     void HandleInput()
     {
+        // Change cursor mode
         if (Input.GetKey(KeyCode.LeftAlt))
         {
             Cursor.lockState = CursorLockMode.None;
@@ -109,75 +98,52 @@ public class Player : NetworkBehaviour
             Cursor.visible = false;
         }
 
-
-        PlayerAction action = PlayerAction.None;
-
-        if (Input.GetKey(KeyCode.W)) action = PlayerAction.MoveF;
-        else if (Input.GetKey(KeyCode.S)) action = PlayerAction.MoveB;
-        else if (Input.GetKey(KeyCode.A)) action = PlayerAction.MoveL;
-        else if (Input.GetKey(KeyCode.D)) action = PlayerAction.MoveR;
-
-        if (action != PlayerAction.None)
-        {
-            LocalMovement(action);
-            SubmitMoveToServerRpc(action);
-        }
-
+        // Reload
         if (Input.GetKeyDown(KeyCode.R))
         {
             currentGun.Reload();
         }
 
+        // Interact (atm, only door)
         if (Input.GetKeyDown(KeyCode.E) && FindDoor())
         {
-            SubmitActionServerRpc(PlayerAction.OpenDoor);
+            // Open door
         }
 
+        // Use Medkit
         if (Input.GetKeyDown(KeyCode.H))
         {
             // Use medkit
         }
 
+        // Player movement
+        Vector3 move = Vector3.zero;
+
+        if (Input.GetKey(KeyCode.W)) move += transform.forward;
+        if (Input.GetKey(KeyCode.S)) move -= transform.forward;
+        if (Input.GetKey(KeyCode.A)) move -= transform.right;
+        if (Input.GetKey(KeyCode.D)) move += transform.right;
+
+        if (move != Vector3.zero)
+        {
+            transform.position += move.normalized * moveSpeed * Time.deltaTime;
+        }
+
+        // Mouse camera
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");
 
         if (mouseX != 0 || mouseY != 0)
         {
             LocalViewRotate(mouseX * sensitivity * Time.deltaTime, mouseY * sensitivity * Time.deltaTime);
-            SubmitRotateServerRpc(mouseX * sensitivity, mouseY * sensitivity);
         }
 
-        if (Input.GetButtonDown("Fire1"))
+        // Shoot weapon
+        if (Input.GetButton("Fire1"))
         {
             Debug.Log("Shooting");
             var shot = currentGun.CalculateShot();
             SubmitShotServerRpc(shot.origin, shot.direction);
-        }
-    }
-
-    void LocalMovement(PlayerAction action)
-    {
-        Vector3 direction = Vector3.zero;
-
-        switch (action)
-        {
-            case PlayerAction.MoveF:
-                direction = transform.forward;
-                break;
-            case PlayerAction.MoveB:
-                direction = -transform.forward;
-                break;
-            case PlayerAction.MoveL:
-                direction = -transform.right;
-                break;
-            case PlayerAction.MoveR:
-                direction = transform.right;
-                break;
-        }
-
-        if (direction.magnitude > 0)
-        {
-            transform.Translate(direction * moveSpeed * Time.deltaTime, Space.World);
         }
     }
 
@@ -212,30 +178,9 @@ public class Player : NetworkBehaviour
 
     // Server RPC functions -------------------------------------------------------------------------------------------
     [ServerRpc]
-    void SubmitMoveToServerRpc(PlayerAction actionType)
-    {
-        LocalMovement(actionType);
-    }
-
-    [ServerRpc]
-    void SubmitRotateServerRpc(float mouseX, float mouseY)
-    {
-        LocalViewRotate(mouseX * Time.deltaTime, mouseY * Time.deltaTime);
-    }
-
-    [ServerRpc]
     void SubmitShotServerRpc(Vector3 origin, Vector3 dir)
     {
         currentGun.Shoot(origin, dir);
-    }
-
-    [ServerRpc]
-    void SubmitActionServerRpc(PlayerAction actionType)
-    {
-        if (actionType == PlayerAction.OpenDoor)
-        {
-            OpenDoor();
-        }
     }
 
     [ServerRpc]

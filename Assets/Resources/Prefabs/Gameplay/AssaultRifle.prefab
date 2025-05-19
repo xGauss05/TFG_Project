@@ -630,7 +630,7 @@ MonoBehaviour:
   currentAmmo: 50
   gunDamage: 25
   shotSpreadVariance: {x: 0.005, y: 0.005, z: 0.005}
-  fireRate: 0.08
-  gunShotSfx: {fileID: 8300000, guid: 4999f89f9eb485040a744ea71195c242, type: 3}
+  fireRate: 0.125
+  gunShotSfx: {fileID: 8300000, guid: f26d23781441df54d81059482210e31b, type: 3}
   emptyClipSfx: {fileID: 8300000, guid: 8f48ffbc4b451494490e3674b0559047, type: 3}
-  reloadSfx: {fileID: 8300000, guid: f1fbb718099e2d449a9d82cc40ba292e, type: 3}
+  reloadSfx: {fileID: 8300000, guid: fd02c3a8fe540f641b2bf14ad73c6998, type: 3}

@@ -62,9 +62,22 @@ public class Player : NetworkBehaviour
             GetComponentInChildren<Canvas>().gameObject.SetActive(false);
         }
 
-        // Currently hardcoded
-        // Should check player spawn points in map then choose 1 random
-        this.transform.position = new Vector3(20, 2, -20);
+        GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("PlayerSpawnpoint");
+
+        if (spawnPoints.Length > 0)
+        {
+            int randomIndex = Random.Range(0, spawnPoints.Length);
+            Transform spawnTransform = spawnPoints[randomIndex].transform;
+
+            // Set the Player spawn point to the Spawnpoint position
+            transform.position = spawnTransform.position;
+            transform.rotation = spawnTransform.rotation;
+        }
+        else
+        {
+            Debug.LogWarning("No player spawn points found. Spawning at default position.");
+            this.transform.position = new Vector3(20, 2, -20);
+        }
     }
 
     void Start()

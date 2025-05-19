@@ -6,6 +6,7 @@ TagManager:
   tags:
   - CinemachineTarget
   - ZombieSpawnpoint
+  - PlayerSpawnpoint
   layers:
   - Default
   - TransparentFX

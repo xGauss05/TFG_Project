@@ -96,10 +96,19 @@ public class Player : NetworkBehaviour
             Cursor.visible = false;
         }
 
-        if (Input.GetKey(KeyCode.W)) SubmitMoveServerRpc(PlayerAction.MoveF);
-        if (Input.GetKey(KeyCode.S)) SubmitMoveServerRpc(PlayerAction.MoveB);
-        if (Input.GetKey(KeyCode.A)) SubmitMoveServerRpc(PlayerAction.MoveL);
-        if (Input.GetKey(KeyCode.D)) SubmitMoveServerRpc(PlayerAction.MoveR);
+
+        PlayerAction action = PlayerAction.None;
+
+        if (Input.GetKey(KeyCode.W)) action = PlayerAction.MoveF;
+        else if (Input.GetKey(KeyCode.S)) action = PlayerAction.MoveB;
+        else if (Input.GetKey(KeyCode.A)) action = PlayerAction.MoveL;
+        else if (Input.GetKey(KeyCode.D)) action = PlayerAction.MoveR;
+
+        if (action != PlayerAction.None)
+        {
+            LocalMovement(action);
+            SubmitMoveToServerRpc(action);
+        }
 
         if (Input.GetKeyDown(KeyCode.R))
         {
@@ -121,6 +130,7 @@ public class Player : NetworkBehaviour
 
         if (mouseX != 0 || mouseY != 0)
         {
+            LocalViewRotate(mouseX * sensitivity * Time.deltaTime, mouseY * sensitivity * Time.deltaTime);
             SubmitRotateServerRpc(mouseX * sensitivity, mouseY * sensitivity);
         }
 
@@ -132,7 +142,7 @@ public class Player : NetworkBehaviour
         }
     }
 
-    void Move(PlayerAction action, float deltaTime)
+    void LocalMovement(PlayerAction action)
     {
         Vector3 direction = Vector3.zero;
 
@@ -154,11 +164,11 @@ public class Player : NetworkBehaviour
 
         if (direction.magnitude > 0)
         {
-            transform.Translate(direction * moveSpeed * deltaTime, Space.World);
+            transform.Translate(direction * moveSpeed * Time.deltaTime, Space.World);
         }
     }
 
-    void Rotate(float xIncrement, float yIncrement)
+    void LocalViewRotate(float xIncrement, float yIncrement)
     {
         transform.Rotate(Vector3.up * xIncrement);
 
@@ -189,15 +199,15 @@ public class Player : NetworkBehaviour
 
     // Server RPC functions -------------------------------------------------------------------------------------------
     [ServerRpc]
-    void SubmitMoveServerRpc(PlayerAction actionType)
+    void SubmitMoveToServerRpc(PlayerAction actionType)
     {
-        Move(actionType, Time.deltaTime);
+        LocalMovement(actionType);
     }
 
     [ServerRpc]
     void SubmitRotateServerRpc(float mouseX, float mouseY)
     {
-        Rotate(mouseX * Time.deltaTime, mouseY * Time.deltaTime);
+        LocalViewRotate(mouseX * Time.deltaTime, mouseY * Time.deltaTime);
     }
 
     [ServerRpc]

@@ -43,8 +43,8 @@ public class Player : NetworkBehaviour
 
     void Awake()
     {
-        GameObject gunGO = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Pistol"), gunPivot);
-        currentGun = gunGO.GetComponent<Pistol>();
+        GameObject gunGO = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Shotgun"), gunPivot);
+        currentGun = gunGO.GetComponent<Shotgun>();
     }
 
     public override void OnNetworkSpawn()
@@ -111,6 +111,11 @@ public class Player : NetworkBehaviour
             SubmitActionServerRpc(PlayerAction.OpenDoor);
         }
 
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            // Use medkit
+        }
+
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");
 
@@ -121,6 +126,7 @@ public class Player : NetworkBehaviour
 
         if (Input.GetButtonDown("Fire1"))
         {
+            Debug.Log("Shooting");
             var shot = currentGun.CalculateShot();
             SubmitShotServerRpc(shot.origin, shot.direction);
         }
@@ -197,7 +203,7 @@ public class Player : NetworkBehaviour
     [ServerRpc]
     void SubmitShotServerRpc(Vector3 origin, Vector3 dir)
     {
-        //currentGun.Shoot(origin, dir);
+        currentGun.Shoot(origin, dir);
     }
 
     [ServerRpc]

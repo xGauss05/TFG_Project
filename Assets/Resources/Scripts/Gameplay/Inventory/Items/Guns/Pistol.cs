@@ -6,7 +6,7 @@ public class Pistol : GunBase
 {
     public override void Shoot(Vector3 origin, Vector3 direction)
     {
-        if (isReloading) return;
+        if (isReloading || Time.time - lastShotTime < fireRate) return;
 
         if (currentAmmo <= 0)
         {
@@ -28,5 +28,7 @@ public class Pistol : GunBase
         {
             trail.GetComponent<BulletTrail>()?.SetTrailPositions(origin, origin + direction * 999f);
         }
+
+        lastShotTime = Time.time;
     }
 }

@@ -7,6 +7,8 @@ using UnityEngine.SceneManagement;
 public class ZombieBasicSpawner : NetworkBehaviour
 {
     [SerializeField] GameObject Zombie_Basic;
+    [SerializeField] GameObject Medkit;
+    [SerializeField] GameObject AmmoBox;
 
     void Start()
     {
@@ -27,7 +29,11 @@ public class ZombieBasicSpawner : NetworkBehaviour
             for (int i = 0; i < spawnPoints.Length; i++)
             {
                 GameObject zombie = Instantiate(Zombie_Basic);
+                GameObject medkit = Instantiate(Medkit);
+                GameObject ammo = Instantiate(AmmoBox);
                 zombie.GetComponent<NetworkObject>().Spawn();
+                medkit.GetComponent<NetworkObject>().Spawn();
+                ammo.GetComponent<NetworkObject>().Spawn();
             }
         }
     }

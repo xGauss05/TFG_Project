@@ -586,8 +586,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Zombie_Basic: {fileID: 609194813430149826, guid: 6d3c800ad03aaee4da14042dbd2db603, type: 3}
-  Medkit: {fileID: 2933228936658766195, guid: 7396be217327e9543b0c12c99979ebe2, type: 3}
-  Ammobox: {fileID: 9112024627195489059, guid: 36f734ad474426a4abeada838b528439, type: 3}
+  Medkit: {fileID: 9112024627195489059, guid: 36f734ad474426a4abeada838b528439, type: 3}
+  AmmoBox: {fileID: 2933228936658766195, guid: 7396be217327e9543b0c12c99979ebe2, type: 3}
 --- !u!1 &1654932533
 GameObject:
   m_ObjectHideFlags: 0

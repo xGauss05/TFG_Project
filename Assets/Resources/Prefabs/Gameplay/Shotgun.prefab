@@ -626,11 +626,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gunMuzzle: {fileID: 1572871185077827056}
-  maxCapacity: 20
-  currentAmmo: 20
-  gunDamage: 10
-  shotSpreadVariance: {x: 0.005, y: 0.005, z: 0.005}
+  maxCapacity: 8
+  currentAmmo: 8
+  gunDamage: 30
+  shotSpreadVariance: {x: 0.015, y: 0.015, z: 0.015}
+  fireRate: 1
   gunShotSfx: {fileID: 8300000, guid: 4999f89f9eb485040a744ea71195c242, type: 3}
   emptyClipSfx: {fileID: 8300000, guid: 8f48ffbc4b451494490e3674b0559047, type: 3}
   reloadSfx: {fileID: 8300000, guid: f1fbb718099e2d449a9d82cc40ba292e, type: 3}
-  pelletCount: 8
+  pelletCount: 10

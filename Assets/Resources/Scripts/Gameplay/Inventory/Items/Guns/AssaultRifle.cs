@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class AssaultRifle : GunBase
 {
-    [SerializeField] float fireRate = 0.1f;
-    float lastShotTime = 0;
-
     public override void Shoot(Vector3 origin, Vector3 direction)
     {
         if (isReloading || Time.time - lastShotTime < fireRate) return;

@@ -45,7 +45,7 @@ public abstract class PickupItem : NetworkBehaviour
         else
         {
             Debug.LogWarning("No zombie spawn points found. Spawning at default position.");
-            this.transform.position = new Vector3(0, 0, 0); // Fallback position
+            this.transform.position = new Vector3(0, 0, 0); // Default position
         }
 
     }

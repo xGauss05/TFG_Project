@@ -9,12 +9,16 @@ public abstract class GunBase : MonoBehaviour
     [SerializeField] protected int currentAmmo = 20;
     [SerializeField] protected int gunDamage = 10;
     [SerializeField] protected Vector3 shotSpreadVariance = new Vector3(0.005f, 0.005f, 0.005f);
-    protected bool isReloading = false;
+    [SerializeField] protected float fireRate = 0.0f;
 
     [Header("Gun Audios")]
     [SerializeField] protected AudioClip gunShotSfx;
     [SerializeField] protected AudioClip emptyClipSfx;
     [SerializeField] protected AudioClip reloadSfx;
+
+    // Flags & variables for logic handling
+    protected bool isReloading = false;
+    protected float lastShotTime = 0;
 
     // Helpers and Components
     protected AudioSource audioSource;
@@ -24,7 +28,7 @@ public abstract class GunBase : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
     }
 
-    public virtual (Vector3 origin, Vector3 direction) CalculateShot()
+    public (Vector3 origin, Vector3 direction) CalculateShot()
     {
         Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
         Ray ray = Camera.main.ScreenPointToRay(screenCenter);
@@ -67,28 +71,7 @@ public abstract class GunBase : MonoBehaviour
 
     public virtual void Shoot(Vector3 origin, Vector3 direction)
     {
-        if (isReloading) return;
 
-        if (currentAmmo <= 0)
-        {
-            audioSource?.PlayOneShot(emptyClipSfx);
-            return;
-        }
-
-        audioSource?.PlayOneShot(gunShotSfx);
-        currentAmmo--;
-
-        GameObject trail = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/BulletTrail"));
-
-        if (Physics.Raycast(origin, direction, out RaycastHit hit, 999.0f))
-        {
-            trail.GetComponent<BulletTrail>()?.SetTrailPositions(origin, hit.point);
-            hit.collider.GetComponent<BasicZombie>()?.TakeDamageServerRpc(gunDamage);
-        }
-        else
-        {
-            trail.GetComponent<BulletTrail>()?.SetTrailPositions(origin, origin + direction * 999f);
-        }
     }
 
     public virtual void Reload()
@@ -105,4 +88,5 @@ public abstract class GunBase : MonoBehaviour
         currentAmmo = maxCapacity;
         isReloading = false;
     }
+
 }

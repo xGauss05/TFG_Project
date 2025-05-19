@@ -20,7 +20,7 @@ public class BasicZombie : NetworkBehaviour
     [SerializeField] float meleeRadius = 2.0f;
     [SerializeField] float movementSpeed = 0.25f;
     public int attackDamage = 5;
-    const int maxHealth = 30;
+    const int maxHealth = 50;
 
     [Header("Zombie Animator")]
     [SerializeField] Animator zombieAnimator;
@@ -65,7 +65,7 @@ public class BasicZombie : NetworkBehaviour
         else
         {
             Debug.LogWarning("No zombie spawn points found. Spawning at default position.");
-            this.transform.position = new Vector3(0, 0, 0); // Fallback position
+            this.transform.position = new Vector3(0, 0, 0); // Default position
         }
 
     }

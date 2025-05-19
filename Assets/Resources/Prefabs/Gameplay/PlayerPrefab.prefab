@@ -129,13 +129,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1d645dbca15f3c44bb2e326712837ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveSpeed: 5
   sensitivity: 100
   verticalRotation: 0
-  gunPivot: {fileID: 4971416500773532903}
-  camPivot: {fileID: 5752189182569971771}
+  playerHurtSfx: {fileID: 8300000, guid: 3bdc4d4b3accd404ca7d97783de4c725, type: 3}
   currentHealth:
     m_InternalValue: 100
-  playerHurtSfx: {fileID: 8300000, guid: 3bdc4d4b3accd404ca7d97783de4c725, type: 3}
+  gunPivot: {fileID: 4971416500773532903}
+  camPivot: {fileID: 5752189182569971771}
 --- !u!54 &-2694677535852992469
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -610,6 +611,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6792d2e7c804474a890fd083c9f698f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nameText: {fileID: 1844144822933798599}
+  nameCanvas: {fileID: 5907742534535274646}
 --- !u!1 &6233201408126295146
 GameObject:
   m_ObjectHideFlags: 0

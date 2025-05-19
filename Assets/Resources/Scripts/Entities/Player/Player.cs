@@ -31,19 +31,13 @@ public class Player : NetworkBehaviour
 
     void Awake()
     {
-        GameObject gunGO = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Shotgun"), gunPivot);
-        currentGun = gunGO.GetComponent<Shotgun>();
+        GameObject gunGO = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Pistol"), gunPivot);
+        currentGun = gunGO.GetComponent<Pistol>();
     }
 
     public override void OnNetworkSpawn()
     {
-        if (!IsOwner)
-        {
-            //this.enabled = false;
-            GetComponentInChildren<Canvas>().gameObject.SetActive(true);
-            GetComponentInChildren<TMPro.TextMeshProUGUI>().text = "Unknown";
-        }
-        else
+        if (IsOwner)
         {
             Camera.main.GetComponent<PlayerCamera>().SetParent(camPivot);
             Camera.main.transform.rotation = transform.rotation;
@@ -141,7 +135,6 @@ public class Player : NetworkBehaviour
         // Shoot weapon
         if (Input.GetButton("Fire1"))
         {
-            Debug.Log("Shooting");
             var shot = currentGun.CalculateShot();
             SubmitShotServerRpc(shot.origin, shot.direction);
         }

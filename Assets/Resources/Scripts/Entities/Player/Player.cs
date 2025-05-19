@@ -51,9 +51,9 @@ public class Player : NetworkBehaviour
     {
         if (!IsOwner)
         {
-            this.enabled = false;
-            //GetComponentInChildren<Canvas>().gameObject.SetActive(false);
-            //GetComponentInChildren<TMPro.TextMeshProUGUI>().text = ownerName.Value;
+            //this.enabled = false;
+            GetComponentInChildren<Canvas>().gameObject.SetActive(true);
+            GetComponentInChildren<TMPro.TextMeshProUGUI>().text = "Unknown";
         }
         else
         {

@@ -7,14 +7,26 @@ using UnityEngine.SceneManagement;
 public class LevelManager : MonoBehaviour
 {
     [SerializeField] ExtractionZone exit;
-    
-    // Update is called once per frame
-    void Update()
+
+    void OnEnable()
     {
-        if (exit.playersInside >= exit.requiredPlayers)
+        if (NetworkManager.Singleton != null)
         {
-            NetworkManager.Singleton.SceneManager.LoadScene("1_MainMenu", LoadSceneMode.Single);
-            NetworkManager.Singleton.Shutdown();
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
         }
     }
+
+    void OnDisable()
+    {
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
+        }
+    }
+
+    void OnClientDisconnected(ulong clientId)
+    {
+        LobbyReference.Singleton.NotifyLobbyUpdated();
+    }
+
 }

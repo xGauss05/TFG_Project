@@ -8,6 +8,7 @@ public class MainMenu : MonoBehaviour
 {
     [SerializeField] GameObject MainScreen;
     [SerializeField] GameObject JoinLobbyScreen;
+    [SerializeField] GameObject HostConfirmationScreen;
     [SerializeField] TextMeshProUGUI PlayerFeedback;
     [SerializeField] AudioClip buttonSfx;
 
@@ -20,6 +21,16 @@ public class MainMenu : MonoBehaviour
     public void ButtonPress()
     {
         SFXManager.Singleton.PlaySound(buttonSfx);
+    }
+
+    public void OpenHostConfirmation()
+    {
+        HostConfirmationScreen.SetActive(true);
+    }
+
+    public void CloseHostConfirmation()
+    {
+        HostConfirmationScreen.SetActive(false);
     }
 
     public void JoinLobby()

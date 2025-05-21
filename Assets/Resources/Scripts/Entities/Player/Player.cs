@@ -199,6 +199,7 @@ public class Player : NetworkBehaviour
     {
         if (transform.position != position)
         {
+            transform.position = position;
             SendPositionClientRpc(position);
         }
     }

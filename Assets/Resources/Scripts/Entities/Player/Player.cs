@@ -84,6 +84,9 @@ public class Player : NetworkBehaviour
         {
             transform.position = networkPosition;
             LocalViewRotate(x_networkIncrement, y_networkIncrement);
+
+            x_networkIncrement = 0f;
+            y_networkIncrement = 0f;
         }
 
         if (!IsOwner || isDead) return;
@@ -108,7 +111,10 @@ public class Player : NetworkBehaviour
         // Reload
         if (Input.GetKeyDown(KeyCode.R))
         {
-            currentGun.Reload();
+            if (IsServer)
+                currentGun.Reload();
+            else
+                ReloadServerRpc();
         }
 
         // Interact (atm, only door)
@@ -172,6 +178,7 @@ public class Player : NetworkBehaviour
         verticalRotation = Mathf.Clamp(verticalRotation, -maxAngle, maxAngle);
 
         camPivot.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
+
     }
 
     void OpenDoor()
@@ -191,6 +198,24 @@ public class Player : NetworkBehaviour
         }
 
         return false;
+    }
+
+    // Client RPC functions -------------------------------------------------------------------------------------------
+    [ClientRpc]
+    void SendPositionClientRpc(Vector3 position)
+    {
+        if (IsOwner) return;
+
+        networkPosition = position;
+    }
+
+    [ClientRpc]
+    void SendRotationClientRpc(float xIncrement, float yIncrement)
+    {
+        if (IsOwner) return;
+
+        x_networkIncrement = xIncrement;
+        y_networkIncrement = yIncrement;
     }
 
     // Server RPC functions -------------------------------------------------------------------------------------------
@@ -231,22 +256,10 @@ public class Player : NetworkBehaviour
         }
     }
 
-    // Client RPC functions -------------------------------------------------------------------------------------------
-    [ClientRpc]
-    void SendPositionClientRpc(Vector3 position)
+    [ServerRpc]
+    void ReloadServerRpc()
     {
-        if (IsOwner) return;
-
-        networkPosition = position;
-    }
-
-    [ClientRpc]
-    void SendRotationClientRpc(float xIncrement, float yIncrement)
-    {
-        if (IsOwner) return;
-
-        x_networkIncrement = xIncrement;
-        y_networkIncrement = yIncrement;
+        currentGun.Reload();
     }
 
 }

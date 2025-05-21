@@ -108,6 +108,7 @@ public class SteamManager : MonoBehaviour
 
         NetworkManager.Singleton.gameObject.GetComponent<FacepunchTransport>().targetSteamId = lobby.Owner.Id;
         NetworkManager.Singleton.StartClient();
+        StartGameButton.SetActive(false);
 
         UpdatePlayerListUI();
         Debug.Log($"Entered lobby {lobby.Id}");

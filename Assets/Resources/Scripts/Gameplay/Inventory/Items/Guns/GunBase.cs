@@ -93,6 +93,8 @@ public abstract class GunBase : MonoBehaviour
     {
         GameObject trail = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/BulletTrail"));
         trail.GetComponent<BulletTrail>()?.SetTrailPositions(start, end);
+        trail.GetComponent<NetworkObject>().Spawn();
+
     }
 
 }

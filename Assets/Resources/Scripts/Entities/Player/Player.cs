@@ -85,7 +85,7 @@ public class Player : NetworkBehaviour
             transform.position = networkPosition;
             LocalViewRotate(x_networkIncrement, y_networkIncrement);
         }
-        
+
         if (!IsOwner || isDead) return;
 
     }
@@ -153,7 +153,14 @@ public class Player : NetworkBehaviour
         if (Input.GetButton("Fire1"))
         {
             var shot = currentGun.CalculateShot();
-            SubmitShotServerRpc(shot.origin, shot.direction);
+            if (IsServer)
+            {
+                currentGun.Shoot(shot.origin, shot.direction);
+            }
+            else
+            {
+                SubmitShotServerRpc(shot.origin, shot.direction);
+            }
         }
     }
 
@@ -190,7 +197,10 @@ public class Player : NetworkBehaviour
     [ServerRpc]
     void SendPositionServerRpc(Vector3 position)
     {
-        SendPositionClientRpc(position);
+        if (transform.position != position)
+        {
+            SendPositionClientRpc(position);
+        }
     }
 
     [ServerRpc]

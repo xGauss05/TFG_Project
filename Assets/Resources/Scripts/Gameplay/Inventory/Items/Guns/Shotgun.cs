@@ -10,9 +10,10 @@ public class Shotgun : GunBase
     {
         if (isReloading || Time.time - lastShotTime < fireRate) return;
 
-        if (currentAmmo <= 0)
+        if (currentAmmo <= 0 || Time.time - lastShotTime < fireRate)
         {
             audioSource?.PlayOneShot(emptyClipSfx);
+            lastShotTime = Time.time;
             return;
         }
 
@@ -21,18 +22,23 @@ public class Shotgun : GunBase
 
         for (int i = 0; i < pelletCount; i++)
         {
-            GameObject trail = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/BulletTrail"));
-
             direction = ApplySpread(direction);
+
+            Vector3 hitPoint = origin + direction * 999f;
 
             if (Physics.Raycast(origin, direction, out RaycastHit hit, 999.0f))
             {
-                trail.GetComponent<BulletTrail>()?.SetTrailPositions(origin, hit.point);
+                hitPoint = hit.point;
                 hit.collider.GetComponent<BasicZombie>()?.TakeDamageServerRpc(gunDamage);
+            }
+
+            if (IsServer)
+            {
+                SpawnTrailClientRpc(origin, hitPoint);
             }
             else
             {
-                trail.GetComponent<BulletTrail>()?.SetTrailPositions(origin, origin + direction * 999f);
+                SpawnTrailServerRpc(origin, hitPoint);
             }
         }
 

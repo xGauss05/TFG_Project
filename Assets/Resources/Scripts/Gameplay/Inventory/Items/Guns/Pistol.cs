@@ -8,9 +8,10 @@ public class Pistol : GunBase
     {
         if (isReloading || Time.time - lastShotTime < fireRate) return;
 
-        if (currentAmmo <= 0)
+        if (currentAmmo <= 0 || Time.time - lastShotTime < fireRate)
         {
             audioSource?.PlayOneShot(emptyClipSfx);
+            lastShotTime = Time.time;
             return;
         }
 

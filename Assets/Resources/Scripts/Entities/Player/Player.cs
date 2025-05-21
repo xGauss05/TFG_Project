@@ -28,6 +28,9 @@ public class Player : NetworkBehaviour
     // Helpers and Components
     GunBase currentGun;
     AudioSource audioSource;
+    Vector3 networkPosition;
+    float x_networkIncrement;
+    float y_networkIncrement;
 
     void Awake()
     {
@@ -72,9 +75,19 @@ public class Player : NetworkBehaviour
 
     void Update()
     {
+
+        if (IsOwner)
+        {
+            HandleInput();
+        }
+        else
+        {
+            transform.position = networkPosition;
+            LocalViewRotate(x_networkIncrement, y_networkIncrement);
+        }
+        
         if (!IsOwner || isDead) return;
 
-        HandleInput();
     }
 
     void HandleInput()
@@ -121,6 +134,7 @@ public class Player : NetworkBehaviour
         if (move != Vector3.zero)
         {
             transform.position += move.normalized * moveSpeed * Time.deltaTime;
+            SendPositionServerRpc(transform.position);
         }
 
         // Mouse camera
@@ -129,7 +143,10 @@ public class Player : NetworkBehaviour
 
         if (mouseX != 0 || mouseY != 0)
         {
-            LocalViewRotate(mouseX * sensitivity * Time.deltaTime, mouseY * sensitivity * Time.deltaTime);
+            float xIncrement = mouseX * sensitivity * Time.deltaTime;
+            float yIncrement = mouseY * sensitivity * Time.deltaTime;
+            LocalViewRotate(xIncrement, yIncrement);
+            SendRotationServerRpc(xIncrement, yIncrement);
         }
 
         // Shoot weapon
@@ -171,6 +188,18 @@ public class Player : NetworkBehaviour
 
     // Server RPC functions -------------------------------------------------------------------------------------------
     [ServerRpc]
+    void SendPositionServerRpc(Vector3 position)
+    {
+        SendPositionClientRpc(position);
+    }
+
+    [ServerRpc]
+    void SendRotationServerRpc(float xIncrement, float yIncrement)
+    {
+        SendRotationClientRpc(xIncrement, yIncrement);
+    }
+
+    [ServerRpc]
     void SubmitShotServerRpc(Vector3 origin, Vector3 dir)
     {
         currentGun.Shoot(origin, dir);
@@ -189,6 +218,24 @@ public class Player : NetworkBehaviour
             isDead = true;
             Debug.Log("Player dead!");
         }
+    }
+
+    // Client RPC functions -------------------------------------------------------------------------------------------
+    [ClientRpc]
+    void SendPositionClientRpc(Vector3 position)
+    {
+        if (IsOwner) return;
+
+        networkPosition = position;
+    }
+
+    [ClientRpc]
+    void SendRotationClientRpc(float xIncrement, float yIncrement)
+    {
+        if (IsOwner) return;
+
+        x_networkIncrement = xIncrement;
+        y_networkIncrement = yIncrement;
     }
 
 }

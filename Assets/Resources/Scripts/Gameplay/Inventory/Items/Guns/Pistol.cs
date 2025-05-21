@@ -25,7 +25,14 @@ public class Pistol : GunBase
             hit.collider.GetComponent<BasicZombie>()?.TakeDamageServerRpc(gunDamage);
         }
 
-        SpawnTrailClientRpc(origin, hitPoint);
+        if (IsServer)
+        {
+            SpawnTrailClientRpc(origin, hitPoint);
+        }
+        else
+        {
+            SpawnTrailServerRpc(origin, hitPoint);
+        }
 
         lastShotTime = Time.time;
     }

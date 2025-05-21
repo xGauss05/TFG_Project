@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using Unity.Netcode;
 
-public abstract class GunBase : MonoBehaviour
+public abstract class GunBase : NetworkBehaviour
 {
     [Header("Gun Settings")]
     [SerializeField] protected Transform gunMuzzle;
@@ -87,13 +87,24 @@ public abstract class GunBase : MonoBehaviour
         isReloading = false;
     }
 
-    // Client RPC functions -------------------------------------------------------------------------------------------
-    [ClientRpc]
-    protected void SpawnTrailClientRpc(Vector3 start, Vector3 end)
+    protected void SpawnTrail(Vector3 start, Vector3 end)
     {
         GameObject trail = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/BulletTrail"));
         trail.GetComponent<BulletTrail>()?.SetTrailPositions(start, end);
-        trail.GetComponent<NetworkObject>().Spawn(true);
+    }
+
+    // Client RPC functions -------------------------------------------------------------------------------------------
+    [ClientRpc]
+    protected void SpawnTrailClientRpc(Vector3 origin, Vector3 hitPoint)
+    {
+        SpawnTrail(origin, hitPoint);
+    }
+
+    // Server RPC functions -------------------------------------------------------------------------------------------
+    [ServerRpc]
+    protected void SpawnTrailServerRpc(Vector3 start, Vector3 end)
+    {
+        SpawnTrailClientRpc(start, end);
     }
 
 }

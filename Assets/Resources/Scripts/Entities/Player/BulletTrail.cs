@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public class BulletTrail : NetworkBehaviour
+public class BulletTrail : MonoBehaviour
 {
     [SerializeField] float trailLifeTime = 0.1f;
     [SerializeField] LineRenderer lineRenderer;
@@ -19,8 +19,7 @@ public class BulletTrail : NetworkBehaviour
         currentTime -= Time.deltaTime;
         if (currentTime <= 0f)
         {
-            if (IsHost)
-                Destroy(gameObject);
+            Destroy(gameObject);
         }
 
         Color currentColor = lineRenderer.material.GetColor("_Color");

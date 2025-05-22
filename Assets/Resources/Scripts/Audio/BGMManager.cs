@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class BGMManager : MonoBehaviour
+public class BGMManager : NetworkBehaviour
 {
     public static BGMManager Singleton { get; private set; }
 
@@ -38,34 +39,44 @@ public class BGMManager : MonoBehaviour
             musicTracksSize++;
         }
 
-        BGMManager.Singleton.ChangeBGM(0);
+        if (!NetworkManager.Singleton || !NetworkManager.Singleton.IsListening)
+        {
+            ChangeBGM(0);
+        }
+        else if (IsServer)
+        {
+            ChangeBGMClientRpc(0);
+        }
     }
 
     void Update()
     {
-
 #if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.C))
+        if ((IsServer ||
+            !NetworkManager.Singleton ||
+            !NetworkManager.Singleton.IsListening) &&
+            Input.GetKeyDown(KeyCode.C))
         {
             currentTrackIndex++;
 
             if (currentTrackIndex >= musicTracksSize) currentTrackIndex = 0;
 
-            ChangeBGM(musicTracks[currentTrackIndex]);
+            if (IsServer)
+            {
+                ChangeBGMClientRpc(currentTrackIndex);
+            }
+            else
+            {
+                ChangeBGM(currentTrackIndex);
+            }
         }
 #endif
-
-    }
-
-    public void ChangeBGM(AudioClip musicToChange)
-    {
-        currentBgm.Stop();
-        currentBgm.clip = musicToChange;
-        currentBgm.Play();
     }
 
     public void ChangeBGM(int audioIndex)
     {
+        if (audioIndex < 0 || audioIndex >= musicTracks.Length) return; // Safety measure
+
         currentTrackIndex = audioIndex;
         currentBgm.Stop();
 
@@ -73,4 +84,22 @@ public class BGMManager : MonoBehaviour
         currentBgm.Play();
     }
 
+    // Client RPC functions -------------------------------------------------------------------------------------------
+    [ClientRpc]
+    void ChangeBGMClientRpc(int trackIndex)
+    {
+        if (trackIndex < 0 || trackIndex >= musicTracks.Length) return;
+
+        currentTrackIndex = trackIndex;
+        currentBgm.Stop();
+        currentBgm.clip = musicTracks[trackIndex];
+        currentBgm.Play();
+    }
+
+    // Server RPC functions -------------------------------------------------------------------------------------------
+    [ServerRpc(RequireOwnership = false)]
+    public void RequestChangeBGMServerRpc(int trackIndex)
+    {
+        ChangeBGMClientRpc(trackIndex);
+    }
 }

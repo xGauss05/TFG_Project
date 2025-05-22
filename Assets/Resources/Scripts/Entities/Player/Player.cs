@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Unity.Collections;
+using Steamworks;
 
 public class Player : NetworkBehaviour
 {
@@ -27,6 +29,8 @@ public class Player : NetworkBehaviour
 
     [Header("Player Network variables")]
     public NetworkVariable<int> currentHealth = new NetworkVariable<int>(maxHealth);
+    NetworkVariable<FixedString64Bytes> steamName = new NetworkVariable<FixedString64Bytes>(default,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     [Header("Player Gun properties")]
     [SerializeField] Billboard billboard;
@@ -55,6 +59,7 @@ public class Player : NetworkBehaviour
             Camera.main.GetComponent<PlayerCamera>().SetParent(camPivot);
             Camera.main.transform.rotation = transform.rotation;
             GetComponentInChildren<Canvas>().gameObject.SetActive(false);
+            steamName.Value = SteamClient.Name;
         }
 
         GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("PlayerSpawnpoint");
@@ -75,7 +80,8 @@ public class Player : NetworkBehaviour
             this.transform.position = defaultPos;
         }
 
-        billboard.InitForNetwork(this);
+        billboard.SetName(steamName.Value);
+        steamName.OnValueChanged += OnNameChanged;
     }
 
     void Start()
@@ -226,6 +232,11 @@ public class Player : NetworkBehaviour
             direction.Normalize();
             transform.Translate(direction * moveSpeed * deltaTime, Space.World);
         }
+    }
+
+    void OnNameChanged(FixedString64Bytes prev, FixedString64Bytes current)
+    {
+        billboard.SetName(current);
     }
 
     // Client RPC functions -------------------------------------------------------------------------------------------

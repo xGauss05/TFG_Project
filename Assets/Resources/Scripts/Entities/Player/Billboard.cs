@@ -4,25 +4,13 @@ using UnityEngine;
 using Unity.Netcode;
 using TMPro;
 using Steamworks;
+using Unity.Collections;
+using System;
 
 public class Billboard : NetworkBehaviour
 {
     [SerializeField] TextMeshProUGUI nameText;
     [SerializeField] GameObject nameCanvas;
-
-    public void InitForNetwork(Player player)
-    {
-        if (player.IsOwner)
-        {
-            nameText.text = SteamClient.Name;
-            nameCanvas.SetActive(true);
-        }
-        else
-        {
-            nameText.text = $"Player {player.OwnerClientId}";
-            nameCanvas.SetActive(true);
-        }
-    }
 
     void Update()
     {
@@ -32,4 +20,12 @@ public class Billboard : NetworkBehaviour
         }
     }
 
+    public void SetName(FixedString64Bytes current)
+    {
+        if (!IsOwner)
+        {
+            nameText.text = current.ConvertToString();
+            nameCanvas.SetActive(true);
+        }
+    }
 }

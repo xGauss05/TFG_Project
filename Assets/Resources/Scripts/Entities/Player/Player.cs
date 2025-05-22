@@ -5,6 +5,16 @@ using Unity.Netcode;
 
 public class Player : NetworkBehaviour
 {
+    [System.Flags]
+    public enum PlayerAction
+    {
+        None = 0,
+        MoveF = 1 << 0,
+        MoveB = 1 << 1,
+        MoveL = 1 << 2,
+        MoveR = 1 << 3
+    }
+
     [Header("Player Parameters")]
     [SerializeField] float moveSpeed = 5.0f;
     [SerializeField] float sensitivity = 100.0f;
@@ -19,6 +29,7 @@ public class Player : NetworkBehaviour
     public NetworkVariable<int> currentHealth = new NetworkVariable<int>(maxHealth);
 
     [Header("Player Gun properties")]
+    [SerializeField] Billboard billboard;
     [SerializeField] Transform gunPivot;
     public Transform camPivot;
 
@@ -28,7 +39,6 @@ public class Player : NetworkBehaviour
     // Helpers and Components
     GunBase currentGun;
     AudioSource audioSource;
-    Vector3 networkPosition;
     float x_networkIncrement;
     float y_networkIncrement;
 
@@ -61,8 +71,11 @@ public class Player : NetworkBehaviour
         else
         {
             Debug.LogWarning("No player spawn points found. Spawning at default position.");
-            this.transform.position = new Vector3(20, 2, -20);
+            Vector3 defaultPos = new Vector3(20, 2, -20);
+            this.transform.position = defaultPos;
         }
+
+        billboard.InitForNetwork(this);
     }
 
     void Start()
@@ -73,16 +86,29 @@ public class Player : NetworkBehaviour
         audioSource = GetComponent<AudioSource>();
     }
 
+    void FixedUpdate()
+    {
+        if (!IsOwner) return;
+
+        // Player movement
+        PlayerAction action = PlayerAction.None;
+
+        if (Input.GetKey(KeyCode.W)) action |= PlayerAction.MoveF;
+        if (Input.GetKey(KeyCode.S)) action |= PlayerAction.MoveB;
+        if (Input.GetKey(KeyCode.A)) action |= PlayerAction.MoveL;
+        if (Input.GetKey(KeyCode.D)) action |= PlayerAction.MoveR;
+
+        if (action != PlayerAction.None) SendMoveServerRpc(action);
+    }
+
     void Update()
     {
-
         if (IsOwner)
         {
             HandleInput();
         }
         else
         {
-            transform.position = networkPosition;
             LocalViewRotate(x_networkIncrement, y_networkIncrement);
 
             x_networkIncrement = 0f;
@@ -127,20 +153,6 @@ public class Player : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.H))
         {
             // Use medkit
-        }
-
-        // Player movement
-        Vector3 move = Vector3.zero;
-
-        if (Input.GetKey(KeyCode.W)) move += transform.forward;
-        if (Input.GetKey(KeyCode.S)) move -= transform.forward;
-        if (Input.GetKey(KeyCode.A)) move -= transform.right;
-        if (Input.GetKey(KeyCode.D)) move += transform.right;
-
-        if (move != Vector3.zero)
-        {
-            transform.position += move.normalized * moveSpeed * Time.deltaTime;
-            SendPositionServerRpc(transform.position);
         }
 
         // Mouse camera
@@ -200,15 +212,23 @@ public class Player : NetworkBehaviour
         return false;
     }
 
-    // Client RPC functions -------------------------------------------------------------------------------------------
-    [ClientRpc]
-    void SendPositionClientRpc(Vector3 position)
+    void Move(PlayerAction actions, float deltaTime)
     {
-        if (IsOwner) return;
+        Vector3 direction = Vector3.zero;
 
-        networkPosition = position;
+        if (actions.HasFlag(PlayerAction.MoveF)) direction += transform.forward;
+        if (actions.HasFlag(PlayerAction.MoveB)) direction -= transform.forward;
+        if (actions.HasFlag(PlayerAction.MoveL)) direction -= transform.right;
+        if (actions.HasFlag(PlayerAction.MoveR)) direction += transform.right;
+
+        if (direction.sqrMagnitude > 0.0f)
+        {
+            direction.Normalize();
+            transform.Translate(direction * moveSpeed * deltaTime, Space.World);
+        }
     }
 
+    // Client RPC functions -------------------------------------------------------------------------------------------
     [ClientRpc]
     void SendRotationClientRpc(float xIncrement, float yIncrement)
     {
@@ -220,13 +240,9 @@ public class Player : NetworkBehaviour
 
     // Server RPC functions -------------------------------------------------------------------------------------------
     [ServerRpc]
-    void SendPositionServerRpc(Vector3 position)
+    void SendMoveServerRpc(PlayerAction move)
     {
-        if (transform.position != position)
-        {
-            transform.position = position;
-            SendPositionClientRpc(position);
-        }
+        Move(move, Time.deltaTime);
     }
 
     [ServerRpc]

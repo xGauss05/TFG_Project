@@ -97,12 +97,16 @@ public class SteamManager : MonoBehaviour
         LobbyReference.Singleton.currentLobby = lobby;
         LobbyIDText.text = lobby.Id.ToString();
 
+        LobbyReference.Singleton.UpdateIds();
+
         MainMenu.SetActive(false);
         JoinLobbyScreen.SetActive(false);
         LobbyScreen.SetActive(true);
         LobbyChat.SetActive(true);
         LobbyIDScreen.SetActive(true);
         LobbyPlayersList.SetActive(true);
+
+        Debug.Log($"Entered lobby {lobby.Id}");
 
         if (NetworkManager.Singleton.IsHost) return;
 
@@ -111,7 +115,6 @@ public class SteamManager : MonoBehaviour
         StartGameButton.SetActive(false);
 
         UpdatePlayerListUI();
-        Debug.Log($"Entered lobby {lobby.Id}");
 
     }
 

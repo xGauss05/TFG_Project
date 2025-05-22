@@ -10,25 +10,17 @@ public class Billboard : NetworkBehaviour
     [SerializeField] TextMeshProUGUI nameText;
     [SerializeField] GameObject nameCanvas;
 
-    public override void OnNetworkSpawn()
+    public void InitForNetwork(Player player)
     {
-        if (!IsOwner)
+        if (player.IsOwner)
         {
-            nameCanvas.gameObject.SetActive(true);
-
-            if (IsClient && !IsServer)
-            {
-                RequestNameServerRpc(SteamClient.Name);
-            }
+            nameText.text = SteamClient.Name;
+            nameCanvas.SetActive(true);
         }
         else
         {
-            nameCanvas.gameObject.SetActive(false);
-
-            if (IsServer)
-            {
-                SetNameClientRpc(SteamClient.Name, OwnerClientId);
-            }
+            nameText.text = $"Player {player.OwnerClientId}";
+            nameCanvas.SetActive(true);
         }
     }
 
@@ -38,22 +30,6 @@ public class Billboard : NetworkBehaviour
         {
             transform.LookAt(Camera.main.transform);
         }
-    }
-
-    // Client RPC functions -------------------------------------------------------------------------------------------
-    [ClientRpc]
-    void SetNameClientRpc(string steamName, ulong targetClientId)
-    {
-        if (OwnerClientId != targetClientId) return;
-
-        nameText.text = steamName;
-    }
-
-    // Server RPC functions -------------------------------------------------------------------------------------------
-    [ServerRpc(RequireOwnership = false)]
-    void RequestNameServerRpc(string steamName, ServerRpcParams rpcParams = default)
-    {
-        SetNameClientRpc(steamName, rpcParams.Receive.SenderClientId);
     }
 
 }

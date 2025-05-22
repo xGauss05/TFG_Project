@@ -97,8 +97,6 @@ public class SteamManager : MonoBehaviour
         LobbyReference.Singleton.currentLobby = lobby;
         LobbyIDText.text = lobby.Id.ToString();
 
-        LobbyReference.Singleton.UpdateIds();
-
         MainMenu.SetActive(false);
         JoinLobbyScreen.SetActive(false);
         LobbyScreen.SetActive(true);

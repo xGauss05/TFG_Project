@@ -11,8 +11,6 @@ public class LobbyReference : MonoBehaviour
 
     public Lobby? currentLobby;
 
-    public UnityEvent onLobbyUpdated = new UnityEvent();
-
     void Awake()
     {
         #region Singleton
@@ -29,11 +27,6 @@ public class LobbyReference : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
 
         #endregion Singleton
-    }
-
-    public void NotifyLobbyUpdated()
-    {
-        onLobbyUpdated?.Invoke();
     }
 
 }

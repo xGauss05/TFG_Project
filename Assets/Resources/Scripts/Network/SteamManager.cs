@@ -64,12 +64,9 @@ public class SteamManager : MonoBehaviour
             LobbyIDScreen.SetActive(true);
             LobbyPlayersList.SetActive(true);
 
-            if (!NetworkManager.Singleton.IsHost && !NetworkManager.Singleton.IsClient)
+            if (NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsHost)
             {
-                NetworkManager.Singleton.GetComponent<FacepunchTransport>().targetSteamId =
-                    LobbyReference.Singleton.currentLobby.Value.Owner.Id;
-
-                NetworkManager.Singleton.StartClient();
+                StartGameButton.SetActive(false);
             }
 
             UpdatePlayerListUI();

@@ -21,7 +21,6 @@ public abstract class GunBase : NetworkBehaviour
     protected bool isReloading = false;
     protected float lastShotTime = 0;
 
-    // Helpers and Components
     public (Vector3 origin, Vector3 direction) CalculateShot()
     {
         Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);

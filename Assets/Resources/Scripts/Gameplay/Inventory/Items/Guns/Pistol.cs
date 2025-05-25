@@ -10,12 +10,12 @@ public class Pistol : GunBase
 
         if (currentAmmo <= 0 || Time.time - lastShotTime < fireRate)
         {
-            audioSource?.PlayOneShot(emptyClipSfx);
+            PlayEmptyClipSFXClientRpc();
             lastShotTime = Time.time;
             return;
         }
 
-        audioSource?.PlayOneShot(gunShotSfx);
+        PlayGunShotSFXClientRpc();
         currentAmmo--;
 
         Vector3 hitPoint = origin + direction * 999f;

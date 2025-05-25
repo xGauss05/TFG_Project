@@ -12,12 +12,12 @@ public class Shotgun : GunBase
 
         if (currentAmmo <= 0 || Time.time - lastShotTime < fireRate)
         {
-            audioSource?.PlayOneShot(emptyClipSfx);
+            PlayEmptyClipSFXClientRpc();
             lastShotTime = Time.time;
             return;
         }
 
-        audioSource?.PlayOneShot(gunShotSfx);
+        PlayGunShotSFXClientRpc();
         currentAmmo--;
 
         for (int i = 0; i < pelletCount; i++)

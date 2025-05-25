@@ -47,7 +47,6 @@ public class BasicZombie : NetworkBehaviour
     // Helpers and Components
     NavMeshAgent agent;
     GameObject targetPlayer;
-    AudioSource audioSource;
 
     public override void OnNetworkSpawn()
     {
@@ -75,8 +74,6 @@ public class BasicZombie : NetworkBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         agent.speed = movementSpeed;
-
-        audioSource = GetComponent<AudioSource>();
 
         StartCoroutine(WaitForSpawnAnimation());
     }
@@ -214,26 +211,6 @@ public class BasicZombie : NetworkBehaviour
         isAttacking = false;
     }
 
-    [ServerRpc]
-    public void TakeDamageServerRpc(int amount)
-    {
-        if (currentHealth.Value <= 0 || isDead) return;
-
-        currentHealth.Value -= amount;
-        if (currentHealth.Value <= 0)
-        {
-            isDead = true;
-            if (!CheckAnimationState("Death")) zombieAnimator.SetTrigger("Death");
-
-            //Debug.Log("Basic Zombie Death");
-
-            agent.ResetPath();
-            audioSource.PlayOneShot(zombieDeathSfx);
-
-            StartCoroutine(WaitForDeathAnimation());
-        }
-    }
-
     IEnumerator WaitForDeathAnimation()
     {
         AnimatorStateInfo animatorStateInfo = zombieAnimator.GetCurrentAnimatorStateInfo(0);
@@ -269,6 +246,46 @@ public class BasicZombie : NetworkBehaviour
         AnimatorStateInfo animatorStateInfo = zombieAnimator.GetCurrentAnimatorStateInfo(0);
 
         return animatorStateInfo.IsName(animName);
+    }
+
+    // Client RPC functions -------------------------------------------------------------------------------------------
+    [ClientRpc]
+    void PlayZombieAttackSFXClientRpc()
+    {
+        SFXManager.Singleton.PlaySound(zombieAttackSfx);
+    }
+
+    [ClientRpc]
+    void PlayZombieScreechSFXClientRpc()
+    {
+        SFXManager.Singleton.PlaySound(zombieScreechSfx);
+    }
+
+    [ClientRpc]
+    void PlayZombieDeathSFXClientRpc()
+    {
+        SFXManager.Singleton.PlaySound(zombieDeathSfx);
+    }
+
+    // Server RPC functions -------------------------------------------------------------------------------------------
+    [ServerRpc]
+    public void TakeDamageServerRpc(int amount)
+    {
+        if (currentHealth.Value <= 0 || isDead) return;
+
+        currentHealth.Value -= amount;
+        if (currentHealth.Value <= 0)
+        {
+            isDead = true;
+            if (!CheckAnimationState("Death")) zombieAnimator.SetTrigger("Death");
+
+            //Debug.Log("Basic Zombie Death");
+
+            agent.ResetPath();
+            PlayZombieDeathSFXClientRpc();
+
+            StartCoroutine(WaitForDeathAnimation());
+        }
     }
 
     void OnDrawGizmos()

@@ -22,13 +22,6 @@ public abstract class GunBase : NetworkBehaviour
     protected float lastShotTime = 0;
 
     // Helpers and Components
-    protected AudioSource audioSource;
-
-    protected virtual void Start()
-    {
-        audioSource = GetComponent<AudioSource>();
-    }
-
     public (Vector3 origin, Vector3 direction) CalculateShot()
     {
         Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
@@ -61,7 +54,7 @@ public abstract class GunBase : NetworkBehaviour
         return (gunMuzzle.position, bulletDirection);
     }
 
-    protected virtual Vector3 ApplySpread(Vector3 direction)
+    protected Vector3 ApplySpread(Vector3 direction)
     {
         return direction + new Vector3(
             Random.Range(-shotSpreadVariance.x, shotSpreadVariance.x),
@@ -72,24 +65,27 @@ public abstract class GunBase : NetworkBehaviour
 
     public abstract void Shoot(Vector3 origin, Vector3 direction);
 
-    public virtual void Reload()
+    public void Reload()
     {
         if (isReloading || currentAmmo >= maxCapacity) return;
+
         StartCoroutine(ReloadCoroutine());
     }
 
-    protected virtual IEnumerator ReloadCoroutine()
+    protected IEnumerator ReloadCoroutine()
     {
         isReloading = true;
-        audioSource?.PlayOneShot(reloadSfx);
+        PlayReloadSFXClientRpc();
+
         yield return new WaitForSeconds(reloadSfx.length);
+
         currentAmmo = maxCapacity;
         isReloading = false;
     }
 
     protected void SpawnTrail(Vector3 start, Vector3 end)
     {
-        GameObject trail = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/BulletTrail"));
+        GameObject trail = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Items/Guns/BulletTrail"));
         trail.GetComponent<BulletTrail>()?.SetTrailPositions(start, end);
     }
 
@@ -98,6 +94,24 @@ public abstract class GunBase : NetworkBehaviour
     protected void SpawnTrailClientRpc(Vector3 origin, Vector3 hitPoint)
     {
         SpawnTrail(origin, hitPoint);
+    }
+
+    [ClientRpc]
+    protected void PlayGunShotSFXClientRpc()
+    {
+        SFXManager.Singleton.PlaySound(gunShotSfx);
+    }
+
+    [ClientRpc]
+    protected void PlayReloadSFXClientRpc()
+    {
+        SFXManager.Singleton.PlaySound(reloadSfx);
+    }
+
+    [ClientRpc]
+    protected void PlayEmptyClipSFXClientRpc()
+    {
+        SFXManager.Singleton.PlaySound(emptyClipSfx);
     }
 
     // Server RPC functions -------------------------------------------------------------------------------------------

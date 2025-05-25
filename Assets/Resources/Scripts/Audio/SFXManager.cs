@@ -5,12 +5,11 @@ using UnityEngine;
 public class SFXManager : MonoBehaviour
 {
     public static SFXManager Singleton { get; private set; }
-    private AudioSource sfx_source;
+    AudioSource sfx_source;
 
     void Awake()
     {
         sfx_source = GetComponent<AudioSource>();
-        sfx_source.volume = 50;
 
         #region Singleton
 

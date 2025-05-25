@@ -40,11 +40,10 @@ public class Player : NetworkBehaviour
 
     // Helpers and Components
     GunBase currentGun;
-    AudioSource audioSource;
 
     void Awake()
     {
-        GameObject gunGO = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Pistol"), gunPivot);
+        GameObject gunGO = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Items/Guns/Pistol"), gunPivot);
         currentGun = gunGO.GetComponent<Pistol>();
     }
 
@@ -84,8 +83,6 @@ public class Player : NetworkBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
-        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -221,6 +218,13 @@ public class Player : NetworkBehaviour
         billboard.SetName(current);
     }
 
+    // Client RPC functions -------------------------------------------------------------------------------------------
+    [ClientRpc]
+    void PlayHurtSFXClientRpc()
+    {
+        SFXManager.Singleton.PlaySound(playerHurtSfx);
+    }
+
     // Server RPC functions -------------------------------------------------------------------------------------------
     [ServerRpc]
     void SubmitShotServerRpc(Vector3 origin, Vector3 dir)
@@ -234,7 +238,7 @@ public class Player : NetworkBehaviour
         if (currentHealth.Value <= 0) return;
 
         currentHealth.Value -= amount;
-        audioSource.PlayOneShot(playerHurtSfx);
+        PlayHurtSFXClientRpc();
 
         if (currentHealth.Value <= 0)
         {

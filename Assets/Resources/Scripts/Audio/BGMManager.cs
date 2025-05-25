@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class BGMManager : NetworkBehaviour
+public class BGMManager : MonoBehaviour
 {
     public static BGMManager Singleton { get; private set; }
 
@@ -43,34 +43,6 @@ public class BGMManager : NetworkBehaviour
         {
             ChangeBGM(0);
         }
-        else if (IsServer)
-        {
-            ChangeBGMClientRpc(0);
-        }
-    }
-
-    void Update()
-    {
-#if UNITY_EDITOR
-        if ((IsServer ||
-            !NetworkManager.Singleton ||
-            !NetworkManager.Singleton.IsListening) &&
-            Input.GetKeyDown(KeyCode.C))
-        {
-            currentTrackIndex++;
-
-            if (currentTrackIndex >= musicTracksSize) currentTrackIndex = 0;
-
-            if (IsServer)
-            {
-                ChangeBGMClientRpc(currentTrackIndex);
-            }
-            else
-            {
-                ChangeBGM(currentTrackIndex);
-            }
-        }
-#endif
     }
 
     public void ChangeBGM(int audioIndex)

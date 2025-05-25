@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Unity.Netcode;
-using Unity.Collections;
 using Steamworks;
+using Unity.Collections;
+using Unity.Netcode;
+using UnityEngine;
 
 public class Player : NetworkBehaviour
 {
@@ -43,8 +41,6 @@ public class Player : NetworkBehaviour
     // Helpers and Components
     GunBase currentGun;
     AudioSource audioSource;
-    float x_networkIncrement;
-    float y_networkIncrement;
 
     void Awake()
     {
@@ -92,33 +88,11 @@ public class Player : NetworkBehaviour
         audioSource = GetComponent<AudioSource>();
     }
 
-    void FixedUpdate()
-    {
-        if (!IsOwner) return;
-
-        // Player movement
-        PlayerAction action = PlayerAction.None;
-
-        if (Input.GetKey(KeyCode.W)) action |= PlayerAction.MoveF;
-        if (Input.GetKey(KeyCode.S)) action |= PlayerAction.MoveB;
-        if (Input.GetKey(KeyCode.A)) action |= PlayerAction.MoveL;
-        if (Input.GetKey(KeyCode.D)) action |= PlayerAction.MoveR;
-
-        if (action != PlayerAction.None) SendMoveServerRpc(action);
-    }
-
     void Update()
     {
         if (IsOwner)
         {
             HandleInput();
-        }
-        else
-        {
-            LocalViewRotate(x_networkIncrement, y_networkIncrement);
-
-            x_networkIncrement = 0f;
-            y_networkIncrement = 0f;
         }
 
         if (!IsOwner || isDead) return;
@@ -161,6 +135,16 @@ public class Player : NetworkBehaviour
             // Use medkit
         }
 
+        // Player movement
+        PlayerAction action = PlayerAction.None;
+
+        if (Input.GetKey(KeyCode.W)) action |= PlayerAction.MoveF;
+        if (Input.GetKey(KeyCode.S)) action |= PlayerAction.MoveB;
+        if (Input.GetKey(KeyCode.A)) action |= PlayerAction.MoveL;
+        if (Input.GetKey(KeyCode.D)) action |= PlayerAction.MoveR;
+
+        if (action != PlayerAction.None) Move(action, Time.deltaTime);
+
         // Mouse camera
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");
@@ -169,8 +153,7 @@ public class Player : NetworkBehaviour
         {
             float xIncrement = mouseX * sensitivity * Time.deltaTime;
             float yIncrement = mouseY * sensitivity * Time.deltaTime;
-            LocalViewRotate(xIncrement, yIncrement);
-            SendRotationServerRpc(xIncrement, yIncrement);
+            Rotate(xIncrement, yIncrement);
         }
 
         // Shoot weapon
@@ -188,7 +171,23 @@ public class Player : NetworkBehaviour
         }
     }
 
-    void LocalViewRotate(float xIncrement, float yIncrement)
+    void Move(PlayerAction actions, float deltaTime)
+    {
+        Vector3 direction = Vector3.zero;
+
+        if (actions.HasFlag(PlayerAction.MoveF)) direction += transform.forward;
+        if (actions.HasFlag(PlayerAction.MoveB)) direction -= transform.forward;
+        if (actions.HasFlag(PlayerAction.MoveL)) direction -= transform.right;
+        if (actions.HasFlag(PlayerAction.MoveR)) direction += transform.right;
+
+        if (direction.sqrMagnitude > 0.0f)
+        {
+            direction.Normalize();
+            transform.position += direction * moveSpeed * deltaTime;
+        }
+    }
+
+    void Rotate(float xIncrement, float yIncrement)
     {
         transform.Rotate(Vector3.up * xIncrement);
 
@@ -218,50 +217,12 @@ public class Player : NetworkBehaviour
         return false;
     }
 
-    void Move(PlayerAction actions, float deltaTime)
-    {
-        Vector3 direction = Vector3.zero;
-
-        if (actions.HasFlag(PlayerAction.MoveF)) direction += transform.forward;
-        if (actions.HasFlag(PlayerAction.MoveB)) direction -= transform.forward;
-        if (actions.HasFlag(PlayerAction.MoveL)) direction -= transform.right;
-        if (actions.HasFlag(PlayerAction.MoveR)) direction += transform.right;
-
-        if (direction.sqrMagnitude > 0.0f)
-        {
-            direction.Normalize();
-            transform.Translate(direction * moveSpeed * deltaTime, Space.World);
-        }
-    }
-
     void OnNameChanged(FixedString64Bytes prev, FixedString64Bytes current)
     {
         billboard.SetName(current);
     }
 
-    // Client RPC functions -------------------------------------------------------------------------------------------
-    [ClientRpc]
-    void SendRotationClientRpc(float xIncrement, float yIncrement)
-    {
-        if (IsOwner) return;
-
-        x_networkIncrement = xIncrement;
-        y_networkIncrement = yIncrement;
-    }
-
     // Server RPC functions -------------------------------------------------------------------------------------------
-    [ServerRpc]
-    void SendMoveServerRpc(PlayerAction move)
-    {
-        Move(move, Time.deltaTime);
-    }
-
-    [ServerRpc]
-    void SendRotationServerRpc(float xIncrement, float yIncrement)
-    {
-        SendRotationClientRpc(xIncrement, yIncrement);
-    }
-
     [ServerRpc]
     void SubmitShotServerRpc(Vector3 origin, Vector3 dir)
     {

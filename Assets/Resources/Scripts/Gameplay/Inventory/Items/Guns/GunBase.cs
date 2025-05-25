@@ -1,7 +1,8 @@
 using System.Collections;
 using UnityEngine;
+using Unity.Netcode;
 
-public abstract class GunBase : MonoBehaviour
+public abstract class GunBase : NetworkBehaviour
 {
     [Header("Gun Settings")]
     [SerializeField] protected Transform gunMuzzle;
@@ -19,14 +20,6 @@ public abstract class GunBase : MonoBehaviour
     // Flags & variables for logic handling
     protected bool isReloading = false;
     protected float lastShotTime = 0;
-
-    // Helpers and Components
-    protected AudioSource audioSource;
-
-    protected virtual void Start()
-    {
-        audioSource = GetComponent<AudioSource>();
-    }
 
     public (Vector3 origin, Vector3 direction) CalculateShot()
     {
@@ -60,7 +53,7 @@ public abstract class GunBase : MonoBehaviour
         return (gunMuzzle.position, bulletDirection);
     }
 
-    protected virtual Vector3 ApplySpread(Vector3 direction)
+    protected Vector3 ApplySpread(Vector3 direction)
     {
         return direction + new Vector3(
             Random.Range(-shotSpreadVariance.x, shotSpreadVariance.x),
@@ -69,24 +62,62 @@ public abstract class GunBase : MonoBehaviour
         );
     }
 
-    public virtual void Shoot(Vector3 origin, Vector3 direction)
-    {
+    public abstract void Shoot(Vector3 origin, Vector3 direction);
 
-    }
-
-    public virtual void Reload()
+    public void Reload()
     {
         if (isReloading || currentAmmo >= maxCapacity) return;
+
         StartCoroutine(ReloadCoroutine());
     }
 
-    protected virtual IEnumerator ReloadCoroutine()
+    protected IEnumerator ReloadCoroutine()
     {
         isReloading = true;
-        audioSource?.PlayOneShot(reloadSfx);
+        PlayReloadSFXClientRpc();
+
         yield return new WaitForSeconds(reloadSfx.length);
+
         currentAmmo = maxCapacity;
         isReloading = false;
+    }
+
+    protected void SpawnTrail(Vector3 start, Vector3 end)
+    {
+        GameObject trail = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Items/Guns/BulletTrail"));
+        trail.GetComponent<BulletTrail>()?.SetTrailPositions(start, end);
+    }
+
+    // Client RPC functions -------------------------------------------------------------------------------------------
+    [ClientRpc]
+    protected void SpawnTrailClientRpc(Vector3 origin, Vector3 hitPoint)
+    {
+        SpawnTrail(origin, hitPoint);
+    }
+
+    [ClientRpc]
+    protected void PlayGunShotSFXClientRpc()
+    {
+        SFXManager.Singleton.PlaySound(gunShotSfx);
+    }
+
+    [ClientRpc]
+    protected void PlayReloadSFXClientRpc()
+    {
+        SFXManager.Singleton.PlaySound(reloadSfx);
+    }
+
+    [ClientRpc]
+    protected void PlayEmptyClipSFXClientRpc()
+    {
+        SFXManager.Singleton.PlaySound(emptyClipSfx);
+    }
+
+    // Server RPC functions -------------------------------------------------------------------------------------------
+    [ServerRpc]
+    protected void SpawnTrailServerRpc(Vector3 start, Vector3 end)
+    {
+        SpawnTrailClientRpc(start, end);
     }
 
 }

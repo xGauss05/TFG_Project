@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 public class BulletTrail : MonoBehaviour
 {
@@ -31,4 +32,5 @@ public class BulletTrail : MonoBehaviour
         lineRenderer.SetPosition(0, start);
         lineRenderer.SetPosition(1, end);
     }
+
 }

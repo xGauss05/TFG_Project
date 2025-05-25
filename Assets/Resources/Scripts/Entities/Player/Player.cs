@@ -1,20 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using Steamworks;
+using Unity.Collections;
 using Unity.Netcode;
+using UnityEngine;
 
 public class Player : NetworkBehaviour
 {
+    [System.Flags]
     public enum PlayerAction
     {
-        None,
-        MoveF,
-        MoveB,
-        MoveL,
-        MoveR,
-        Rotate,
-        Shot,
-        OpenDoor,
+        None = 0,
+        MoveF = 1 << 0,
+        MoveB = 1 << 1,
+        MoveL = 1 << 2,
+        MoveR = 1 << 3
     }
 
     [Header("Player Parameters")]
@@ -29,8 +27,11 @@ public class Player : NetworkBehaviour
 
     [Header("Player Network variables")]
     public NetworkVariable<int> currentHealth = new NetworkVariable<int>(maxHealth);
+    NetworkVariable<FixedString64Bytes> steamName = new NetworkVariable<FixedString64Bytes>(default,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     [Header("Player Gun properties")]
+    [SerializeField] Billboard billboard;
     [SerializeField] Transform gunPivot;
     public Transform camPivot;
 
@@ -39,51 +40,64 @@ public class Player : NetworkBehaviour
 
     // Helpers and Components
     GunBase currentGun;
-    AudioSource audioSource;
 
     void Awake()
     {
-        GameObject gunGO = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Shotgun"), gunPivot);
-        currentGun = gunGO.GetComponent<Shotgun>();
+        GameObject gunGO = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Items/Guns/Pistol"), gunPivot);
+        currentGun = gunGO.GetComponent<Pistol>();
     }
 
     public override void OnNetworkSpawn()
     {
-        if (!IsOwner)
-        {
-            this.enabled = false;
-            //GetComponentInChildren<Canvas>().gameObject.SetActive(false);
-            //GetComponentInChildren<TMPro.TextMeshProUGUI>().text = ownerName.Value;
-        }
-        else
+        if (IsOwner)
         {
             Camera.main.GetComponent<PlayerCamera>().SetParent(camPivot);
             Camera.main.transform.rotation = transform.rotation;
             GetComponentInChildren<Canvas>().gameObject.SetActive(false);
+            steamName.Value = SteamClient.Name;
         }
 
-        // Currently hardcoded
-        // Should check player spawn points in map then choose 1 random
-        this.transform.position = new Vector3(20, 2, -20);
+        GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("PlayerSpawnpoint");
+
+        if (spawnPoints.Length > 0)
+        {
+            int randomIndex = Random.Range(0, spawnPoints.Length);
+            Transform spawnTransform = spawnPoints[randomIndex].transform;
+
+            // Set the Player spawn point to the Spawnpoint position
+            transform.position = spawnTransform.position;
+            transform.rotation = spawnTransform.rotation;
+        }
+        else
+        {
+            Debug.LogWarning("No player spawn points found. Spawning at default position.");
+            Vector3 defaultPos = new Vector3(20, 2, -20);
+            this.transform.position = defaultPos;
+        }
+
+        billboard.SetName(steamName.Value);
+        steamName.OnValueChanged += OnNameChanged;
     }
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
-        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
     {
         if (!IsOwner || isDead) return;
 
-        HandleInput();
+        if (IsOwner)
+        {
+            HandleInput();
+        }
     }
 
     void HandleInput()
     {
+        // Change cursor mode
         if (Input.GetKey(KeyCode.LeftAlt))
         {
             Cursor.lockState = CursorLockMode.None;
@@ -96,65 +110,76 @@ public class Player : NetworkBehaviour
             Cursor.visible = false;
         }
 
-        if (Input.GetKey(KeyCode.W)) SubmitMoveServerRpc(PlayerAction.MoveF);
-        if (Input.GetKey(KeyCode.S)) SubmitMoveServerRpc(PlayerAction.MoveB);
-        if (Input.GetKey(KeyCode.A)) SubmitMoveServerRpc(PlayerAction.MoveL);
-        if (Input.GetKey(KeyCode.D)) SubmitMoveServerRpc(PlayerAction.MoveR);
-
+        // Reload
         if (Input.GetKeyDown(KeyCode.R))
         {
-            currentGun.Reload();
+            if (IsServer)
+                currentGun.Reload();
+            else
+                ReloadServerRpc();
         }
 
+        // Interact (atm, only door)
         if (Input.GetKeyDown(KeyCode.E) && FindDoor())
         {
-            SubmitActionServerRpc(PlayerAction.OpenDoor);
+            // Open door
         }
 
+        // Use Medkit
         if (Input.GetKeyDown(KeyCode.H))
         {
             // Use medkit
         }
 
+        // Player movement
+        PlayerAction action = PlayerAction.None;
+
+        if (Input.GetKey(KeyCode.W)) action |= PlayerAction.MoveF;
+        if (Input.GetKey(KeyCode.S)) action |= PlayerAction.MoveB;
+        if (Input.GetKey(KeyCode.A)) action |= PlayerAction.MoveL;
+        if (Input.GetKey(KeyCode.D)) action |= PlayerAction.MoveR;
+
+        if (action != PlayerAction.None) Move(action, Time.deltaTime);
+
+        // Mouse camera
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");
 
         if (mouseX != 0 || mouseY != 0)
         {
-            SubmitRotateServerRpc(mouseX * sensitivity, mouseY * sensitivity);
+            float xIncrement = mouseX * sensitivity * Time.deltaTime;
+            float yIncrement = mouseY * sensitivity * Time.deltaTime;
+            Rotate(xIncrement, yIncrement);
         }
 
-        if (Input.GetButtonDown("Fire1"))
+        // Shoot weapon
+        if (Input.GetButton("Fire1"))
         {
-            Debug.Log("Shooting");
             var shot = currentGun.CalculateShot();
-            SubmitShotServerRpc(shot.origin, shot.direction);
+            if (IsServer)
+            {
+                currentGun.Shoot(shot.origin, shot.direction);
+            }
+            else
+            {
+                SubmitShotServerRpc(shot.origin, shot.direction);
+            }
         }
     }
 
-    void Move(PlayerAction action, float deltaTime)
+    void Move(PlayerAction actions, float deltaTime)
     {
         Vector3 direction = Vector3.zero;
 
-        switch (action)
-        {
-            case PlayerAction.MoveF:
-                direction = transform.forward;
-                break;
-            case PlayerAction.MoveB:
-                direction = -transform.forward;
-                break;
-            case PlayerAction.MoveL:
-                direction = -transform.right;
-                break;
-            case PlayerAction.MoveR:
-                direction = transform.right;
-                break;
-        }
+        if (actions.HasFlag(PlayerAction.MoveF)) direction += transform.forward;
+        if (actions.HasFlag(PlayerAction.MoveB)) direction -= transform.forward;
+        if (actions.HasFlag(PlayerAction.MoveL)) direction -= transform.right;
+        if (actions.HasFlag(PlayerAction.MoveR)) direction += transform.right;
 
-        if (direction.magnitude > 0)
+        if (direction.sqrMagnitude > 0.0f)
         {
-            transform.Translate(direction * moveSpeed * deltaTime, Space.World);
+            direction.Normalize();
+            transform.position += direction * moveSpeed * deltaTime;
         }
     }
 
@@ -166,6 +191,7 @@ public class Player : NetworkBehaviour
         verticalRotation = Mathf.Clamp(verticalRotation, -maxAngle, maxAngle);
 
         camPivot.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
+
     }
 
     void OpenDoor()
@@ -187,46 +213,44 @@ public class Player : NetworkBehaviour
         return false;
     }
 
+    void OnNameChanged(FixedString64Bytes prev, FixedString64Bytes current)
+    {
+        billboard.SetName(current);
+    }
+
+    // Client RPC functions -------------------------------------------------------------------------------------------
+    [ClientRpc]
+    void PlayHurtSFXClientRpc()
+    {
+        SFXManager.Singleton.PlaySound(playerHurtSfx);
+    }
+
     // Server RPC functions -------------------------------------------------------------------------------------------
-    [ServerRpc]
-    void SubmitMoveServerRpc(PlayerAction actionType)
-    {
-        Move(actionType, Time.deltaTime);
-    }
-
-    [ServerRpc]
-    void SubmitRotateServerRpc(float mouseX, float mouseY)
-    {
-        Rotate(mouseX * Time.deltaTime, mouseY * Time.deltaTime);
-    }
-
     [ServerRpc]
     void SubmitShotServerRpc(Vector3 origin, Vector3 dir)
     {
         currentGun.Shoot(origin, dir);
     }
 
-    [ServerRpc]
-    void SubmitActionServerRpc(PlayerAction actionType)
-    {
-        if (actionType == PlayerAction.OpenDoor)
-        {
-            OpenDoor();
-        }
-    }
-
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void TakeDamageServerRpc(int amount)
     {
         if (currentHealth.Value <= 0) return;
 
         currentHealth.Value -= amount;
-        audioSource.PlayOneShot(playerHurtSfx);
+        PlayHurtSFXClientRpc();
 
         if (currentHealth.Value <= 0)
         {
             isDead = true;
-            Debug.Log("Player dead!");
+            Debug.Log($"Player {steamName.Value} dead!");
         }
     }
+
+    [ServerRpc]
+    void ReloadServerRpc()
+    {
+        currentGun.Reload();
+    }
+
 }

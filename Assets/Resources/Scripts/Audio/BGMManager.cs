@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class BGMManager : MonoBehaviour
@@ -38,34 +39,16 @@ public class BGMManager : MonoBehaviour
             musicTracksSize++;
         }
 
-        BGMManager.Singleton.ChangeBGM(0);
-    }
-
-    void Update()
-    {
-
-#if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.C))
+        if (!NetworkManager.Singleton || !NetworkManager.Singleton.IsListening)
         {
-            currentTrackIndex++;
-
-            if (currentTrackIndex >= musicTracksSize) currentTrackIndex = 0;
-
-            ChangeBGM(musicTracks[currentTrackIndex]);
+            ChangeBGM(0);
         }
-#endif
-
-    }
-
-    public void ChangeBGM(AudioClip musicToChange)
-    {
-        currentBgm.Stop();
-        currentBgm.clip = musicToChange;
-        currentBgm.Play();
     }
 
     public void ChangeBGM(int audioIndex)
     {
+        if (audioIndex < 0 || audioIndex >= musicTracks.Length) return; // Safety measure
+
         currentTrackIndex = audioIndex;
         currentBgm.Stop();
 
@@ -73,4 +56,22 @@ public class BGMManager : MonoBehaviour
         currentBgm.Play();
     }
 
+    // Client RPC functions -------------------------------------------------------------------------------------------
+    [ClientRpc]
+    void ChangeBGMClientRpc(int trackIndex)
+    {
+        if (trackIndex < 0 || trackIndex >= musicTracks.Length) return;
+
+        currentTrackIndex = trackIndex;
+        currentBgm.Stop();
+        currentBgm.clip = musicTracks[trackIndex];
+        currentBgm.Play();
+    }
+
+    // Server RPC functions -------------------------------------------------------------------------------------------
+    [ServerRpc(RequireOwnership = false)]
+    public void RequestChangeBGMServerRpc(int trackIndex)
+    {
+        ChangeBGMClientRpc(trackIndex);
+    }
 }

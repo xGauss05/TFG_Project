@@ -52,6 +52,27 @@ public class SteamManager : MonoBehaviour
         SteamMatchmaking.OnLobbyMemberLeave -= LobbyMemberLeave;
     }
 
+    void Start()
+    {
+        if (LobbyReference.Singleton.currentLobby != null)
+        {
+            LobbyIDText.text = LobbyReference.Singleton.currentLobby.Value.Id.ToString();
+
+            MainMenu.SetActive(false);
+            LobbyScreen.SetActive(true);
+            LobbyChat.SetActive(true);
+            LobbyIDScreen.SetActive(true);
+            LobbyPlayersList.SetActive(true);
+
+            if (NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsHost)
+            {
+                StartGameButton.SetActive(false);
+            }
+
+            UpdatePlayerListUI();
+        }
+    }
+
     void LobbyCreated(Result result, Lobby lobby)
     {
         if (result == Result.OK)
@@ -80,13 +101,15 @@ public class SteamManager : MonoBehaviour
         LobbyIDScreen.SetActive(true);
         LobbyPlayersList.SetActive(true);
 
+        Debug.Log($"Entered lobby {lobby.Id}");
+
         if (NetworkManager.Singleton.IsHost) return;
 
         NetworkManager.Singleton.gameObject.GetComponent<FacepunchTransport>().targetSteamId = lobby.Owner.Id;
         NetworkManager.Singleton.StartClient();
+        StartGameButton.SetActive(false);
 
         UpdatePlayerListUI();
-        Debug.Log($"Entered lobby {lobby.Id}");
 
     }
 
@@ -170,7 +193,7 @@ public class SteamManager : MonoBehaviour
         LobbyReference.Singleton.currentLobby = null;
 
         NetworkManager.Singleton.Shutdown();
-        
+
         MainMenu.SetActive(true);
         LobbyScreen.SetActive(false);
         LobbyChat.SetActive(false);

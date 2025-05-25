@@ -10,6 +10,10 @@ public abstract class PickupItem : NetworkBehaviour
     [SerializeField] float upDownSpeed = 0.5f;
     [SerializeField] float rotSpeed = 10.0f;
 
+    NetworkVariable<Vector3> syncedPosition = new NetworkVariable<Vector3>(
+        writePerm: NetworkVariableWritePermission.Server
+    );
+
     public abstract void OnPickup(Player player);
 
     void OnTriggerEnter(Collider other)
@@ -22,7 +26,7 @@ public abstract class PickupItem : NetworkBehaviour
             if (player != null)
             {
                 //player.PickupItem(this); // NYI
-                Despawn();
+                DespawnServerRpc();
                 Debug.Log("Item pickup!");
             }
         }
@@ -30,24 +34,34 @@ public abstract class PickupItem : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        // Currently testing for ZombieSpawnpoints
-        GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("ZombieSpawnpoint");
-
-        if (spawnPoints.Length > 0)
+        if (IsServer)
         {
-            int randomIndex = Random.Range(0, spawnPoints.Length);
-            Transform spawnTransform = spawnPoints[randomIndex].transform;
+            // Currently testing for ZombieSpawnpoints
+            GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("ZombieSpawnpoint");
 
-            // Set the PickupItem spawn point to the Spawnpoint position
-            transform.position = spawnTransform.position;
-            transform.rotation = spawnTransform.rotation;
+            if (spawnPoints.Length > 0)
+            {
+                int randomIndex = Random.Range(0, spawnPoints.Length);
+                Transform spawnTransform = spawnPoints[randomIndex].transform;
+
+                // Set the PickupItem spawn point to the Spawnpoint position
+                syncedPosition.Value = spawnTransform.position;
+            }
+            else
+            {
+                Debug.LogWarning("No zombie spawn points found. Spawning at default position.");
+                syncedPosition.Value = new Vector3(0, 0, 0); // Default position
+            }
+
+            transform.position = syncedPosition.Value;
         }
-        else
+
+        syncedPosition.OnValueChanged += (oldValue, newValue) =>
         {
-            Debug.LogWarning("No zombie spawn points found. Spawning at default position.");
-            this.transform.position = new Vector3(0, 0, 0); // Default position
-        }
+            transform.position = newValue;
+        };
 
+        transform.position = syncedPosition.Value;
     }
 
     void Update()
@@ -59,8 +73,12 @@ public abstract class PickupItem : NetworkBehaviour
         gameObject.transform.Rotate(rot);
     }
 
-    void Despawn()
+    [ServerRpc]
+    void DespawnServerRpc()
     {
-        GetComponent<NetworkObject>().Despawn(true);
+        if (IsServer)
+        {
+            GetComponent<NetworkObject>().Despawn(true);
+        }
     }
 }

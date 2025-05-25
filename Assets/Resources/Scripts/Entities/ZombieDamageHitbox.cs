@@ -13,12 +13,11 @@ public class ZombieDamageHitbox : MonoBehaviour
             if (attacker != null)
             {
                 other.GetComponent<Player>().TakeDamageServerRpc(attacker.attackDamage);
-                Debug.Log("Player hit!");
             }
         }
     }
 
-    private void OnDrawGizmos()
+    void OnDrawGizmos()
     {
         SphereCollider sphere = GetComponent<SphereCollider>();
 

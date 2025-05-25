@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 7138770791296940094}
   - component: {fileID: 7679069547985297477}
   - component: {fileID: 3797462252055271543}
+  - component: {fileID: 5562070844906338869}
+  - component: {fileID: 526280158126455428}
   m_Layer: 0
   m_Name: Zombie_Basic
   m_TagString: Untagged
@@ -95,7 +97,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3178942962
+  GlobalObjectIdHash: 2525407607
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -120,6 +122,7 @@ MonoBehaviour:
   detectionRadius: 10
   meleeRadius: 2
   movementSpeed: 3.5
+  attackDamage: 5
   zombieAnimator: {fileID: 9048280090246497628}
   zombieAttackSfx: {fileID: 8300000, guid: 05d1b161910a9924d8a873e2c276fe17, type: 3}
   zombieScreechSfx: {fileID: 8300000, guid: 465ab330b4f3c3c41b27fe97760d4427, type: 3}
@@ -128,7 +131,6 @@ MonoBehaviour:
     m_InternalValue: 1
   currentHealth:
     m_InternalValue: 100
-  attackDamage: 5
   meleeHitboxPrefab: {fileID: 2700269903401608430, guid: 5408a08ee254fce4292fca0f8d842b27, type: 3}
   meleeSpawnpoint: {fileID: 5235445558112577416}
 --- !u!82 &3797462252055271543
@@ -227,6 +229,51 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &5562070844906338869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 609194813430149826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
+--- !u!114 &526280158126455428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 609194813430149826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TransitionStateInfoList: []
+  m_Animator: {fileID: 9048280090246497628}
 --- !u!1 &1381136439840426159
 GameObject:
   m_ObjectHideFlags: 0
@@ -358,6 +405,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7709792882650234474, guid: d27bb82bbc54f8a41b9c3129ef034a94, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7709792883443893007, guid: d27bb82bbc54f8a41b9c3129ef034a94, type: 3}
       propertyPath: m_Controller
       value: 
@@ -366,30 +417,8 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 7596070898899066781, guid: d27bb82bbc54f8a41b9c3129ef034a94, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7367825317264382048, guid: d27bb82bbc54f8a41b9c3129ef034a94, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5385978075954528675}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d27bb82bbc54f8a41b9c3129ef034a94, type: 3}
---- !u!1 &8165196672478977587 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7367825317264382048, guid: d27bb82bbc54f8a41b9c3129ef034a94, type: 3}
-  m_PrefabInstance: {fileID: 1688670683403634259}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &5385978075954528675
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8165196672478977587}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TransitionStateInfoList: []
-  m_Animator: {fileID: 9048280090246497628}
 --- !u!95 &9048280090246497628 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 7709792883443893007, guid: d27bb82bbc54f8a41b9c3129ef034a94, type: 3}

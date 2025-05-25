@@ -90,13 +90,12 @@ public class Player : NetworkBehaviour
 
     void Update()
     {
+        if (!IsOwner || isDead) return;
+
         if (IsOwner)
         {
             HandleInput();
         }
-
-        if (!IsOwner || isDead) return;
-
     }
 
     void HandleInput()
@@ -229,7 +228,7 @@ public class Player : NetworkBehaviour
         currentGun.Shoot(origin, dir);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void TakeDamageServerRpc(int amount)
     {
         if (currentHealth.Value <= 0) return;
@@ -240,7 +239,7 @@ public class Player : NetworkBehaviour
         if (currentHealth.Value <= 0)
         {
             isDead = true;
-            Debug.Log("Player dead!");
+            Debug.Log($"Player {steamName.Value} dead!");
         }
     }
 

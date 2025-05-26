@@ -96,6 +96,11 @@ public abstract class GunBase : NetworkBehaviour
         trail.GetComponent<BulletTrail>()?.SetTrailPositions(start, end);
     }
 
+    public float GetReloadLength()
+    {
+        return reloadSfx.length;
+    }
+
     // Client RPC functions -------------------------------------------------------------------------------------------
     [ClientRpc]
     protected void SpawnTrailClientRpc(Vector3 origin, Vector3 hitPoint)

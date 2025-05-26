@@ -52,8 +52,8 @@ public class Player : NetworkBehaviour
         shotgunObject = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Items/Guns/Shotgun"), gunPivot);
 
         inventory.availableGuns.Add(pistolObject.GetComponent<Pistol>(), true);
-        inventory.availableGuns.Add(assaultRifleObject.GetComponent<AssaultRifle>(), true);
-        inventory.availableGuns.Add(shotgunObject.GetComponent<Shotgun>(), true);
+        inventory.availableGuns.Add(assaultRifleObject.GetComponent<AssaultRifle>(), false);
+        inventory.availableGuns.Add(shotgunObject.GetComponent<Shotgun>(), false);
     }
 
     public override void OnNetworkSpawn()
@@ -137,8 +137,6 @@ public class Player : NetworkBehaviour
                 inventory.ReloadGun();
             else
                 ReloadServerRpc();
-
-            
         }
 
         // Interact (atm, only door)
@@ -247,8 +245,11 @@ public class Player : NetworkBehaviour
 
     void EquipGun(GameObject gunGO)
     {
-        if (inventory.EquipGun(gunGO.GetComponent<GunBase>()))
+        GunBase gunBase = gunGO.GetComponent<GunBase>();
+        if (inventory.IsGunAvailable(gunBase))
         {
+            inventory.EquipGun(gunBase);
+
             pistolObject.SetActive(false);
             assaultRifleObject.SetActive(false);
             shotgunObject.SetActive(false);

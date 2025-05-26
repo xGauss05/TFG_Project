@@ -20,12 +20,19 @@ public class Inventory : NetworkBehaviour
         GunBase gunToGet = CheckGun(gun);
         if (gunToGet != null)
         {
+            List<GunBase> keysToEnable = new List<GunBase>();
             foreach (var gunKey in availableGuns.Keys)
             {
                 if (gunKey.GetType() == gun.GetType())
                 {
-                    availableGuns[gunKey] = true;
+                    keysToEnable.Add(gunKey);
+                    break;
                 }
+            }
+
+            foreach (var key in keysToEnable)
+            {
+                availableGuns[key] = true;
             }
         }
     }
@@ -69,13 +76,32 @@ public class Inventory : NetworkBehaviour
     public void ReloadGun()
     {
         currentGun.Reload();
-        OnGunChanged.Invoke(currentGun);
+        StartCoroutine(DelayReload());
     }
+
+    IEnumerator DelayReload()
+    {
+        float seconds = currentGun.GetReloadLength();
+        yield return new WaitForSeconds(seconds);
+
+        OnGunChanged?.Invoke(currentGun);
+    }
+
+    public bool IsGunAvailable(GunBase gun)
+    {
+        if (availableGuns.TryGetValue(gun, out bool isAvailable))
+        {
+            return isAvailable;
+        }
+
+        return false;
+    }
+
 
     public void AddAmmo(int amount) => Ammo.Value += amount;
 
-    public void AddMedkit() 
-    { 
+    public void AddMedkit()
+    {
         Medkits.Value += 1;
         OnMedkitChanged?.Invoke(Medkits.Value);
     }

@@ -7,6 +7,6 @@ public class Medkit : PickupItem
     public override void OnPickup(Player player)
     {
         player.inventory.AddMedkit();
-        Debug.Log($"{player.steamName} obtained a Medkit.");
+        Debug.Log($"{player.steamName.Value} obtained a Medkit.");
     }
 }

@@ -26,7 +26,7 @@ public class Player : NetworkBehaviour
     [SerializeField] AudioClip playerHurtSfx;
 
     [Header("Player Network variables")]
-    public NetworkVariable<int> currentHealth = new NetworkVariable<int>(maxHealth);
+    public NetworkVariable<int> currentHealth = new NetworkVariable<int>(maxHealth, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     public NetworkVariable<FixedString64Bytes> steamName = new NetworkVariable<FixedString64Bytes>(default,
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -125,9 +125,11 @@ public class Player : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             if (IsServer)
-                inventory.currentGun.Reload();
+                inventory.ReloadGun();
             else
                 ReloadServerRpc();
+
+            
         }
 
         // Interact (atm, only door)
@@ -163,7 +165,8 @@ public class Player : NetworkBehaviour
             var shot = inventory.currentGun.CalculateShot();
             if (IsServer)
             {
-                inventory.currentGun.Shoot(shot.origin, shot.direction);
+                inventory.ShootGun(shot.origin, shot.direction);
+                //inventory.currentGun.Shoot(shot.origin, shot.direction);
             }
             else
             {
@@ -300,7 +303,7 @@ public class Player : NetworkBehaviour
     [ServerRpc]
     void SubmitShotServerRpc(Vector3 origin, Vector3 dir)
     {
-        inventory.currentGun.Shoot(origin, dir);
+        inventory.ShootGun(origin, dir);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -321,7 +324,7 @@ public class Player : NetworkBehaviour
     [ServerRpc]
     void ReloadServerRpc()
     {
-        inventory.currentGun.Reload();
+        inventory.ReloadGun();
     }
 
     [ServerRpc]

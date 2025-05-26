@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -10,6 +11,9 @@ public class Inventory : NetworkBehaviour
 
     public GunBase currentGun { get; private set; }
     public Dictionary<GunBase, bool> availableGuns = new Dictionary<GunBase, bool>();
+
+    public event Action<int> OnMedkitChanged;
+    public event Action<GunBase> OnGunChanged;
 
     public void AddGun(GunBase gun)
     {
@@ -49,22 +53,40 @@ public class Inventory : NetworkBehaviour
         if (ret != null)
         {
             currentGun = ret;
+            OnGunChanged?.Invoke(currentGun);
             return true;
         }
 
         return false;
     }
 
+    public void ShootGun(Vector3 origin, Vector3 direction)
+    {
+        currentGun.Shoot(origin, direction);
+        OnGunChanged.Invoke(currentGun);
+    }
+
+    public void ReloadGun()
+    {
+        currentGun.Reload();
+        OnGunChanged.Invoke(currentGun);
+    }
+
     public void AddAmmo(int amount) => Ammo.Value += amount;
 
-    public void AddMedkit() => Medkits.Value += 1;
+    public void AddMedkit() 
+    { 
+        Medkits.Value += 1;
+        OnMedkitChanged?.Invoke(Medkits.Value);
+    }
 
     public bool UseMedkit()
     {
         if (Medkits.Value > 0)
         {
             Medkits.Value -= 1;
-            Debug.Log("Used Medkit!");
+            OnMedkitChanged?.Invoke(Medkits.Value);
+            //Debug.Log("Used Medkit!");
             return true;
         }
 

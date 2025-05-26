@@ -14,8 +14,8 @@ public abstract class GunBase : NetworkBehaviour
 
     [Header("Gun Settings")]
     [SerializeField] protected Transform gunMuzzle;
-    [SerializeField] protected int maxCapacity = 20;
-    [SerializeField] protected int currentAmmo = 20;
+    [SerializeField] public int maxCapacity = 20;
+    [SerializeField] public int currentAmmo = 20;
     [SerializeField] protected int gunDamage = 10;
     [SerializeField] protected Vector3 shotSpreadVariance = new Vector3(0.005f, 0.005f, 0.005f);
     [SerializeField] protected float fireRate = 0.0f;

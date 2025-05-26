@@ -2,11 +2,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
+using System.Collections;
 
 public class PlayerUI : MonoBehaviour
 {
     [Header("References")]
     public Slider healthSlider;
+    public TextMeshProUGUI healthText;
     public TextMeshProUGUI medkitText;
     public TextMeshProUGUI currentAmmoText;
     public TextMeshProUGUI maxAmmoText;
@@ -18,13 +20,6 @@ public class PlayerUI : MonoBehaviour
 
     Player player;
 
-    void Start()
-    {
-        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-
-        TrySetLocalPlayer();
-    }
-
     void OnDestroy()
     {
         if (player != null && player.IsOwner)
@@ -33,34 +28,9 @@ public class PlayerUI : MonoBehaviour
             player.inventory.OnMedkitChanged -= OnMedkitChanged;
             player.inventory.OnGunChanged -= OnGunChanged;
         }
-
-        if (NetworkManager.Singleton != null)
-            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
     }
 
-    void OnClientConnected(ulong clientId)
-    {
-        if (clientId == NetworkManager.Singleton.LocalClientId)
-        {
-            TrySetLocalPlayer();
-        }
-    }
-
-    void TrySetLocalPlayer()
-    {
-        Player[] players = FindObjectsOfType<Player>();
-
-        foreach (Player p in players)
-        {
-            if (p.IsOwner)
-            {
-                SetPlayer(p);
-                break;
-            }
-        }
-    }
-
-    void SetPlayer(Player p)
+    public void SetPlayer(Player p)
     {
         if (player != null)
         {
@@ -79,6 +49,7 @@ public class PlayerUI : MonoBehaviour
 
         healthSlider.maxValue = 100;
         healthSlider.value = player.currentHealth.Value;
+        healthText.text = $"{player.currentHealth.Value}";
 
         OnMedkitChanged(player.inventory.Medkits.Value);
         OnGunChanged(player.inventory.currentGun);
@@ -114,5 +85,21 @@ public class PlayerUI : MonoBehaviour
     void OnHealthChanged(int previousValue, int newValue)
     {
         healthSlider.value = newValue;
+        healthText.text = $"{player.currentHealth.Value}";
+
+        float percentage = newValue / healthSlider.maxValue;
+
+        if (percentage >= 0.7f)
+        {
+            healthSlider.fillRect.GetComponent<Image>().color = Color.green;
+        }
+        else if (percentage >= 0.3f)
+        {
+            healthSlider.fillRect.GetComponent<Image>().color = Color.yellow;
+        }
+        else
+        {
+            healthSlider.fillRect.GetComponent<Image>().color = Color.red;
+        }
     }
 }

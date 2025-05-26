@@ -86,6 +86,15 @@ public class Player : NetworkBehaviour
 
         billboard.SetName(steamName.Value);
         steamName.OnValueChanged += OnNameChanged;
+
+        if (IsOwner)
+        {
+            var playerUI = FindObjectOfType<PlayerUI>();
+            if (playerUI != null)
+            {
+                playerUI.SetPlayer(this);
+            }
+        }
     }
 
     void Start()
@@ -316,6 +325,7 @@ public class Player : NetworkBehaviour
 
         if (currentHealth.Value <= 0)
         {
+            currentHealth.Value = 0;
             isDead = true;
             Debug.Log($"Player {steamName.Value} dead!");
         }

@@ -42941,6 +42941,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healthSlider: {fileID: 436736250}
+  healthText: {fileID: 1923367175}
   medkitText: {fileID: 2003253371}
   currentAmmoText: {fileID: 1593789967}
   maxAmmoText: {fileID: 979592545}
@@ -53098,8 +53099,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.25}
   m_AnchorMax: {x: 1, y: 0.75}
-  m_AnchoredPosition: {x: -5, y: 0}
-  m_SizeDelta: {x: -20, y: 0}
+  m_AnchoredPosition: {x: 2.500001, y: 0}
+  m_SizeDelta: {x: -5.000002, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2111719167
 GameObject:

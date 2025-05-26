@@ -8,6 +8,7 @@ public class AmmoBox : PickupItem
 
     public override void OnPickup(Player player)
     {
-        //player.AddAmmo(ammoAmount); // NYI        
+        player.inventory.AddAmmo(ammoAmount);
+        Debug.Log($"{player.steamName} obtained {ammoAmount}.");
     }
 }

@@ -1,39 +1,74 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class Inventory : MonoBehaviour
+public class Inventory : NetworkBehaviour
 {
-    // Inventory values
-    public int Ammo { get; private set; } = 0;
+    public NetworkVariable<int> Ammo = new NetworkVariable<int>(0);
+    public NetworkVariable<int> Medkits = new NetworkVariable<int>(0);
 
-    public int Medkits { get; private set; } = 0;
-
-    List<GunBase> ownedGuns = new List<GunBase>();
-
-    public GunBase CurrentGun { get; private set; }
-
-    public void AddAmmo(int amount) => Ammo += amount;
-
-    public void AddMedkit() => Medkits += 1;
-
-    public void UseMedkit()
-    {
-        if (Medkits > 0)
-        {
-            Medkits--;
-        }
-    }
+    public GunBase currentGun { get; private set; }
+    public Dictionary<GunBase, bool> availableGuns = new Dictionary<GunBase, bool>();
 
     public void AddGun(GunBase gun)
     {
-        if (!ownedGuns.Contains(gun))
+        GunBase gunToGet = CheckGun(gun);
+        if (gunToGet != null)
         {
-            ownedGuns.Add(gun);
+            foreach (var gunKey in availableGuns.Keys)
+            {
+                if (gunKey.GetType() == gun.GetType())
+                {
+                    availableGuns[gunKey] = true;
+                }
+            }
         }
-
-        CurrentGun = gun;
     }
 
-    public bool HasGun(GunBase gun) => ownedGuns.Contains(gun);
+    GunBase CheckGun(GunBase gunToCheck)
+    {
+        GunBase ret = null;
+
+        foreach (var kvp in availableGuns)
+        {
+            if (kvp.Key.GetType() == gunToCheck.GetType())
+            {
+                ret = kvp.Key;
+                break;
+            }
+        }
+
+        return ret;
+    }
+
+    public bool EquipGun(GunBase gun)
+    {
+        GunBase ret = CheckGun(gun);
+
+        if (ret != null)
+        {
+            currentGun = ret;
+            return true;
+        }
+
+        return false;
+    }
+
+    public void AddAmmo(int amount) => Ammo.Value += amount;
+
+    public void AddMedkit() => Medkits.Value += 1;
+
+    public bool UseMedkit()
+    {
+        if (Medkits.Value > 0)
+        {
+            Medkits.Value -= 1;
+            Debug.Log("Used Medkit!");
+            return true;
+        }
+
+        return false;
+    }
+
 }

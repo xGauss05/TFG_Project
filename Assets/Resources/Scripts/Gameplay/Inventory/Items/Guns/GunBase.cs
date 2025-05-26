@@ -4,6 +4,14 @@ using Unity.Netcode;
 
 public abstract class GunBase : NetworkBehaviour
 {
+    public enum Type
+    {
+        None,
+        Pistol,
+        AssaultRifle,
+        Shotgun
+    }
+
     [Header("Gun Settings")]
     [SerializeField] protected Transform gunMuzzle;
     [SerializeField] protected int maxCapacity = 20;
@@ -18,7 +26,7 @@ public abstract class GunBase : NetworkBehaviour
     [SerializeField] protected AudioClip reloadSfx;
 
     // Flags & variables for logic handling
-    protected bool isReloading = false;
+    public bool isReloading { get; private set; } = false;
     protected float lastShotTime = 0;
 
     public (Vector3 origin, Vector3 direction) CalculateShot()

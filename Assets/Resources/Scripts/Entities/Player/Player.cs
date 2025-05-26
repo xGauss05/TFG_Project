@@ -27,7 +27,7 @@ public class Player : NetworkBehaviour
 
     [Header("Player Network variables")]
     public NetworkVariable<int> currentHealth = new NetworkVariable<int>(maxHealth);
-    NetworkVariable<FixedString64Bytes> steamName = new NetworkVariable<FixedString64Bytes>(default,
+    public NetworkVariable<FixedString64Bytes> steamName = new NetworkVariable<FixedString64Bytes>(default,
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     [Header("Player Gun properties")]
@@ -39,12 +39,21 @@ public class Player : NetworkBehaviour
     bool isDead = false;
 
     // Helpers and Components
-    GunBase currentGun;
+    public Inventory inventory;
+    GameObject pistolObject;
+    GameObject assaultRifleObject;
+    GameObject shotgunObject;
 
     void Awake()
     {
-        GameObject gunGO = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Items/Guns/Pistol"), gunPivot);
-        currentGun = gunGO.GetComponent<Pistol>();
+        inventory = GetComponent<Inventory>();
+        pistolObject = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Items/Guns/Pistol"), gunPivot);
+        assaultRifleObject = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Items/Guns/AssaultRifle"), gunPivot);
+        shotgunObject = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Items/Guns/Shotgun"), gunPivot);
+
+        inventory.availableGuns.Add(pistolObject.GetComponent<Pistol>(), true);
+        inventory.availableGuns.Add(assaultRifleObject.GetComponent<AssaultRifle>(), true);
+        inventory.availableGuns.Add(shotgunObject.GetComponent<Shotgun>(), true);
     }
 
     public override void OnNetworkSpawn()
@@ -83,6 +92,8 @@ public class Player : NetworkBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        if (IsOwner) EquipGunServerRpc(GunBase.Type.Pistol);
     }
 
     void Update()
@@ -114,7 +125,7 @@ public class Player : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             if (IsServer)
-                currentGun.Reload();
+                inventory.currentGun.Reload();
             else
                 ReloadServerRpc();
         }
@@ -123,12 +134,6 @@ public class Player : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.E) && FindDoor())
         {
             // Open door
-        }
-
-        // Use Medkit
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-            // Use medkit
         }
 
         // Player movement
@@ -155,15 +160,49 @@ public class Player : NetworkBehaviour
         // Shoot weapon
         if (Input.GetButton("Fire1"))
         {
-            var shot = currentGun.CalculateShot();
+            var shot = inventory.currentGun.CalculateShot();
             if (IsServer)
             {
-                currentGun.Shoot(shot.origin, shot.direction);
+                inventory.currentGun.Shoot(shot.origin, shot.direction);
             }
             else
             {
                 SubmitShotServerRpc(shot.origin, shot.direction);
             }
+        }
+
+        // Change gun
+        if (IsServer)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1) && !inventory.currentGun.isReloading) EquipGunClientRpc(GunBase.Type.Pistol);
+            if (Input.GetKeyDown(KeyCode.Alpha2) && !inventory.currentGun.isReloading) EquipGunClientRpc(GunBase.Type.AssaultRifle);
+            if (Input.GetKeyDown(KeyCode.Alpha3) && !inventory.currentGun.isReloading) EquipGunClientRpc(GunBase.Type.Shotgun);
+        }
+        else
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1) && !inventory.currentGun.isReloading) EquipGunServerRpc(GunBase.Type.Pistol);
+            if (Input.GetKeyDown(KeyCode.Alpha2) && !inventory.currentGun.isReloading) EquipGunServerRpc(GunBase.Type.AssaultRifle);
+            if (Input.GetKeyDown(KeyCode.Alpha3) && !inventory.currentGun.isReloading) EquipGunServerRpc(GunBase.Type.Shotgun);
+        }
+
+        // Use Medkit
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            if (IsServer)
+                UseMedkit();
+            else
+                UseMedkitServerRpc();
+        }
+
+    }
+
+    void UseMedkit()
+    {
+        if (inventory.UseMedkit())
+        {
+            Debug.Log($"Before {currentHealth.Value}");
+            currentHealth.Value += (int)(maxHealth - currentHealth.Value) * 80 / 100;
+            Debug.Log($"After {currentHealth.Value}");
         }
     }
 
@@ -192,6 +231,17 @@ public class Player : NetworkBehaviour
 
         camPivot.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
 
+    }
+
+    void EquipGun(GameObject gunGO)
+    {
+        if (inventory.EquipGun(gunGO.GetComponent<GunBase>()))
+        {
+            pistolObject.SetActive(false);
+            assaultRifleObject.SetActive(false);
+            shotgunObject.SetActive(false);
+            gunGO.SetActive(true);
+        }
     }
 
     void OpenDoor()
@@ -225,11 +275,32 @@ public class Player : NetworkBehaviour
         SFXManager.Singleton.PlaySound(playerHurtSfx);
     }
 
+    [ClientRpc]
+    void EquipGunClientRpc(GunBase.Type type)
+    {
+        switch (type)
+        {
+            case GunBase.Type.Pistol:
+                EquipGun(pistolObject);
+                break;
+            case GunBase.Type.AssaultRifle:
+                EquipGun(assaultRifleObject);
+                break;
+            case GunBase.Type.Shotgun:
+                EquipGun(shotgunObject);
+                break;
+            case GunBase.Type.None:
+            default:
+                EquipGun(pistolObject);
+                break;
+        }
+    }
+
     // Server RPC functions -------------------------------------------------------------------------------------------
     [ServerRpc]
     void SubmitShotServerRpc(Vector3 origin, Vector3 dir)
     {
-        currentGun.Shoot(origin, dir);
+        inventory.currentGun.Shoot(origin, dir);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -250,7 +321,19 @@ public class Player : NetworkBehaviour
     [ServerRpc]
     void ReloadServerRpc()
     {
-        currentGun.Reload();
+        inventory.currentGun.Reload();
+    }
+
+    [ServerRpc]
+    void UseMedkitServerRpc()
+    {
+        UseMedkit();
+    }
+
+    [ServerRpc]
+    void EquipGunServerRpc(GunBase.Type type)
+    {
+        EquipGunClientRpc(type);
     }
 
 }

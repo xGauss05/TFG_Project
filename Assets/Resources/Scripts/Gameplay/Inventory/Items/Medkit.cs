@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class Medkit : PickupItem
 {
-    [SerializeField] int quantity = 1;
-
     public override void OnPickup(Player player)
     {
-        //player.AddMedkit(quantity); // NYI
+        player.inventory.AddMedkit();
+        Debug.Log($"{player.steamName} obtained a Medkit.");
     }
 }

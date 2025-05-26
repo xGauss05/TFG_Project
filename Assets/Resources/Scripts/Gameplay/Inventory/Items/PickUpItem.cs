@@ -25,7 +25,7 @@ public abstract class PickupItem : NetworkBehaviour
             Player player = other.GetComponent<Player>();
             if (player != null)
             {
-                //player.PickupItem(this); // NYI
+                OnPickup(player);
                 DespawnServerRpc();
                 Debug.Log("Item pickup!");
             }

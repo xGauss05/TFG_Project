@@ -6,11 +6,16 @@ using UnityEngine;
 
 public class Inventory : NetworkBehaviour
 {
+    public GunBase currentGun { get; private set; }
+
+    [Header("Inventory Network variables")]
     public NetworkVariable<int> Ammo = new NetworkVariable<int>(0);
     public NetworkVariable<int> Medkits = new NetworkVariable<int>(0);
+    public NetworkVariable<GunBase.Type> currentGunType = new NetworkVariable<GunBase.Type>(
+        GunBase.Type.Pistol, 
+        NetworkVariableReadPermission.Everyone, 
+        NetworkVariableWritePermission.Server);
 
-    public GunBase currentGun { get; private set; }
-    public NetworkVariable<GunBase.Type> currentGunType = new NetworkVariable<GunBase.Type>(GunBase.Type.Pistol, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     public Dictionary<GunBase, bool> availableGuns = new Dictionary<GunBase, bool>();
 
     public void AddGun(GunBase gun)

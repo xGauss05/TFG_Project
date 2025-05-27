@@ -1,14 +1,30 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class Pistol : GunBase
 {
+    protected override int maxCapacity => 16;
+
+    void Awake()
+    {
+        GunType = Type.Pistol;
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        if (currentAmmo == null)
+            currentAmmo = new NetworkVariable<int>(maxCapacity, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    }
+
     public override void Shoot(Vector3 origin, Vector3 direction)
     {
         if (isReloading || Time.time - lastShotTime < fireRate) return;
 
-        if (currentAmmo <= 0 || Time.time - lastShotTime < fireRate)
+        if (currentAmmo.Value <= 0 || Time.time - lastShotTime < fireRate)
         {
             PlayEmptyClipSFXClientRpc();
             lastShotTime = Time.time;
@@ -16,7 +32,7 @@ public class Pistol : GunBase
         }
 
         PlayGunShotSFXClientRpc();
-        currentAmmo--;
+        currentAmmo.Value--;
 
         Vector3 hitPoint = origin + direction * 999f;
 

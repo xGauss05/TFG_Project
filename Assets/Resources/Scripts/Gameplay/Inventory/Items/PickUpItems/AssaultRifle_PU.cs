@@ -6,8 +6,7 @@ public class AssaultRifle_PU : PickupItem
 {
     public override void OnPickup(Player player)
     {
-        var newRifle = new AssaultRifle();
-        player.inventory.AddGun(newRifle);
+        player.inventory.AddGun(player.GetWeapon(GunBase.Type.AssaultRifle));
         Debug.Log($"{player.steamName.Value} obtained an Assault Rifle.");
     }
 }

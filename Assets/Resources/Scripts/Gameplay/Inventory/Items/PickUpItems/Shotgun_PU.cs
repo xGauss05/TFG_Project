@@ -6,8 +6,7 @@ public class Shotgun_PU : PickupItem
 {
     public override void OnPickup(Player player)
     {
-        var newShotgun = new Shotgun();
-        player.inventory.AddGun(newShotgun);
+        player.inventory.AddGun(player.GetWeapon(GunBase.Type.Shotgun));
         Debug.Log($"{player.steamName.Value} obtained a Shotgun.");
     }
 }

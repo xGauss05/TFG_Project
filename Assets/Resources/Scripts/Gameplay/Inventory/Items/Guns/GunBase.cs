@@ -14,11 +14,12 @@ public abstract class GunBase : NetworkBehaviour
 
     [Header("Gun Settings")]
     [SerializeField] protected Transform gunMuzzle;
-    [SerializeField] public int maxCapacity = 20;
-    [SerializeField] public int currentAmmo = 20;
+    protected virtual int maxCapacity => 8;
+    [SerializeField] public NetworkVariable<int> currentAmmo;
     [SerializeField] protected int gunDamage = 10;
     [SerializeField] protected Vector3 shotSpreadVariance = new Vector3(0.005f, 0.005f, 0.005f);
     [SerializeField] protected float fireRate = 0.0f;
+    public Type GunType { get; protected set; } = Type.None;
 
     [Header("Gun Audios")]
     [SerializeField] protected AudioClip gunShotSfx;
@@ -74,7 +75,7 @@ public abstract class GunBase : NetworkBehaviour
 
     public void Reload()
     {
-        if (isReloading || currentAmmo >= maxCapacity) return;
+        if (isReloading || currentAmmo.Value >= maxCapacity) return;
 
         StartCoroutine(ReloadCoroutine());
     }
@@ -86,7 +87,7 @@ public abstract class GunBase : NetworkBehaviour
 
         yield return new WaitForSeconds(reloadSfx.length);
 
-        currentAmmo = maxCapacity;
+        currentAmmo.Value = maxCapacity;
         isReloading = false;
     }
 
@@ -94,11 +95,6 @@ public abstract class GunBase : NetworkBehaviour
     {
         GameObject trail = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Items/Guns/BulletTrail"));
         trail.GetComponent<BulletTrail>()?.SetTrailPositions(start, end);
-    }
-
-    public float GetReloadLength()
-    {
-        return reloadSfx.length;
     }
 
     // Client RPC functions -------------------------------------------------------------------------------------------

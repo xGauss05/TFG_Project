@@ -40,16 +40,13 @@ public class Player : NetworkBehaviour
 
     // Helpers and Components
     public Inventory inventory;
-    GameObject pistolObject;
-    GameObject assaultRifleObject;
-    GameObject shotgunObject;
+    [SerializeField] GameObject pistolObject;
+    [SerializeField] GameObject assaultRifleObject;
+    [SerializeField] GameObject shotgunObject;
 
     void Awake()
     {
         inventory = GetComponent<Inventory>();
-        pistolObject = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Items/Guns/Pistol"), gunPivot);
-        assaultRifleObject = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Items/Guns/AssaultRifle"), gunPivot);
-        shotgunObject = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Items/Guns/Shotgun"), gunPivot);
 
         inventory.availableGuns.Add(pistolObject.GetComponent<Pistol>(), true);
         inventory.availableGuns.Add(assaultRifleObject.GetComponent<AssaultRifle>(), false);
@@ -95,13 +92,14 @@ public class Player : NetworkBehaviour
 
         if (IsLocalPlayer)
         {
+            EquipGunServerRpc(GunBase.Type.Pistol);
+
             var playerUI = FindObjectOfType<PlayerUI>();
             if (playerUI != null)
             {
                 playerUI.SetPlayer(this);
             }
 
-            EquipGunServerRpc(GunBase.Type.Pistol);
         }
     }
 
@@ -279,6 +277,21 @@ public class Player : NetworkBehaviour
     void OnNameChanged(FixedString64Bytes prev, FixedString64Bytes current)
     {
         billboard.SetName(current);
+    }
+
+    public GunBase GetWeapon(GunBase.Type type)
+    {
+        switch (type)
+        {
+            case GunBase.Type.AssaultRifle:
+                return assaultRifleObject.GetComponent<AssaultRifle>();
+            case GunBase.Type.Shotgun:
+                return shotgunObject.GetComponent<Shotgun>();
+            case GunBase.Type.Pistol:
+            case GunBase.Type.None:
+            default:
+                return pistolObject.GetComponent<Pistol>();
+        }
     }
 
     // Client RPC functions -------------------------------------------------------------------------------------------

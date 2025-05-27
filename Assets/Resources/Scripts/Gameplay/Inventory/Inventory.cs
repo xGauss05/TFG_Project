@@ -66,6 +66,8 @@ public class Inventory : NetworkBehaviour
                 else currentGunType.Value = GunBase.Type.Shotgun;
             }
 
+            
+
             return true;
         }
 

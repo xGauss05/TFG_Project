@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
@@ -19,30 +19,18 @@ public class PlayerUI : MonoBehaviour
     public Sprite shotgunSprite;
 
     Player player;
+    GunBase currentGunInstance;
 
     void OnDisable()
     {
-        if (player != null && player.IsOwner)
-        {
-            player.currentHealth.OnValueChanged -= (prev, curr) => OnHealthChanged(curr);
-            player.inventory.Medkits.OnValueChanged -= (prev, curr) => OnMedkitChanged(curr);
-            player.inventory.currentGunType.OnValueChanged -= (prev, curr) => OnGunChanged(curr);
-            //player.inventory.currentGun.currentAmmo.OnValueChanged -= (prev, curr) => OnCurrentAmmoChanged(curr);
-            //player.inventory.OnGunChanged -= OnGunChanged;
-        }
+        if (player != null && player.IsOwner) UnsubscribeEvents();
     }
 
     public void SetPlayer(Player p)
     {
         Debug.Log($"Setting player to UI. Player name: {p.steamName.Value}");
 
-        if (player != null)
-        {
-            player.currentHealth.OnValueChanged -= (prev, curr) => OnHealthChanged(curr);
-            player.inventory.Medkits.OnValueChanged -= (prev, curr) => OnMedkitChanged(curr);
-            player.inventory.currentGunType.OnValueChanged -= (prev, curr) => OnGunChanged(curr);
-            //player.inventory.currentGun.currentAmmo.OnValueChanged -= (prev, curr) => OnCurrentAmmoChanged(curr);
-        }
+        if (player != null) UnsubscribeEvents();
 
         player = p;
 
@@ -53,15 +41,52 @@ public class PlayerUI : MonoBehaviour
         player.currentHealth.OnValueChanged += (prev, curr) => OnHealthChanged(curr);
         player.inventory.Medkits.OnValueChanged += (prev, curr) => OnMedkitChanged(curr);
         player.inventory.currentGunType.OnValueChanged += (prev, curr) => OnGunChanged(curr);
-        //player.inventory.currentGun.currentAmmo.OnValueChanged += (prev, curr) => OnCurrentAmmoChanged(curr);
+        StartCoroutine(WaitForGun());
+        //player.inventory.OnGunChanged += OnGunChanged;
 
         healthSlider.maxValue = 100;
-        healthSlider.value = player.currentHealth.Value;
-        healthText.text = $"{player.currentHealth.Value}";
 
+        OnHealthChanged(player.currentHealth.Value);
         OnMedkitChanged(player.inventory.Medkits.Value);
         OnGunChanged(player.inventory.currentGunType.Value);
+        //OnCurrentAmmoChanged(player.inventory.currentGun.currentAmmo.Value);
     }
+
+    void UnsubscribeEvents()
+    {
+        player.currentHealth.OnValueChanged -= (prev, curr) => OnHealthChanged(curr);
+        player.inventory.Medkits.OnValueChanged -= (prev, curr) => OnMedkitChanged(curr);
+        player.inventory.currentGunType.OnValueChanged -= (prev, curr) => OnGunChanged(curr);
+        UnsubscribeFromGun();
+        //player.inventory.OnGunChanged -= OnGunChanged;
+    }
+
+    void SubscribeToGun(GunBase gun)
+    {
+        if (gun == null) return;
+        currentGunInstance = gun;
+        currentGunInstance.currentAmmo.OnValueChanged += (prev, curr) => OnCurrentAmmoChanged(curr);
+        OnCurrentAmmoChanged(currentGunInstance.currentAmmo.Value);
+    }
+
+    void UnsubscribeFromGun()
+    {
+        if (currentGunInstance == null) return;
+        currentGunInstance.currentAmmo.OnValueChanged -= (prev, curr) => OnCurrentAmmoChanged(curr);
+        currentGunInstance = null;
+    }
+
+    IEnumerator WaitForGun()
+    {
+        while (player.inventory.currentGun == null)
+        {
+            yield return null;
+        }
+
+        Debug.Log("No longer waiting for Gun.");
+        SubscribeToGun(player.inventory.currentGun);
+    }
+
 
     void OnMedkitChanged(int count)
     {
@@ -79,17 +104,20 @@ public class PlayerUI : MonoBehaviour
                 weaponIcon.sprite = shotgunSprite;
                 break;
             case GunBase.Type.Pistol:
-                weaponIcon.sprite = pistolSprite;
-                break;
             case GunBase.Type.None:
             default:
+                weaponIcon.sprite = pistolSprite;
                 break;
         }
+
+        UnsubscribeFromGun();
+        StartCoroutine(WaitForGun());
     }
 
     void OnCurrentAmmoChanged(int newValue)
     {
         currentAmmoText.text = $"{newValue}";
+        if (currentGunInstance) maxAmmoText.text = "∞";
     }
 
     void OnHealthChanged(int newValue)

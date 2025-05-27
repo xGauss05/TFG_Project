@@ -15,7 +15,12 @@ public abstract class GunBase : NetworkBehaviour
     [Header("Gun Settings")]
     [SerializeField] protected Transform gunMuzzle;
     protected virtual int maxCapacity => 8;
-    [SerializeField] public NetworkVariable<int> currentAmmo;
+    public NetworkVariable<int> currentAmmo = new NetworkVariable<int>(
+    0,
+    NetworkVariableReadPermission.Everyone,
+    NetworkVariableWritePermission.Server
+    );
+
     [SerializeField] protected int gunDamage = 10;
     [SerializeField] protected Vector3 shotSpreadVariance = new Vector3(0.005f, 0.005f, 0.005f);
     [SerializeField] protected float fireRate = 0.0f;
@@ -29,6 +34,16 @@ public abstract class GunBase : NetworkBehaviour
     // Flags & variables for logic handling
     public bool isReloading { get; private set; } = false;
     protected float lastShotTime = 0;
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        if (IsServer)
+        {
+            currentAmmo.Value = maxCapacity;
+        }
+    }
 
     public (Vector3 origin, Vector3 direction) CalculateShot()
     {

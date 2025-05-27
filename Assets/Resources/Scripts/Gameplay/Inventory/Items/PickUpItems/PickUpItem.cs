@@ -27,7 +27,7 @@ public abstract class PickupItem : NetworkBehaviour
             {
                 OnPickup(player);
                 DespawnServerRpc();
-                Debug.Log("Item pickup!");
+                //Debug.Log("Item pickup!");
             }
         }
     }

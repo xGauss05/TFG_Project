@@ -85,7 +85,7 @@ public class SteamManager : MonoBehaviour
             LobbyReference.Singleton.currentLobby = lobby;
 
             UpdatePlayerListUI();
-            Debug.Log($"Created lobby {lobby.Id}");
+            //Debug.Log($"Created lobby {lobby.Id}");
         }
     }
 
@@ -101,7 +101,7 @@ public class SteamManager : MonoBehaviour
         LobbyIDScreen.SetActive(true);
         LobbyPlayersList.SetActive(true);
 
-        Debug.Log($"Entered lobby {lobby.Id}");
+        //Debug.Log($"Entered lobby {lobby.Id}");
 
         if (NetworkManager.Singleton.IsHost) return;
 
@@ -158,7 +158,7 @@ public class SteamManager : MonoBehaviour
         // Steam lobby IDs are 'ulong' type of variable
         if (!ulong.TryParse(LobbyIDInputField.text, out ID))
         {
-            Debug.Log($"{LobbyIDInputField.text} is not a valid Lobby ID.");
+            //Debug.Log($"{LobbyIDInputField.text} is not a valid Lobby ID.");
             PlayerFeedback.text = $"{LobbyIDInputField.text} is not a valid Lobby ID.";
             return;
         }
@@ -170,7 +170,7 @@ public class SteamManager : MonoBehaviour
         }
         catch (Exception ex)
         {
-            Debug.Log($"Failed to join lobby: {ID}, {ex.Message}");
+            //Debug.Log($"Failed to join lobby: {ID}, {ex.Message}");
             PlayerFeedback.text = $"Failed to join lobby: {ID}, {ex.Message}";
         }
 
@@ -183,7 +183,7 @@ public class SteamManager : MonoBehaviour
         tEditor.SelectAll();
         tEditor.Copy();
 
-        Debug.Log($"Successfully copied lobby ID: {LobbyIDText.text}.");
+        //Debug.Log($"Successfully copied lobby ID: {LobbyIDText.text}.");
         PlayerFeedback.text = $"Successfully copied lobby ID: {LobbyIDText.text}.";
     }
 

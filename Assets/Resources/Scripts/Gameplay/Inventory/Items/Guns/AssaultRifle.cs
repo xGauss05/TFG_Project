@@ -12,14 +12,6 @@ public class AssaultRifle : GunBase
         GunType = Type.AssaultRifle;
     }
 
-    public override void OnNetworkSpawn()
-    {
-        base.OnNetworkSpawn();
-
-        if (currentAmmo == null)
-            currentAmmo = new NetworkVariable<int>(maxCapacity, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-    }
-
     public override void Shoot(Vector3 origin, Vector3 direction)
     {
         if (isReloading || Time.time - lastShotTime < fireRate) return;

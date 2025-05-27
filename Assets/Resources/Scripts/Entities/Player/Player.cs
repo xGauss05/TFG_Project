@@ -44,9 +44,11 @@ public class Player : NetworkBehaviour
     [SerializeField] GameObject assaultRifleObject;
     [SerializeField] GameObject shotgunObject;
 
+    // Unity Event functions ------------------------------------------------------------------------------------------
+    #region Unity Event functions
     void Awake()
     {
-        inventory = GetComponent<Inventory>();
+        //inventory = GetComponent<Inventory>();
 
         inventory.availableGuns.Add(pistolObject.GetComponent<Pistol>(), true);
         inventory.availableGuns.Add(assaultRifleObject.GetComponent<AssaultRifle>(), false);
@@ -105,13 +107,14 @@ public class Player : NetworkBehaviour
 
     void Update()
     {
-        if (!IsOwner || isDead) return;
+        if (!IsOwner || !IsSpawned || isDead) return;
 
         if (IsOwner)
         {
             HandleInput();
         }
     }
+    #endregion
 
     void HandleInput()
     {
@@ -251,6 +254,7 @@ public class Player : NetworkBehaviour
             pistolObject.SetActive(false);
             assaultRifleObject.SetActive(false);
             shotgunObject.SetActive(false);
+
             gunGO.SetActive(true);
         }
     }
@@ -295,6 +299,7 @@ public class Player : NetworkBehaviour
     }
 
     // Client RPC functions -------------------------------------------------------------------------------------------
+    #region Client RPC functions
     [ClientRpc]
     void PlayHurtSFXClientRpc()
     {
@@ -304,25 +309,26 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     void EquipGunClientRpc(GunBase.Type type)
     {
+        Debug.Log("Calling EquipGunClientRpc.");
         switch (type)
         {
-            case GunBase.Type.Pistol:
-                EquipGun(pistolObject);
-                break;
             case GunBase.Type.AssaultRifle:
                 EquipGun(assaultRifleObject);
                 break;
             case GunBase.Type.Shotgun:
                 EquipGun(shotgunObject);
                 break;
+            case GunBase.Type.Pistol:
             case GunBase.Type.None:
             default:
                 EquipGun(pistolObject);
                 break;
         }
     }
+    #endregion
 
     // Server RPC functions -------------------------------------------------------------------------------------------
+    #region Server RPC functions
     [ServerRpc]
     void SubmitShotServerRpc(Vector3 origin, Vector3 dir)
     {
@@ -360,7 +366,8 @@ public class Player : NetworkBehaviour
     [ServerRpc]
     void EquipGunServerRpc(GunBase.Type type)
     {
+        Debug.Log("Calling EquipGunServerRpc.");
         EquipGunClientRpc(type);
     }
-
+    #endregion
 }

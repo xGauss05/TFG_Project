@@ -20,39 +20,47 @@ public class PlayerUI : MonoBehaviour
 
     Player player;
 
-    void OnDestroy()
+    void OnDisable()
     {
         if (player != null && player.IsOwner)
         {
-            player.currentHealth.OnValueChanged -= OnHealthChanged;
-            player.inventory.OnMedkitChanged -= OnMedkitChanged;
-            player.inventory.OnGunChanged -= OnGunChanged;
+            player.currentHealth.OnValueChanged -= (prev, curr) => OnHealthChanged(curr);
+            player.inventory.Medkits.OnValueChanged -= (prev, curr) => OnMedkitChanged(curr);
+            player.inventory.currentGunType.OnValueChanged -= (prev, curr) => OnGunChanged(curr);
+            //player.inventory.currentGun.currentAmmo.OnValueChanged -= (prev, curr) => OnCurrentAmmoChanged(curr);
+            //player.inventory.OnGunChanged -= OnGunChanged;
         }
     }
 
     public void SetPlayer(Player p)
     {
+        Debug.Log($"Setting player to UI. Player name: {p.steamName.Value}");
+
         if (player != null)
         {
-            player.currentHealth.OnValueChanged -= OnHealthChanged;
-            player.inventory.OnMedkitChanged -= OnMedkitChanged;
-            player.inventory.OnGunChanged -= OnGunChanged;
+            player.currentHealth.OnValueChanged -= (prev, curr) => OnHealthChanged(curr);
+            player.inventory.Medkits.OnValueChanged -= (prev, curr) => OnMedkitChanged(curr);
+            player.inventory.currentGunType.OnValueChanged -= (prev, curr) => OnGunChanged(curr);
+            //player.inventory.currentGun.currentAmmo.OnValueChanged -= (prev, curr) => OnCurrentAmmoChanged(curr);
         }
 
         player = p;
 
-        if (player == null || !player.IsOwner) return;
+        if (player == null) return;
 
-        player.currentHealth.OnValueChanged += OnHealthChanged;
-        player.inventory.OnMedkitChanged += OnMedkitChanged;
-        player.inventory.OnGunChanged += OnGunChanged;
+        Debug.Log($"Subscribing {p.steamName.Value} to UI events.");
+
+        player.currentHealth.OnValueChanged += (prev, curr) => OnHealthChanged(curr);
+        player.inventory.Medkits.OnValueChanged += (prev, curr) => OnMedkitChanged(curr);
+        player.inventory.currentGunType.OnValueChanged += (prev, curr) => OnGunChanged(curr);
+        //player.inventory.currentGun.currentAmmo.OnValueChanged += (prev, curr) => OnCurrentAmmoChanged(curr);
 
         healthSlider.maxValue = 100;
         healthSlider.value = player.currentHealth.Value;
         healthText.text = $"{player.currentHealth.Value}";
 
         OnMedkitChanged(player.inventory.Medkits.Value);
-        OnGunChanged(player.inventory.currentGun);
+        OnGunChanged(player.inventory.currentGunType.Value);
     }
 
     void OnMedkitChanged(int count)
@@ -60,29 +68,31 @@ public class PlayerUI : MonoBehaviour
         medkitText.text = $"x{count}";
     }
 
-    void OnGunChanged(GunBase gun)
+    void OnGunChanged(GunBase.Type gunType)
     {
-        if (gun == null) return;
-
-        currentAmmoText.text = $"{gun.currentAmmo}";
-        maxAmmoText.text = $"{gun.maxCapacity}";
-
-        if (gun is Pistol)
+        switch (gunType)
         {
-            weaponIcon.sprite = pistolSprite;
+            case GunBase.Type.AssaultRifle:
+                weaponIcon.sprite = assaultRifleSprite;
+                break;
+            case GunBase.Type.Shotgun:
+                weaponIcon.sprite = shotgunSprite;
+                break;
+            case GunBase.Type.Pistol:
+                weaponIcon.sprite = pistolSprite;
+                break;
+            case GunBase.Type.None:
+            default:
+                break;
         }
-        else if (gun is AssaultRifle)
-        {
-            weaponIcon.sprite = assaultRifleSprite;
-        }
-        else if (gun is Shotgun)
-        {
-            weaponIcon.sprite = shotgunSprite;
-        }
-
     }
 
-    void OnHealthChanged(int previousValue, int newValue)
+    void OnCurrentAmmoChanged(int newValue)
+    {
+        currentAmmoText.text = $"{newValue}";
+    }
+
+    void OnHealthChanged(int newValue)
     {
         healthSlider.value = newValue;
         healthText.text = $"{player.currentHealth.Value}";

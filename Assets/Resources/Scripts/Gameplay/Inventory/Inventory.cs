@@ -10,10 +10,8 @@ public class Inventory : NetworkBehaviour
     public NetworkVariable<int> Medkits = new NetworkVariable<int>(0);
 
     public GunBase currentGun { get; private set; }
+    public NetworkVariable<GunBase.Type> currentGunType = new NetworkVariable<GunBase.Type>(GunBase.Type.Pistol, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     public Dictionary<GunBase, bool> availableGuns = new Dictionary<GunBase, bool>();
-
-    public event Action<int> OnMedkitChanged;
-    public event Action<GunBase> OnGunChanged;
 
     public void AddGun(GunBase gun)
     {
@@ -60,7 +58,14 @@ public class Inventory : NetworkBehaviour
         if (ret != null)
         {
             currentGun = ret;
-            OnGunChanged?.Invoke(currentGun);
+
+            if (IsServer)
+            {
+                if (ret is Pistol) currentGunType.Value = GunBase.Type.Pistol;
+                else if (ret is AssaultRifle) currentGunType.Value = GunBase.Type.AssaultRifle;
+                else currentGunType.Value = GunBase.Type.Shotgun;
+            }
+
             return true;
         }
 
@@ -70,21 +75,11 @@ public class Inventory : NetworkBehaviour
     public void ShootGun(Vector3 origin, Vector3 direction)
     {
         currentGun.Shoot(origin, direction);
-        OnGunChanged.Invoke(currentGun);
     }
 
     public void ReloadGun()
     {
         currentGun.Reload();
-        StartCoroutine(DelayReload());
-    }
-
-    IEnumerator DelayReload()
-    {
-        float seconds = currentGun.GetReloadLength();
-        yield return new WaitForSeconds(seconds);
-
-        OnGunChanged?.Invoke(currentGun);
     }
 
     public bool IsGunAvailable(GunBase gun)
@@ -97,13 +92,11 @@ public class Inventory : NetworkBehaviour
         return false;
     }
 
-
     public void AddAmmo(int amount) => Ammo.Value += amount;
 
     public void AddMedkit()
     {
         Medkits.Value += 1;
-        OnMedkitChanged?.Invoke(Medkits.Value);
     }
 
     public bool UseMedkit()
@@ -111,7 +104,6 @@ public class Inventory : NetworkBehaviour
         if (Medkits.Value > 0)
         {
             Medkits.Value -= 1;
-            OnMedkitChanged?.Invoke(Medkits.Value);
             //Debug.Log("Used Medkit!");
             return true;
         }

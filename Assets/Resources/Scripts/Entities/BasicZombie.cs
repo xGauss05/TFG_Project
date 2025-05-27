@@ -69,6 +69,11 @@ public class BasicZombie : NetworkBehaviour
 
     }
 
+    public override void OnNetworkDespawn() 
+    {
+        Debug.Log("Basic Zombie despawn.");
+    }
+
     // Start is called before the first frame update
     void Start()
     {

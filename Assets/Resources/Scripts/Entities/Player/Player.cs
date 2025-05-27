@@ -56,6 +56,12 @@ public class Player : NetworkBehaviour
         inventory.availableGuns.Add(shotgunObject.GetComponent<Shotgun>(), false);
     }
 
+    void Start()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
     public override void OnNetworkSpawn()
     {
         if (IsOwner)
@@ -87,22 +93,16 @@ public class Player : NetworkBehaviour
         billboard.SetName(steamName.Value);
         steamName.OnValueChanged += OnNameChanged;
 
-        if (IsOwner)
+        if (IsLocalPlayer)
         {
             var playerUI = FindObjectOfType<PlayerUI>();
             if (playerUI != null)
             {
                 playerUI.SetPlayer(this);
             }
+
+            EquipGunServerRpc(GunBase.Type.Pistol);
         }
-    }
-
-    void Start()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
-        if (IsOwner) EquipGunServerRpc(GunBase.Type.Pistol);
     }
 
     void Update()

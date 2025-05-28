@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1548314331716853169}
   - component: {fileID: -2754853749520751330}
   m_Layer: 0
-  m_Name: AssaultRifle
+  m_Name: PickUp_AssaultRifle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

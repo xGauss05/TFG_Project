@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7223737378419809446}
   - component: {fileID: 4707930281134781295}
   m_Layer: 0
-  m_Name: Medkit
+  m_Name: PickUp_Medkit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

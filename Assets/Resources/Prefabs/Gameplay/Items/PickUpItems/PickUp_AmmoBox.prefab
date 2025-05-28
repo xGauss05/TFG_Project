@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: -8517554578786365713}
   - component: {fileID: 4663665556721681681}
   m_Layer: 0
-  m_Name: AmmoBox
+  m_Name: PickUp_AmmoBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

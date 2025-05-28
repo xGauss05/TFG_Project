@@ -40,7 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1101776862349265357}
-  - component: {fileID: -5727703001681574736}
+  - component: {fileID: 997831632364822663}
   - component: {fileID: 5761114419988718160}
   m_Layer: 0
   m_Name: AssaultRifle
@@ -66,7 +66,7 @@ Transform:
   - {fileID: 1572871185077827056}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-5727703001681574736
+--- !u!114 &997831632364822663
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -78,7 +78,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3902725768
+  GlobalObjectIdHash: 577608375
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1

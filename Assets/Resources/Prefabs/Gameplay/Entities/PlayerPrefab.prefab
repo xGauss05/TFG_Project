@@ -7250,7 +7250,7 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4971416500773532903}
     m_Modifications:
-    - target: {fileID: -5727703001681574736, guid: b0f3c58c6ec2c264ba7414fcacfed527, type: 3}
+    - target: {fileID: 997831632364822663, guid: b0f3c58c6ec2c264ba7414fcacfed527, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 3214007362
       objectReference: {fileID: 0}
@@ -7298,16 +7298,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: AssaultRifle
       objectReference: {fileID: 0}
-    - target: {fileID: 5761114419988718160, guid: b0f3c58c6ec2c264ba7414fcacfed527, type: 3}
-      propertyPath: gunMuzzle
-      value: 
-      objectReference: {fileID: 2027714825236600638}
-    - target: {fileID: 5761114419988718160, guid: b0f3c58c6ec2c264ba7414fcacfed527, type: 3}
-      propertyPath: currentAmmo.m_InternalValue
-      value: 50
-      objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: -5727703001681574736, guid: b0f3c58c6ec2c264ba7414fcacfed527, type: 3}
+    - {fileID: 997831632364822663, guid: b0f3c58c6ec2c264ba7414fcacfed527, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -7315,11 +7307,6 @@ PrefabInstance:
 --- !u!4 &484798700688059139 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1101776862349265357, guid: b0f3c58c6ec2c264ba7414fcacfed527, type: 3}
-  m_PrefabInstance: {fileID: 716096399011717838}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &2027714825236600638 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1572871185077827056, guid: b0f3c58c6ec2c264ba7414fcacfed527, type: 3}
   m_PrefabInstance: {fileID: 716096399011717838}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &5671008089120942373 stripped

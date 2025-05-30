@@ -13,6 +13,8 @@ If the game does not work, in any web browser type:
 It should prompt an installation in you Steam app of *Spacewar!*. There's no need to install it, but it is necessary to register it on your account.
 To check if it's registered correctly, go to Library and search for *Spacewar!*.
 
+It is recommended to add Lights Out.exe at Steam, by Add a Game... > Add a Non-Steam Game... > Browse... and select Lights Out.exe
+
 ## Online features
 - Create/Join a Lobby
 - Shows a list of players in the current Lobby
@@ -20,6 +22,7 @@ To check if it's registered correctly, go to Library and search for *Spacewar!*.
 - Loads the Gameplay scene for each Client connected
 - Zombies can attack Players
 - Shoot them down with your Gun to defend yourself
+- Boxes that can drop goodies for the players
 - Reach the extraction zone (Green zone) to finish the level
   
 ## Controls

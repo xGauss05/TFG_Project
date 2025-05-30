@@ -10,9 +10,7 @@ public abstract class PickupItem : NetworkBehaviour
     [SerializeField] float upDownSpeed = 0.5f;
     [SerializeField] float rotSpeed = 10.0f;
 
-    NetworkVariable<Vector3> syncedPosition = new NetworkVariable<Vector3>(
-        writePerm: NetworkVariableWritePermission.Server
-    );
+    public bool useRandomSpawnPoint = true;
 
     public abstract void OnPickup(Player player);
 
@@ -34,7 +32,7 @@ public abstract class PickupItem : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (IsServer)
+        if (IsServer && useRandomSpawnPoint)
         {
             // Currently testing for ZombieSpawnpoints
             GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("ZombieSpawnpoint");
@@ -45,23 +43,16 @@ public abstract class PickupItem : NetworkBehaviour
                 Transform spawnTransform = spawnPoints[randomIndex].transform;
 
                 // Set the PickupItem spawn point to the Spawnpoint position
-                syncedPosition.Value = spawnTransform.position;
+                transform.position = spawnTransform.position;
+                transform.rotation = spawnTransform.rotation;
             }
             else
             {
                 Debug.LogWarning("No zombie spawn points found. Spawning at default position.");
-                syncedPosition.Value = new Vector3(0, 0, 0); // Default position
+                transform.position = new Vector3(0, 0, 0); // Default position
             }
 
-            transform.position = syncedPosition.Value;
         }
-
-        syncedPosition.OnValueChanged += (oldValue, newValue) =>
-        {
-            transform.position = newValue;
-        };
-
-        transform.position = syncedPosition.Value;
     }
 
     void Update()

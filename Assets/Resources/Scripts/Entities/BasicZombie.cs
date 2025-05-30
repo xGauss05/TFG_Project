@@ -1,10 +1,9 @@
 using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Unity.Netcode;
+using UnityEngine;
 using UnityEngine.AI;
 
-public class BasicZombie : NetworkBehaviour
+public class BasicZombie : NetworkBehaviour, IDamageable
 {
     public enum ZombieState
     {
@@ -191,8 +190,9 @@ public class BasicZombie : NetworkBehaviour
 
         currentHitbox.GetComponent<ZombieDamageHitbox>().attacker = this;
 
-        AnimatorStateInfo animatorStateInfo = zombieAnimator.GetCurrentAnimatorStateInfo(0);
+        PlayZombieAttackSFXClientRpc();
 
+        AnimatorStateInfo animatorStateInfo = zombieAnimator.GetCurrentAnimatorStateInfo(0);
         while (!animatorStateInfo.IsName("Attack1"))
         {
             yield return null;
@@ -253,6 +253,37 @@ public class BasicZombie : NetworkBehaviour
         return animatorStateInfo.IsName(animName);
     }
 
+    public void TakeDamage(int damage)
+    {
+        if (IsServer)
+        {
+            ApplyDamage(damage);
+        }
+        else
+        {
+            TakeDamageServerRpc(damage);
+        }
+    }
+
+    void ApplyDamage(int damage)
+    {
+        if (currentHealth.Value <= 0 || isDead) return;
+
+        currentHealth.Value -= damage;
+        if (currentHealth.Value <= 0)
+        {
+            isDead = true;
+            if (!CheckAnimationState("Death")) zombieAnimator.SetTrigger("Death");
+
+            //Debug.Log("Basic Zombie Death");
+
+            agent.ResetPath();
+            PlayZombieDeathSFXClientRpc();
+
+            StartCoroutine(WaitForDeathAnimation());
+        }
+    }
+
     // Client RPC functions -------------------------------------------------------------------------------------------
     [ClientRpc]
     void PlayZombieAttackSFXClientRpc()
@@ -274,23 +305,9 @@ public class BasicZombie : NetworkBehaviour
 
     // Server RPC functions -------------------------------------------------------------------------------------------
     [ServerRpc]
-    public void TakeDamageServerRpc(int amount)
+    public void TakeDamageServerRpc(int damage)
     {
-        if (currentHealth.Value <= 0 || isDead) return;
-
-        currentHealth.Value -= amount;
-        if (currentHealth.Value <= 0)
-        {
-            isDead = true;
-            if (!CheckAnimationState("Death")) zombieAnimator.SetTrigger("Death");
-
-            //Debug.Log("Basic Zombie Death");
-
-            agent.ResetPath();
-            PlayZombieDeathSFXClientRpc();
-
-            StartCoroutine(WaitForDeathAnimation());
-        }
+        ApplyDamage(damage);
     }
 
     void OnDrawGizmos()
@@ -299,4 +316,6 @@ public class BasicZombie : NetworkBehaviour
         Gizmos.DrawWireSphere(transform.position, loseRadius);
         Gizmos.DrawWireSphere(transform.position, meleeRadius);
     }
+
+    
 }

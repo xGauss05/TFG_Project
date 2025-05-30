@@ -31,7 +31,10 @@ public class Pistol : GunBase
         if (Physics.Raycast(origin, direction, out RaycastHit hit, 999.0f))
         {
             hitPoint = hit.point;
-            hit.collider.GetComponent<BasicZombie>()?.TakeDamageServerRpc(gunDamage);
+            if (hit.collider.TryGetComponent<IDamageable>(out var damageable))
+            {
+                damageable.TakeDamage(gunDamage);
+            }
         }
 
         if (IsServer)

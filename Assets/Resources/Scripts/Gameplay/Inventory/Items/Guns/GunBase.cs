@@ -4,13 +4,27 @@ using Unity.Netcode;
 
 public abstract class GunBase : NetworkBehaviour
 {
+    public enum Type
+    {
+        None,
+        Pistol,
+        AssaultRifle,
+        Shotgun
+    }
+
     [Header("Gun Settings")]
     [SerializeField] protected Transform gunMuzzle;
-    [SerializeField] protected int maxCapacity = 20;
-    [SerializeField] protected int currentAmmo = 20;
+    protected virtual int maxCapacity => 8;
+    public NetworkVariable<int> currentAmmo = new NetworkVariable<int>(
+    0,
+    NetworkVariableReadPermission.Everyone,
+    NetworkVariableWritePermission.Server
+    );
+
     [SerializeField] protected int gunDamage = 10;
     [SerializeField] protected Vector3 shotSpreadVariance = new Vector3(0.005f, 0.005f, 0.005f);
     [SerializeField] protected float fireRate = 0.0f;
+    public Type GunType { get; protected set; } = Type.None;
 
     [Header("Gun Audios")]
     [SerializeField] protected AudioClip gunShotSfx;
@@ -18,8 +32,18 @@ public abstract class GunBase : NetworkBehaviour
     [SerializeField] protected AudioClip reloadSfx;
 
     // Flags & variables for logic handling
-    protected bool isReloading = false;
+    public bool isReloading { get; private set; } = false;
     protected float lastShotTime = 0;
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        if (IsServer)
+        {
+            currentAmmo.Value = maxCapacity;
+        }
+    }
 
     public (Vector3 origin, Vector3 direction) CalculateShot()
     {
@@ -66,7 +90,7 @@ public abstract class GunBase : NetworkBehaviour
 
     public void Reload()
     {
-        if (isReloading || currentAmmo >= maxCapacity) return;
+        if (isReloading || currentAmmo.Value >= maxCapacity) return;
 
         StartCoroutine(ReloadCoroutine());
     }
@@ -78,7 +102,7 @@ public abstract class GunBase : NetworkBehaviour
 
         yield return new WaitForSeconds(reloadSfx.length);
 
-        currentAmmo = maxCapacity;
+        currentAmmo.Value = maxCapacity;
         isReloading = false;
     }
 

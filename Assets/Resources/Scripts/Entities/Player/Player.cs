@@ -26,9 +26,14 @@ public class Player : NetworkBehaviour
     [SerializeField] AudioClip playerHurtSfx;
 
     [Header("Player Network variables")]
-    public NetworkVariable<int> currentHealth = new NetworkVariable<int>(maxHealth);
-    NetworkVariable<FixedString64Bytes> steamName = new NetworkVariable<FixedString64Bytes>(default,
-        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<int> currentHealth = new NetworkVariable<int>(
+        maxHealth,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner);
+    public NetworkVariable<FixedString64Bytes> steamName = new NetworkVariable<FixedString64Bytes>(
+        default,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner);
 
     [Header("Player Gun properties")]
     [SerializeField] Billboard billboard;
@@ -39,12 +44,26 @@ public class Player : NetworkBehaviour
     bool isDead = false;
 
     // Helpers and Components
-    GunBase currentGun;
+    public Inventory inventory;
+    [SerializeField] GameObject pistolObject;
+    [SerializeField] GameObject assaultRifleObject;
+    [SerializeField] GameObject shotgunObject;
 
+    // Unity Event functions ------------------------------------------------------------------------------------------
+    #region Unity Event functions
     void Awake()
     {
-        GameObject gunGO = (GameObject)Instantiate(Resources.Load("Prefabs/Gameplay/Items/Guns/Pistol"), gunPivot);
-        currentGun = gunGO.GetComponent<Pistol>();
+        //inventory = GetComponent<Inventory>();
+
+        inventory.availableGuns.Add(pistolObject.GetComponent<Pistol>(), true);
+        inventory.availableGuns.Add(assaultRifleObject.GetComponent<AssaultRifle>(), false);
+        inventory.availableGuns.Add(shotgunObject.GetComponent<Shotgun>(), false);
+    }
+
+    void Start()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     public override void OnNetworkSpawn()
@@ -77,23 +96,30 @@ public class Player : NetworkBehaviour
 
         billboard.SetName(steamName.Value);
         steamName.OnValueChanged += OnNameChanged;
-    }
 
-    void Start()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        if (IsLocalPlayer)
+        {
+            EquipGunServerRpc(GunBase.Type.Pistol);
+
+            var playerUI = FindObjectOfType<PlayerUI>();
+            if (playerUI != null)
+            {
+                playerUI.SetPlayer(this);
+            }
+
+        }
     }
 
     void Update()
     {
-        if (!IsOwner || isDead) return;
+        if (!IsOwner || !IsSpawned || isDead) return;
 
         if (IsOwner)
         {
             HandleInput();
         }
     }
+    #endregion
 
     void HandleInput()
     {
@@ -113,22 +139,13 @@ public class Player : NetworkBehaviour
         // Reload
         if (Input.GetKeyDown(KeyCode.R))
         {
-            if (IsServer)
-                currentGun.Reload();
-            else
-                ReloadServerRpc();
+            TryReload();
         }
 
         // Interact (atm, only door)
         if (Input.GetKeyDown(KeyCode.E) && FindDoor())
         {
             // Open door
-        }
-
-        // Use Medkit
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-            // Use medkit
         }
 
         // Player movement
@@ -155,16 +172,20 @@ public class Player : NetworkBehaviour
         // Shoot weapon
         if (Input.GetButton("Fire1"))
         {
-            var shot = currentGun.CalculateShot();
-            if (IsServer)
-            {
-                currentGun.Shoot(shot.origin, shot.direction);
-            }
-            else
-            {
-                SubmitShotServerRpc(shot.origin, shot.direction);
-            }
+            TryShoot();
         }
+
+        // Change gun
+        if (Input.GetKeyDown(KeyCode.Alpha1) && !inventory.currentGun.isReloading) TryChangeGun(GunBase.Type.Pistol);
+        if (Input.GetKeyDown(KeyCode.Alpha2) && !inventory.currentGun.isReloading) TryChangeGun(GunBase.Type.AssaultRifle);
+        if (Input.GetKeyDown(KeyCode.Alpha3) && !inventory.currentGun.isReloading) TryChangeGun(GunBase.Type.Shotgun);
+
+        // Use Medkit
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            TryMedkit();
+        }
+
     }
 
     void Move(PlayerAction actions, float deltaTime)
@@ -194,6 +215,49 @@ public class Player : NetworkBehaviour
 
     }
 
+    void EquipGun(GameObject gunGO)
+    {
+        GunBase gunBase = gunGO.GetComponent<GunBase>();
+        if (inventory.IsGunAvailable(gunBase))
+        {
+            inventory.EquipGun(gunBase);
+
+            var pistolObjectRenderers = pistolObject.GetComponentsInChildren<MeshRenderer>();
+            foreach (var renderer in pistolObjectRenderers)
+            {
+                renderer.enabled = false;
+            }
+
+            var arObjectRenderers = assaultRifleObject.GetComponentsInChildren<MeshRenderer>();
+            foreach (var renderer in arObjectRenderers)
+            {
+                renderer.enabled = false;
+            }
+
+            var shotgunObjectRenderers = shotgunObject.GetComponentsInChildren<MeshRenderer>();
+            foreach (var renderer in shotgunObjectRenderers)
+            {
+                renderer.enabled = false;
+            }
+
+            var gunGORenderers = gunGO.GetComponentsInChildren<MeshRenderer>();
+            foreach (var renderer in gunGORenderers)
+            {
+                renderer.enabled = true;
+            }
+        }
+    }
+
+    void UseMedkit()
+    {
+        if (inventory.UseMedkit())
+        {
+            Debug.Log($"Before {currentHealth.Value}");
+            currentHealth.Value += (int)(maxHealth - currentHealth.Value) * 80 / 100;
+            Debug.Log($"After {currentHealth.Value}");
+        }
+    }
+
     void OpenDoor()
     {
         // NYI
@@ -213,23 +277,111 @@ public class Player : NetworkBehaviour
         return false;
     }
 
+    void TryShoot()
+    {
+        var shot = inventory.currentGun.CalculateShot();
+        if (IsServer)
+        {
+            inventory.ShootGun(shot.origin, shot.direction);
+            //inventory.currentGun.Shoot(shot.origin, shot.direction);
+        }
+        else
+        {
+            SubmitShotServerRpc(shot.origin, shot.direction);
+        }
+    }
+
+    void TryChangeGun(GunBase.Type type)
+    {
+        if (IsServer)
+        {
+            EquipGunClientRpc(type);
+        }
+        else
+        {
+            EquipGunServerRpc(type);
+        }
+    }
+
+    void TryReload()
+    {
+        if (IsServer)
+        {
+            inventory.ReloadGun();
+        }
+        else
+        {
+            ReloadServerRpc();
+        }
+    }
+
+    void TryMedkit()
+    {
+        if (IsServer)
+        {
+            UseMedkit();
+        }
+        else
+        {
+            UseMedkitServerRpc();
+        }
+    }
+
     void OnNameChanged(FixedString64Bytes prev, FixedString64Bytes current)
     {
         billboard.SetName(current);
     }
 
+    public GunBase GetGunBaseComponent(GunBase.Type type)
+    {
+        switch (type)
+        {
+            case GunBase.Type.AssaultRifle:
+                return assaultRifleObject.GetComponent<AssaultRifle>();
+            case GunBase.Type.Shotgun:
+                return shotgunObject.GetComponent<Shotgun>();
+            case GunBase.Type.Pistol:
+            case GunBase.Type.None:
+            default:
+                return pistolObject.GetComponent<Pistol>();
+        }
+    }
+
     // Client RPC functions -------------------------------------------------------------------------------------------
+    #region Client RPC functions
     [ClientRpc]
     void PlayHurtSFXClientRpc()
     {
         SFXManager.Singleton.PlaySound(playerHurtSfx);
     }
 
+    [ClientRpc]
+    void EquipGunClientRpc(GunBase.Type type)
+    {
+        Debug.Log("Calling EquipGunClientRpc.");
+        switch (type)
+        {
+            case GunBase.Type.AssaultRifle:
+                EquipGun(assaultRifleObject);
+                break;
+            case GunBase.Type.Shotgun:
+                EquipGun(shotgunObject);
+                break;
+            case GunBase.Type.Pistol:
+            case GunBase.Type.None:
+            default:
+                EquipGun(pistolObject);
+                break;
+        }
+    }
+    #endregion
+
     // Server RPC functions -------------------------------------------------------------------------------------------
+    #region Server RPC functions
     [ServerRpc]
     void SubmitShotServerRpc(Vector3 origin, Vector3 dir)
     {
-        currentGun.Shoot(origin, dir);
+        inventory.ShootGun(origin, dir);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -242,6 +394,7 @@ public class Player : NetworkBehaviour
 
         if (currentHealth.Value <= 0)
         {
+            currentHealth.Value = 0;
             isDead = true;
             Debug.Log($"Player {steamName.Value} dead!");
         }
@@ -250,7 +403,21 @@ public class Player : NetworkBehaviour
     [ServerRpc]
     void ReloadServerRpc()
     {
-        currentGun.Reload();
+        inventory.ReloadGun();
     }
+
+    [ServerRpc]
+    void UseMedkitServerRpc()
+    {
+        UseMedkit();
+    }
+
+    [ServerRpc]
+    void EquipGunServerRpc(GunBase.Type type)
+    {
+        Debug.Log("Calling EquipGunServerRpc.");
+        EquipGunClientRpc(type);
+    }
+    #endregion
 
 }

@@ -9,6 +9,8 @@ public class ZombieBasicSpawner : NetworkBehaviour
     [SerializeField] GameObject Zombie_Basic;
     [SerializeField] GameObject Medkit;
     [SerializeField] GameObject AmmoBox;
+    [SerializeField] GameObject Shotgun;
+    [SerializeField] GameObject AssaultRifle;
 
     void Start()
     {
@@ -31,9 +33,14 @@ public class ZombieBasicSpawner : NetworkBehaviour
                 GameObject zombie = Instantiate(Zombie_Basic);
                 GameObject medkit = Instantiate(Medkit);
                 GameObject ammo = Instantiate(AmmoBox);
+                GameObject ar = Instantiate(AssaultRifle);
+                GameObject shotgun = Instantiate(Shotgun);
+
                 zombie.GetComponent<NetworkObject>().Spawn();
                 medkit.GetComponent<NetworkObject>().Spawn();
                 ammo.GetComponent<NetworkObject>().Spawn();
+                ar.GetComponent<NetworkObject>().Spawn();
+                shotgun.GetComponent<NetworkObject>().Spawn();
             }
         }
     }

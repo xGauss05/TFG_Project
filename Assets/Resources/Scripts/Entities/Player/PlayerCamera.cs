@@ -5,20 +5,35 @@ using UnityEngine;
 public class PlayerCamera : MonoBehaviour
 {
     [SerializeField] Vector3 offset;
+    bool firstPerson = false;
 
     void Update()
     {
         if (transform.parent == null) { return; } //This means Player object has not been instantiated yet
 
-        //Update offset visual
-        if (Input.GetKeyDown(KeyCode.T))
+        // First person perspective
+        if (Input.GetKeyDown(KeyCode.V))
         {
-            transform.localPosition = offset;
+            firstPerson = !firstPerson;
+
+            if (firstPerson)
+            {
+                transform.localPosition = Vector3.zero;
+            }
+            else
+            {
+                transform.localPosition = offset;
+            }
         }
-        if (Input.GetKeyDown(KeyCode.Z))
+
+        // Third person perspective
+        if (!firstPerson)
         {
-            offset.x *= -1;
-            transform.localPosition = offset;
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                offset.x *= -1;
+                transform.localPosition = offset;
+            }
         }
 
         CheckWalls();
@@ -39,7 +54,10 @@ public class PlayerCamera : MonoBehaviour
         }
         else
         {
-            transform.localPosition = offset;
+            if (!firstPerson)
+            {
+                transform.localPosition = offset;
+            }
         }
     }
 }

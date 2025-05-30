@@ -52,6 +52,18 @@ public class SteamManager : MonoBehaviour
         SteamMatchmaking.OnLobbyMemberLeave -= LobbyMemberLeave;
     }
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            var lobby = LobbyReference.Singleton.currentLobby;
+            if (lobby != null)
+            {
+                SteamFriends.OpenGameInviteOverlay((SteamId)lobby?.Id);
+            }
+        }
+    }
+
     void Start()
     {
         if (LobbyReference.Singleton.currentLobby != null)

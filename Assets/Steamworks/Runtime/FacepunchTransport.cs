@@ -7,6 +7,7 @@ using Steamworks.Data;
 using Unity.Netcode;
 using UnityEngine;
 using Unity.Collections.LowLevel.Unsafe;
+using UnityEngine.Events;
 
 namespace Netcode.Transports.Facepunch
 {
@@ -30,7 +31,12 @@ namespace Netcode.Transports.Facepunch
         [Tooltip("When in play mode, this will display your Steam ID.")]
         [SerializeField] private ulong userSteamId;
 
+        [SerializeField] GameObject ErrorGO;
+
         private LogLevel LogLevel => NetworkManager.Singleton.LogLevel;
+
+        public bool steamConnection { get; private set; } = true;
+        public UnityEvent OnSteamInitialized;
 
         private class Client
         {
@@ -48,12 +54,22 @@ namespace Netcode.Transports.Facepunch
             }
             catch (Exception e)
             {
-                if (LogLevel <= LogLevel.Error)
-                    Debug.LogError($"[{nameof(FacepunchTransport)}] - Caught an exeption during initialization of Steam client: {e}");
+                steamConnection = false;
+                Debug.LogError($"[{nameof(FacepunchTransport)}] - Caught an exeption during initialization of Steam client: {e}");
+
             }
             finally
             {
                 StartCoroutine(InitSteamworks());
+            }
+
+            if (steamConnection)
+            {
+                OnSteamInitialized?.Invoke();
+            }
+            else
+            {
+                ErrorGO.SetActive(true);
             }
         }
 
@@ -139,14 +155,14 @@ namespace Netcode.Transports.Facepunch
 
         public override void Send(ulong clientId, ArraySegment<byte> data, NetworkDelivery delivery)
         {
-	        var sendType = NetworkDeliveryToSendType(delivery);
+            var sendType = NetworkDeliveryToSendType(delivery);
 
-	        if (clientId == ServerClientId)
-		        connectionManager.Connection.SendMessage(data.Array, data.Offset, data.Count, sendType);
-	        else if (connectedClients.TryGetValue(clientId, out Client user))
-		        user.connection.SendMessage(data.Array, data.Offset, data.Count, sendType);
-	        else if (LogLevel <= LogLevel.Normal)
-		        Debug.LogWarning($"[{nameof(FacepunchTransport)}] - Failed to send packet to remote client with ID {clientId}, client not connected.");
+            if (clientId == ServerClientId)
+                connectionManager.Connection.SendMessage(data.Array, data.Offset, data.Count, sendType);
+            else if (connectedClients.TryGetValue(clientId, out Client user))
+                user.connection.SendMessage(data.Array, data.Offset, data.Count, sendType);
+            else if (LogLevel <= LogLevel.Normal)
+                Debug.LogWarning($"[{nameof(FacepunchTransport)}] - Failed to send packet to remote client with ID {clientId}, client not connected.");
         }
 
         public override NetworkEvent PollEvent(out ulong clientId, out ArraySegment<byte> payload, out float receiveTime)
@@ -262,13 +278,13 @@ namespace Netcode.Transports.Facepunch
         void ISocketManager.OnDisconnected(SocketConnection connection, ConnectionInfo info)
         {
             if (connectedClients.Remove(connection.Id))
-	    {
-	        InvokeOnTransportEvent(NetworkEvent.Disconnect, connection.Id, default, Time.realtimeSinceStartup);
+            {
+                InvokeOnTransportEvent(NetworkEvent.Disconnect, connection.Id, default, Time.realtimeSinceStartup);
 
-	       if (LogLevel <= LogLevel.Developer)
+                if (LogLevel <= LogLevel.Developer)
                     Debug.Log($"[{nameof(FacepunchTransport)}] - Disconnected Steam user {info.Identity.SteamId}");
-	    }
-     	    else if (LogLevel <= LogLevel.Normal)
+            }
+            else if (LogLevel <= LogLevel.Normal)
                 Debug.LogWarning($"[{nameof(FacepunchTransport)}] - Failed to diconnect client with ID {connection.Id}, client not connected.");
         }
 

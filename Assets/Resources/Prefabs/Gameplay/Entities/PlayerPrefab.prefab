@@ -176,6 +176,7 @@ MonoBehaviour:
   billboard: {fileID: 6574242065070343406}
   gunPivot: {fileID: 4971416500773532903}
   camPivot: {fileID: 5752189182569971771}
+  ps_bloodSplatter: {fileID: 1303003753339649557, guid: 6dff77b2733a8e04ea0ac5c375c69bad, type: 3}
   inventory: {fileID: 3841538959337495724}
   pistolObject: {fileID: 5155579028809513507}
   assaultRifleObject: {fileID: 5671008089120942373}

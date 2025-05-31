@@ -132,6 +132,7 @@ MonoBehaviour:
     m_InternalValue: 100
   meleeHitboxPrefab: {fileID: 2700269903401608430, guid: 5408a08ee254fce4292fca0f8d842b27, type: 3}
   meleeSpawnpoint: {fileID: 5235445558112577416}
+  ps_bloodSplatter: {fileID: 1303003753339649557, guid: 6dff77b2733a8e04ea0ac5c375c69bad, type: 3}
 --- !u!114 &5562070844906338869
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -40,6 +40,9 @@ public class Player : NetworkBehaviour
     [SerializeField] Transform gunPivot;
     public Transform camPivot;
 
+    [Header("Player Particles")]
+    [SerializeField] GameObject ps_bloodSplatter;
+
     // Flags for logic handling
     bool isDead = false;
 
@@ -402,6 +405,15 @@ public class Player : NetworkBehaviour
             }
         }
     }
+
+    [ClientRpc]
+    void SpawnBloodEffectClientRpc()
+    {
+        if (ps_bloodSplatter == null) return;
+
+        GameObject blood = Instantiate(ps_bloodSplatter, transform.position + Vector3.up * 1.0f, Quaternion.identity);
+        Destroy(blood, 0.5f);
+    }
     #endregion
 
     // Server RPC functions -------------------------------------------------------------------------------------------
@@ -419,6 +431,7 @@ public class Player : NetworkBehaviour
 
         currentHealth.Value -= amount;
         PlayHurtSFXClientRpc();
+        SpawnBloodEffectClientRpc();
 
         if (currentHealth.Value <= 0)
         {

@@ -107,6 +107,8 @@ MonoBehaviour:
   doorTransform: {fileID: 4663273407312992049}
   openAngle: 90
   openSpeed: 2
+  openDoorSfx: {fileID: 8300000, guid: 2ce28b9a529a6fb438347410e95d946b, type: 3}
+  closeDoorSfx: {fileID: 8300000, guid: 47d3a15439f297946b63d04f0ebf5667, type: 3}
 --- !u!65 &977705018095458381
 BoxCollider:
   m_ObjectHideFlags: 0

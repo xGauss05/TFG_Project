@@ -38,6 +38,9 @@ public class BasicZombie : NetworkBehaviour, IDamageable
     [SerializeField] GameObject meleeHitboxPrefab;
     [SerializeField] Transform meleeSpawnpoint;
 
+    [Header("Zombie Particles")]
+    [SerializeField] GameObject ps_bloodSplatter;
+
     // Flags for logic handling
     bool zombieSpawned = false;
     bool isAttacking = false;
@@ -68,7 +71,7 @@ public class BasicZombie : NetworkBehaviour, IDamageable
 
     }
 
-    public override void OnNetworkDespawn() 
+    public override void OnNetworkDespawn()
     {
         //Debug.Log("Basic Zombie despawn.");
     }
@@ -270,6 +273,8 @@ public class BasicZombie : NetworkBehaviour, IDamageable
         if (currentHealth.Value <= 0 || isDead) return;
 
         currentHealth.Value -= damage;
+        SpawnBloodEffectClientRpc();
+
         if (currentHealth.Value <= 0)
         {
             isDead = true;
@@ -303,6 +308,15 @@ public class BasicZombie : NetworkBehaviour, IDamageable
         SFXManager.Singleton.PlaySound(zombieDeathSfx);
     }
 
+    [ClientRpc]
+    void SpawnBloodEffectClientRpc()
+    {
+        if (ps_bloodSplatter == null) return;
+
+        GameObject blood = Instantiate(ps_bloodSplatter, transform.position + Vector3.up * 1.0f, Quaternion.identity);
+        Destroy(blood, 0.5f);
+    }
+
     // Server RPC functions -------------------------------------------------------------------------------------------
     [ServerRpc]
     public void TakeDamageServerRpc(int damage)
@@ -317,5 +331,5 @@ public class BasicZombie : NetworkBehaviour, IDamageable
         Gizmos.DrawWireSphere(transform.position, meleeRadius);
     }
 
-    
+
 }

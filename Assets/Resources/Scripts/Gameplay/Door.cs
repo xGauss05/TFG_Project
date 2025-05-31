@@ -11,6 +11,10 @@ public class Door : NetworkBehaviour
     [SerializeField] float openAngle = 90f;
     [SerializeField] float openSpeed = 2f;
 
+    [Header("Door Audios")]
+    [SerializeField] AudioClip openDoorSfx;
+    [SerializeField] AudioClip closeDoorSfx;
+
     public bool isOpen { get; private set; } = false;
 
     Quaternion closedRotation;
@@ -41,6 +45,7 @@ public class Door : NetworkBehaviour
         isOpen = true;
         float time = 0f;
         Quaternion startRotation = doorTransform.rotation;
+        OpenDoorSFXClientRpc();
 
         while (time < 1f)
         {
@@ -57,6 +62,7 @@ public class Door : NetworkBehaviour
         isOpen = false;
         float time = 0f;
         Quaternion startRotation = doorTransform.rotation;
+        CloseDoorSFXClientRpc();
 
         while (time < 1f)
         {
@@ -67,4 +73,19 @@ public class Door : NetworkBehaviour
 
         doorTransform.rotation = closedRotation;
     }
+
+    // Client RPC functions -------------------------------------------------------------------------------------------
+    #region Client RPC functions
+    [ClientRpc]
+    void OpenDoorSFXClientRpc()
+    {
+        SFXManager.Singleton.PlaySound(openDoorSfx);
+    }
+
+    [ClientRpc]
+    void CloseDoorSFXClientRpc()
+    {
+        SFXManager.Singleton.PlaySound(closeDoorSfx);
+    }
+    #endregion
 }

@@ -48,6 +48,7 @@ public class Player : NetworkBehaviour
     [SerializeField] GameObject pistolObject;
     [SerializeField] GameObject assaultRifleObject;
     [SerializeField] GameObject shotgunObject;
+    Door doorNearby;
 
     // Unity Event functions ------------------------------------------------------------------------------------------
     #region Unity Event functions
@@ -119,6 +120,24 @@ public class Player : NetworkBehaviour
             HandleInput();
         }
     }
+
+    void OnTriggerEnter(Collider other)
+    {
+        Door door = other.GetComponent<Door>();
+        if (door != null)
+        {
+            doorNearby = door;
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        Door door = other.GetComponent<Door>();
+        if (door != null && doorNearby == door)
+        {
+            doorNearby = null;
+        }
+    }
     #endregion
 
     void HandleInput()
@@ -142,10 +161,10 @@ public class Player : NetworkBehaviour
             TryReload();
         }
 
-        // Interact (atm, only door)
-        if (Input.GetKeyDown(KeyCode.E) && FindDoor())
+        // Interact
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            // Open door
+            TryToggleDoor(doorNearby);
         }
 
         // Player movement
@@ -258,25 +277,6 @@ public class Player : NetworkBehaviour
         }
     }
 
-    void OpenDoor()
-    {
-        // NYI
-        //GameObject.Find("SafeRoomDoor").GetComponentInChildren<SafeRoomDoor>()?.Open(transform.position);
-    }
-
-    bool FindDoor()
-    {
-        Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
-        Ray ray = Camera.main.ScreenPointToRay(screenCenter);
-
-        if (Physics.Raycast(ray, out RaycastHit hit, 5.0f))
-        {
-            //return hit.collider.GetComponent<SafeRoomDoor>() != null;
-        }
-
-        return false;
-    }
-
     void TryShoot()
     {
         var shot = inventory.currentGun.CalculateShot();
@@ -327,6 +327,21 @@ public class Player : NetworkBehaviour
         }
     }
 
+    void TryToggleDoor(Door door)
+    {
+        if (door != null)
+        {
+            if (IsServer)
+            {
+                ToggleDoorClientRpc(door.NetworkObject);
+            }
+            else
+            {
+                ToggleDoorServerRpc(door.NetworkObject);
+            }
+        }
+    }
+
     void OnNameChanged(FixedString64Bytes prev, FixedString64Bytes current)
     {
         billboard.SetName(current);
@@ -374,6 +389,19 @@ public class Player : NetworkBehaviour
                 break;
         }
     }
+
+    [ClientRpc]
+    void ToggleDoorClientRpc(NetworkObjectReference doorRef)
+    {
+        if (doorRef.TryGet(out NetworkObject doorObj))
+        {
+            Door door = doorObj.GetComponent<Door>();
+            if (door != null)
+            {
+                door.Toggle();
+            }
+        }
+    }
     #endregion
 
     // Server RPC functions -------------------------------------------------------------------------------------------
@@ -417,6 +445,12 @@ public class Player : NetworkBehaviour
     {
         Debug.Log("Calling EquipGunServerRpc.");
         EquipGunClientRpc(type);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void ToggleDoorServerRpc(NetworkObjectReference doorRef)
+    {
+        ToggleDoorClientRpc(doorRef);
     }
     #endregion
 

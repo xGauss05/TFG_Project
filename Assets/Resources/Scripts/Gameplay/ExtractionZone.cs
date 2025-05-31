@@ -15,6 +15,8 @@ public class ExtractionZone : NetworkBehaviour
 
     public UnityEvent onExtractionFull = new UnityEvent();
 
+    [SerializeField] Door safeDoor;
+
     void OnEnable()
     {
         SteamMatchmaking.OnLobbyMemberLeave += UpdatedRequiredPlayers;
@@ -67,18 +69,21 @@ public class ExtractionZone : NetworkBehaviour
 
     void CheckExtraction()
     {
-        if (playersInside >= requiredPlayers)
+        if (playersInside >= requiredPlayers && !safeDoor.isOpen)
         {
-            foreach (var obj in FindObjectsOfType<NetworkObject>())
+            if (IsServer)
             {
-                if (obj != NetworkManager.Singleton.GetComponent<NetworkObject>())
+                foreach (var obj in FindObjectsOfType<NetworkObject>())
                 {
-                    obj.Despawn(true);
+                    if (obj != NetworkManager.Singleton.GetComponent<NetworkObject>())
+                    {
+                        obj.Despawn(true);
+                    }
                 }
-            }
 
-            NetworkManager.Singleton.SceneManager.LoadScene("1_MainMenu", LoadSceneMode.Single);
-            //NetworkManager.Singleton.Shutdown();
+                NetworkManager.Singleton.SceneManager.LoadScene("1_MainMenu", LoadSceneMode.Single);
+                //NetworkManager.Singleton.Shutdown();
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ public class MainMenu : MonoBehaviour
     [SerializeField] GameObject MainScreen;
     [SerializeField] GameObject JoinLobbyScreen;
     [SerializeField] GameObject HostConfirmationScreen;
+    [SerializeField] GameObject RankingScreen;
     [SerializeField] TextMeshProUGUI PlayerFeedback;
     [SerializeField] AudioClip buttonSfx;
 
@@ -40,10 +41,17 @@ public class MainMenu : MonoBehaviour
         if (PlayerFeedback.text.Length > 0) PlayerFeedback.text = "";
     }
 
+    public void Ranking()
+    {
+        RankingScreen.SetActive(true);
+        MainScreen.SetActive(false);
+    }
+
     public void ReturnToMainMenu()
     {
         MainScreen.SetActive(true);
         JoinLobbyScreen.SetActive(false);
+        RankingScreen.SetActive(false);
         if (PlayerFeedback.text.Length > 0) PlayerFeedback.text = "";
     }
 

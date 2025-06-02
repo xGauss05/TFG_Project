@@ -275,7 +275,11 @@ public class Player : NetworkBehaviour
         if (inventory.UseMedkit())
         {
             Debug.Log($"Before {currentHealth.Value}");
-            currentHealth.Value += (int)(maxHealth - currentHealth.Value) * 80 / 100;
+            int healthAmount = (int)(maxHealth - currentHealth.Value) * 80 / 100;
+            currentHealth.Value += healthAmount;
+
+            if (IsServer && ScoreManager.Singleton != null) ScoreManager.Singleton.SubstractScore(healthAmount);
+
             Debug.Log($"After {currentHealth.Value}");
         }
     }
@@ -432,6 +436,8 @@ public class Player : NetworkBehaviour
         currentHealth.Value -= amount;
         PlayHurtSFXClientRpc();
         SpawnBloodEffectClientRpc();
+
+        if (IsServer && ScoreManager.Singleton != null) ScoreManager.Singleton.SubstractScore(amount);
 
         if (currentHealth.Value <= 0)
         {

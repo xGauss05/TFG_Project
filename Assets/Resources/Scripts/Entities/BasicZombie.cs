@@ -20,6 +20,7 @@ public class BasicZombie : NetworkBehaviour, IDamageable
     [SerializeField] float movementSpeed = 0.25f;
     public int attackDamage = 5;
     const int maxHealth = 50;
+    const int score = 50;
 
     [Header("Zombie Animator")]
     [SerializeField] Animator zombieAnimator;
@@ -69,11 +70,6 @@ public class BasicZombie : NetworkBehaviour, IDamageable
             this.transform.position = new Vector3(0, 0, 0); // Default position
         }
 
-    }
-
-    public override void OnNetworkDespawn()
-    {
-        //Debug.Log("Basic Zombie despawn.");
     }
 
     // Start is called before the first frame update
@@ -284,6 +280,7 @@ public class BasicZombie : NetworkBehaviour, IDamageable
 
             agent.ResetPath();
             PlayZombieDeathSFXClientRpc();
+            if (IsServer && ScoreManager.Singleton != null) ScoreManager.Singleton.AddScore(score);
 
             StartCoroutine(WaitForDeathAnimation());
         }

@@ -12127,27 +12127,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 445417997}
-  - component: {fileID: 445417996}
   - component: {fileID: 445417998}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: LeaderboardManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &445417996
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 445417995}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ccb3e40c4f08b843b785c4bbc0a4abe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &445417997
 Transform:
   m_ObjectHideFlags: 0
@@ -35863,6 +35850,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scrollRect: {fileID: 1310749167}
   minY: -50
+  maxY: 430
 --- !u!1 &1310859051
 GameObject:
   m_ObjectHideFlags: 0
@@ -61274,6 +61262,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 689594768}
+  - {fileID: 445417997}
   - {fileID: 7648899959131477199}
   - {fileID: 7919365929505140895}
   - {fileID: 1710304366}
@@ -61281,4 +61270,3 @@ SceneRoots:
   - {fileID: 1284701762}
   - {fileID: 2092416096}
   - {fileID: 1282220976}
-  - {fileID: 445417997}

@@ -6,6 +6,7 @@ using Unity.Netcode;
 public class Box : NetworkBehaviour, IDamageable
 {
     const int maxHealth = 10;
+    const int score = 5;
 
     [Header("Box Network variables")]
     // Variables that need to be updated in both Clients and Server
@@ -40,6 +41,8 @@ public class Box : NetworkBehaviour, IDamageable
         if (currentHealth.Value <= 0)
         {
             PlayBoxDestroyedClientRpc();
+
+            if (IsServer && ScoreManager.Singleton != null) ScoreManager.Singleton.AddScore(score);
 
             if (IsServer)
             {

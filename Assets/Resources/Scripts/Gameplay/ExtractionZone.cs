@@ -13,8 +13,6 @@ public class ExtractionZone : NetworkBehaviour
     public int playersInside;
     public int requiredPlayers;
 
-    public UnityEvent onExtractionFull = new UnityEvent();
-
     [SerializeField] Door safeDoor;
 
     void OnEnable()
@@ -36,13 +34,6 @@ public class ExtractionZone : NetworkBehaviour
         }
 
         requiredPlayers = LobbyReference.Singleton.currentLobby.Value.MemberCount;
-
-        onExtractionFull.AddListener(CheckExtraction);
-    }
-
-    void UpdatedRequiredPlayers(Lobby arg1, Friend arg2)
-    {
-        requiredPlayers = LobbyReference.Singleton.currentLobby.Value.MemberCount;
     }
 
     void OnTriggerEnter(Collider other)
@@ -53,7 +44,7 @@ public class ExtractionZone : NetworkBehaviour
 
         playersInside++;
 
-        onExtractionFull?.Invoke();
+        CheckExtraction();
     }
 
     void OnTriggerExit(Collider other)
@@ -64,26 +55,38 @@ public class ExtractionZone : NetworkBehaviour
 
         playersInside--;
 
-        onExtractionFull?.Invoke();
+        CheckExtraction();
+    }
+
+    void UpdatedRequiredPlayers(Lobby arg1, Friend arg2)
+    {
+        requiredPlayers = LobbyReference.Singleton.currentLobby.Value.MemberCount;
     }
 
     void CheckExtraction()
     {
         if (playersInside >= requiredPlayers && !safeDoor.isOpen)
         {
-            if (IsServer)
-            {
-                foreach (var obj in FindObjectsOfType<NetworkObject>())
-                {
-                    if (obj != NetworkManager.Singleton.GetComponent<NetworkObject>())
-                    {
-                        obj.Despawn(true);
-                    }
-                }
+            if (ScoreManager.Singleton != null) ScoreManager.Singleton.AddScore(2000);
 
-                NetworkManager.Singleton.SceneManager.LoadScene("1_MainMenu", LoadSceneMode.Single);
-                //NetworkManager.Singleton.Shutdown();
+            EndGame();
+        }
+    }
+
+    void EndGame()
+    {
+        if (IsServer)
+        {
+            foreach (var obj in FindObjectsOfType<NetworkObject>())
+            {
+                if (obj != NetworkManager.Singleton.GetComponent<NetworkObject>())
+                {
+                    obj.Despawn(true);
+                }
             }
         }
+
+        NetworkManager.Singleton.SceneManager.LoadScene("1_MainMenu", LoadSceneMode.Single);
+        //NetworkManager.Singleton.Shutdown();
     }
 }

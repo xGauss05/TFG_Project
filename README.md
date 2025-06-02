@@ -24,6 +24,7 @@ It is recommended to add Lights Out.exe at Steam, by Add a Game... > Add a Non-S
 - Shoot them down with your Gun to defend yourself
 - Boxes that can drop goodies for the players
 - Reach the extraction zone (Green zone) to finish the level
+- Point system and Ranking
   
 ## Controls
 | Key | Description |
@@ -33,7 +34,9 @@ It is recommended to add Lights Out.exe at Steam, by Add a Game... > Add a Non-S
 | <code>A</code> | Left movement | 
 | <code>D</code> | Right movement | 
 | <code>R</code> | Reload Gun | 
-| <code>Z</code> | Change perspective | 
+| <code>E</code> | Toggle Door | 
+| <code>Z</code> | Change perspective |
+| <code>V</code> | Toggle 1st/3rd person |
 | <code>MOUSE LMB</code> | Select button / Shoot |
 | <code>ENTER</code> | Chat in the Lobby |
 

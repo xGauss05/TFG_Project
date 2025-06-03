@@ -46,6 +46,7 @@ public class BasicZombie : NetworkBehaviour, IDamageable
     bool zombieSpawned = false;
     bool isAttacking = false;
     bool isDead = false;
+    public bool isHorde = false;
 
     // Helpers and Components
     NavMeshAgent agent;
@@ -53,23 +54,25 @@ public class BasicZombie : NetworkBehaviour, IDamageable
 
     public override void OnNetworkSpawn()
     {
-        GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("ZombieSpawnpoint");
-
-        if (spawnPoints.Length > 0)
+        if (!isHorde)
         {
-            int randomIndex = Random.Range(0, spawnPoints.Length);
-            Transform spawnTransform = spawnPoints[randomIndex].transform;
+            GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("ZombieSpawnpoint");
 
-            // Set the Zombie spawn point to the Spawnpoint position
-            transform.position = spawnTransform.position;
-            transform.rotation = spawnTransform.rotation;
-        }
-        else
-        {
-            Debug.LogWarning("No zombie spawn points found. Spawning at default position.");
-            this.transform.position = new Vector3(0, 0, 0); // Default position
-        }
+            if (spawnPoints.Length > 0)
+            {
+                int randomIndex = Random.Range(0, spawnPoints.Length);
+                Transform spawnTransform = spawnPoints[randomIndex].transform;
 
+                // Set the Zombie spawn point to the Spawnpoint position
+                transform.position = spawnTransform.position;
+                transform.rotation = spawnTransform.rotation;
+            }
+            else
+            {
+                Debug.LogWarning("No zombie spawn points found. Spawning at default position.");
+                this.transform.position = new Vector3(0, 0, 0); // Default position
+            }
+        }
     }
 
     // Start is called before the first frame update

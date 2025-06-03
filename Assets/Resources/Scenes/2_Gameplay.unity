@@ -56608,6 +56608,71 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2147194701}
   m_Mesh: {fileID: 4300126, guid: f6806bac7e6048f4fa49cd463996ac64, type: 3}
+--- !u!1001 &1763927857451742006
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 972827869283575119, guid: 58913a6198e6833449467f429124291f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -4.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 972827869283575119, guid: 58913a6198e6833449467f429124291f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 972827869283575119, guid: 58913a6198e6833449467f429124291f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 9.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 972827869283575119, guid: 58913a6198e6833449467f429124291f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 972827869283575119, guid: 58913a6198e6833449467f429124291f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 972827869283575119, guid: 58913a6198e6833449467f429124291f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 972827869283575119, guid: 58913a6198e6833449467f429124291f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 972827869283575119, guid: 58913a6198e6833449467f429124291f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 972827869283575119, guid: 58913a6198e6833449467f429124291f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 972827869283575119, guid: 58913a6198e6833449467f429124291f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3314453301672151666, guid: 58913a6198e6833449467f429124291f, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 4161955432
+      objectReference: {fileID: 0}
+    - target: {fileID: 3314453301672151666, guid: 58913a6198e6833449467f429124291f, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 4083272737
+      objectReference: {fileID: 0}
+    - target: {fileID: 8054488222948879398, guid: 58913a6198e6833449467f429124291f, type: 3}
+      propertyPath: m_Name
+      value: ZombieHordeSpawner
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 58913a6198e6833449467f429124291f, type: 3}
 --- !u!1001 &4571603252841804372
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -56694,3 +56759,4 @@ SceneRoots:
   - {fileID: 948891074}
   - {fileID: 1866267465}
   - {fileID: 1193166729}
+  - {fileID: 1763927857451742006}

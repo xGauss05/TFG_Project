@@ -380,7 +380,6 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     void EquipGunClientRpc(GunBase.Type type)
     {
-        Debug.Log("Calling EquipGunClientRpc.");
         switch (type)
         {
             case GunBase.Type.AssaultRifle:
@@ -462,7 +461,6 @@ public class Player : NetworkBehaviour
     [ServerRpc]
     void EquipGunServerRpc(GunBase.Type type)
     {
-        Debug.Log("Calling EquipGunServerRpc.");
         EquipGunClientRpc(type);
     }
 

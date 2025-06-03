@@ -53,7 +53,7 @@ public class LeaderboardManager : MonoBehaviour
         if (lb != null)
         {
             leaderboard = (Leaderboard)lb;
-            Debug.Log("Leaderboard loaded: " + lb.Value.Name);
+            //Debug.Log("Leaderboard loaded: " + lb.Value.Name);
         }
     }
 

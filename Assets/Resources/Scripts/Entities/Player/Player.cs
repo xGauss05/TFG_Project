@@ -45,6 +45,7 @@ public class Player : NetworkBehaviour
 
     // Flags for logic handling
     bool isDead = false;
+    bool isChatting = false;
 
     // Helpers and Components
     public Inventory inventory;
@@ -145,6 +146,16 @@ public class Player : NetworkBehaviour
 
     void HandleInput()
     {
+        // Chat
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            isChatting = !isChatting;
+            Cursor.lockState = isChatting ? CursorLockMode.None : CursorLockMode.Locked;
+            Cursor.visible = isChatting;
+        }
+
+        if (isChatting) return;
+        
         // Change cursor mode
         if (Input.GetKey(KeyCode.LeftAlt))
         {
@@ -152,7 +163,8 @@ public class Player : NetworkBehaviour
             Cursor.visible = true;
             return;
         }
-        else
+
+        if (Input.GetKeyUp(KeyCode.LeftAlt))
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;

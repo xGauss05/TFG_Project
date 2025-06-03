@@ -5,11 +5,15 @@ using TMPro;
 using Steamworks;
 using Steamworks.Data;
 using System;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class ChatManager : MonoBehaviour
 {
+    [Header("Chat UI properties")]
     [SerializeField] TMP_InputField ChatInputField;
-    [SerializeField] GameObject ChatGameObject;
+    [SerializeField] TextMeshProUGUI ChatText;
+    [SerializeField] ScrollRect ChatScrollRect;
 
     void OnEnable()
     {
@@ -17,7 +21,7 @@ public class ChatManager : MonoBehaviour
         SteamMatchmaking.OnLobbyEntered += LobbyEntered;
         SteamMatchmaking.OnLobbyMemberJoined += LobbyMemberJoined;
         SteamMatchmaking.OnLobbyMemberLeave += LobbyMemberLeave;
-        ChatGameObject.GetComponent<TextMeshProUGUI>().text = "";
+        ChatText.text = "";
     }
 
     void OnDisable()
@@ -26,33 +30,34 @@ public class ChatManager : MonoBehaviour
         SteamMatchmaking.OnLobbyEntered -= LobbyEntered;
         SteamMatchmaking.OnLobbyMemberJoined -= LobbyMemberJoined;
         SteamMatchmaking.OnLobbyMemberLeave -= LobbyMemberLeave;
-        ChatGameObject.GetComponent<TextMeshProUGUI>().text = "";
+        ChatText.text = "";
     }
 
     void LobbyMemberLeave(Lobby lobby, Friend friend)
     {
-        ChatGameObject.GetComponent<TextMeshProUGUI>().text += friend.Name + " left the lobby.\n";
+        AppendMessage(friend.Name + " left the lobby.");
     }
 
     void LobbyMemberJoined(Lobby lobby, Friend friend)
     {
-        ChatGameObject.GetComponent<TextMeshProUGUI>().text += friend.Name + " joined the lobby.\n";
+        AppendMessage(friend.Name + " joined the lobby.");
     }
 
     void LobbyEntered(Lobby lobby)
     {
-        ChatGameObject.GetComponent<TextMeshProUGUI>().text += "You entered the lobby.\n";
+        AppendMessage("You entered the lobby.");
     }
 
     void ChatSent(Lobby lobby, Friend friend, string msg)
     {
-        ChatGameObject.GetComponent<TextMeshProUGUI>().text += friend.Name + ": " + msg + "\n";
+        AppendMessage(friend.Name + ": " + msg);
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Return))
         {
+            ChatInputField.ActivateInputField();
             SendMessage();
         }
     }
@@ -63,6 +68,15 @@ public class ChatManager : MonoBehaviour
         {
             LobbyReference.Singleton.currentLobby?.SendChatString(ChatInputField.text);
             ChatInputField.text = "";
+            ChatInputField.DeactivateInputField();
         }
+    }
+
+    void AppendMessage(string message)
+    {
+        ChatText.text += message + "\n";
+
+        Canvas.ForceUpdateCanvases();
+        ChatScrollRect.verticalNormalizedPosition = 0f;
     }
 }

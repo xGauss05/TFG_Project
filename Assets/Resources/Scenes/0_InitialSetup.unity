@@ -986,7 +986,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ff8914fb7834ee42a0a9cc811b3ed67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Zombie_Basic: {fileID: 609194813430149826, guid: 6d3c800ad03aaee4da14042dbd2db603, type: 3}
+  Zombie_Basic: {fileID: 1831807057716872682, guid: 841e4eaa6139e6f4eb6fcb5572c9a59d, type: 3}
   Medkit: {fileID: 9112024627195489059, guid: 36f734ad474426a4abeada838b528439, type: 3}
   AmmoBox: {fileID: 2933228936658766195, guid: 7396be217327e9543b0c12c99979ebe2, type: 3}
   Shotgun: {fileID: 270225949823634018, guid: 8e4ee3ce86cce964da40a63ecf93d601, type: 3}

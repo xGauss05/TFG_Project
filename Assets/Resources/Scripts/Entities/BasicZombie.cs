@@ -20,7 +20,7 @@ public class BasicZombie : NetworkBehaviour, IDamageable
     [SerializeField] float movementSpeed = 0.25f;
     public int attackDamage = 5;
     const int maxHealth = 50;
-    const int score = 50;
+    [SerializeField] int score = 50;
 
     [Header("Zombie Animator")]
     [SerializeField] Animator zombieAnimator;

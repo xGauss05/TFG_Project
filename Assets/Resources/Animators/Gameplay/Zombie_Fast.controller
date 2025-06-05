@@ -814,7 +814,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: jump
+  m_Name: Spawn
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -1580,7 +1580,7 @@ AnimatorStateMachine:
     m_Position: {x: 504, y: 852, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1102264317553708104}
-    m_Position: {x: -200, y: 1380, z: 0}
+    m_Position: {x: -190, y: 1400, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1102968577012745500}
     m_Position: {x: 792, y: 324, z: 0}

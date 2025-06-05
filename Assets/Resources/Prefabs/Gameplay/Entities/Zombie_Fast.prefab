@@ -74,7 +74,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2206234245
+  GlobalObjectIdHash: 1883499844
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -162,8 +162,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93b39b80869e08d43b1e261eff2af029, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loseRadius: 15
-  detectionRadius: 10
+  loseRadius: 30
+  detectionRadius: 20
   meleeRadius: 2
   movementSpeed: 7
   attackDamage: 7
@@ -262,6 +262,10 @@ PrefabInstance:
     - target: {fileID: 6347845055732319078, guid: 1f767fa48db25104c96a9670cc753b1b, type: 3}
       propertyPath: m_Name
       value: Base mesh MonsterMutant7 skin3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6347845055741718694, guid: 1f767fa48db25104c96a9670cc753b1b, type: 3}
+      propertyPath: m_Avatar
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 6347845055741718694, guid: 1f767fa48db25104c96a9670cc753b1b, type: 3}
       propertyPath: m_Controller

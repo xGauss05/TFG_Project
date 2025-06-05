@@ -16,11 +16,6 @@ public class Box : NetworkBehaviour, IDamageable
     [Header("Box Audios")]
     [SerializeField] AudioClip boxDestroySfx;
 
-    public override void OnNetworkSpawn()
-    {
-
-    }
-
     public void TakeDamage(int damage)
     {
         if (IsServer)
@@ -84,7 +79,7 @@ public class Box : NetworkBehaviour, IDamageable
         }
     }
 
-    // Client RPC functions
+    // Client RPC functions -------------------------------------------------------------------------------------------
     [ClientRpc]
     public void PlayBoxDestroyedClientRpc()
     {

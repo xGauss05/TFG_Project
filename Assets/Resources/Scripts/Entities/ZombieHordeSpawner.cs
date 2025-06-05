@@ -12,7 +12,6 @@ public class ZombieHordeSpawner : NetworkBehaviour
     float spawnTimer = 0.0f;
     int spawnCount = 0;
     bool activateSpawn = false;
-    //ZombieHordeManager manager;
 
     void Start()
     {
@@ -22,6 +21,8 @@ public class ZombieHordeSpawner : NetworkBehaviour
     void Update()
     {
         if (!IsHost || !activateSpawn || spawnCount >= maxSpawns) return;
+
+        if (HordeManager.Singleton == null || !HordeManager.Singleton.IsHordeActive) return;
 
         spawnTimer += Time.deltaTime;
 
@@ -71,6 +72,4 @@ public class ZombieHordeSpawner : NetworkBehaviour
     {
         spawnCount = 0;
     }
-
-
 }

@@ -11,6 +11,9 @@ public class HordeManager : NetworkBehaviour
     [SerializeField] float hordeDuration = 60.0f;
     float hordeTimer = 0.0f;
 
+    [Header("Horde Audios")]
+    [SerializeField] AudioClip hordeScreamSfx;
+
     NetworkVariable<bool> isHordeActive = new NetworkVariable<bool>(false);
     public bool IsHordeActive => isHordeActive.Value;
 
@@ -50,8 +53,16 @@ public class HordeManager : NetworkBehaviour
     {
         if (!IsServer) return;
 
+        StartCoroutine(TriggerHorde());
+    }
+
+    IEnumerator TriggerHorde()
+    {
+        yield return new WaitForSeconds(1.0f);
+
         isHordeActive.Value = true;
         hordeTimer = 0.0f;
+        PlayHordeScreamClientRpc();
         Debug.Log("Horde started!");
     }
 
@@ -62,5 +73,12 @@ public class HordeManager : NetworkBehaviour
         isHordeActive.Value = false;
         hordeTimer = 0.0f;
         Debug.Log("Horde ended.");
+    }
+
+    // Client RPC functions -------------------------------------------------------------------------------------------
+    [ClientRpc]
+    void PlayHordeScreamClientRpc()
+    {
+        SFXManager.Singleton.PlaySound(hordeScreamSfx);
     }
 }

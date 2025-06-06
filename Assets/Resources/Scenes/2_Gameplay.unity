@@ -8969,6 +8969,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Box (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 5983385692335723542, guid: 476e05daf3ee16845a6f0f6dad9dd2e7, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -21,6 +21,7 @@ public class BasicZombie : NetworkBehaviour, IDamageable
     public int attackDamage = 5;
     const int maxHealth = 50;
     [SerializeField] int score = 50;
+    [SerializeField] float despawnRadius = 200.0f;
 
     [Header("Zombie Animator")]
     [SerializeField] Animator zombieAnimator;
@@ -75,7 +76,6 @@ public class BasicZombie : NetworkBehaviour, IDamageable
         }
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -84,11 +84,11 @@ public class BasicZombie : NetworkBehaviour, IDamageable
         StartCoroutine(WaitForSpawnAnimation());
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (!IsHost || !zombieSpawned || isDead) return;
 
+        DespawnChecker();
         CheckState();
         ExecuteState();
     }
@@ -116,18 +116,32 @@ public class BasicZombie : NetworkBehaviour, IDamageable
 
         targetPlayer = closestPlayer;
 
-        if (smallestDistance < meleeRadius)
+        if (isHorde)
         {
-            currentState.Value = ZombieState.Melee;
+            if (smallestDistance < meleeRadius)
+            {
+                currentState.Value = ZombieState.Melee;
+            }
+            else if (currentState.Value != ZombieState.Chase && currentState.Value != ZombieState.Melee)
+            {
+                currentState.Value = ZombieState.Chase;
+            }
         }
-        else if (currentState.Value != ZombieState.Chase && smallestDistance < detectionRadius)
+        else
         {
-            currentState.Value = ZombieState.Chase;
-        }
-        else if (currentState.Value != ZombieState.Idle && smallestDistance > loseRadius)
-        {
-            agent.SetDestination(transform.position);
-            currentState.Value = ZombieState.Idle;
+            if (smallestDistance < meleeRadius)
+            {
+                currentState.Value = ZombieState.Melee;
+            }
+            else if (currentState.Value != ZombieState.Chase && smallestDistance < detectionRadius)
+            {
+                currentState.Value = ZombieState.Chase;
+            }
+            else if (currentState.Value != ZombieState.Idle && smallestDistance > loseRadius)
+            {
+                agent.SetDestination(transform.position);
+                currentState.Value = ZombieState.Idle;
+            }
         }
     }
 
@@ -216,6 +230,7 @@ public class BasicZombie : NetworkBehaviour, IDamageable
         }
 
         isAttacking = false;
+        currentState.Value = ZombieState.Idle;
     }
 
     IEnumerator WaitForDeathAnimation()
@@ -286,6 +301,32 @@ public class BasicZombie : NetworkBehaviour, IDamageable
             if (IsServer && ScoreManager.Singleton != null) ScoreManager.Singleton.AddScore(score);
 
             StartCoroutine(WaitForDeathAnimation());
+        }
+    }
+
+    void DespawnChecker()
+    {
+        if (IsServer)
+        {
+            GameObject[] foundPlayers = GameObject.FindGameObjectsWithTag("Player");
+            if (foundPlayers.Length == 0) return;
+
+            float smallestDistance = float.MaxValue;
+
+            foreach (var player in foundPlayers)
+            {
+                float distance = Vector3.Distance(transform.position, player.transform.position);
+
+                if (distance < smallestDistance)
+                {
+                    smallestDistance = distance;
+                }
+            }
+
+            if (smallestDistance > despawnRadius)
+            {
+                this.NetworkObject.Despawn();
+            }
         }
     }
 

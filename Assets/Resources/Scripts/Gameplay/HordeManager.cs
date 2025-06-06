@@ -18,6 +18,9 @@ public class HordeManager : NetworkBehaviour
     [SerializeField] GameObject adrenalineIndicator;
 
     NetworkVariable<bool> isHordeActive = new NetworkVariable<bool>(false);
+
+    List<ZombieHordeSpawner> hordeSpawners = new List<ZombieHordeSpawner>();
+
     public bool IsHordeActive => isHordeActive.Value;
 
     void Awake()
@@ -56,6 +59,9 @@ public class HordeManager : NetworkBehaviour
     {
         if (!IsServer) return;
 
+        hordeSpawners.Clear();
+        hordeSpawners.AddRange(FindObjectsOfType<ZombieHordeSpawner>());
+
         StartCoroutine(TriggerHorde());
     }
 
@@ -77,6 +83,15 @@ public class HordeManager : NetworkBehaviour
         isHordeActive.Value = false;
         hordeTimer = 0.0f;
         ToggleAdrenalineUIClientRpc(false);
+
+        foreach (ZombieHordeSpawner spawner in hordeSpawners)
+        {
+            if (spawner != null)
+            {
+                spawner.ResetCount();
+            }
+        }
+
         Debug.Log("Horde ended.");
     }
 

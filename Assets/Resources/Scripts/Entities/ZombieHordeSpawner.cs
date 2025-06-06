@@ -6,7 +6,7 @@ using Unity.Netcode;
 public class ZombieHordeSpawner : NetworkBehaviour
 {
     [SerializeField] GameObject Zombie_Basic;
-    const int maxSpawns = 5;
+    const int maxSpawns = 3;
     const float timeBetweenSpawns = 2.0f;
 
     float spawnTimer = 0.0f;

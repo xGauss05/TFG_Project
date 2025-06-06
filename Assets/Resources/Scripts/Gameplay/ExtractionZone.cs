@@ -50,6 +50,15 @@ public class ExtractionZone : NetworkBehaviour
         CheckExtraction();
     }
 
+    void OnTriggerStay(Collider other)
+    {
+        if (IsClient) return;
+
+        if (!other.CompareTag("Player")) { return; }
+
+        CheckExtraction();
+    }
+
     void OnTriggerExit(Collider other)
     {
         if (IsClient) return;

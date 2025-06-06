@@ -14,6 +14,9 @@ public class HordeManager : NetworkBehaviour
     [Header("Horde Audios")]
     [SerializeField] AudioClip hordeScreamSfx;
 
+    [Header("UI Components")]
+    [SerializeField] GameObject adrenalineIndicator;
+
     NetworkVariable<bool> isHordeActive = new NetworkVariable<bool>(false);
     public bool IsHordeActive => isHordeActive.Value;
 
@@ -63,6 +66,7 @@ public class HordeManager : NetworkBehaviour
         isHordeActive.Value = true;
         hordeTimer = 0.0f;
         PlayHordeScreamClientRpc();
+        ToggleAdrenalineUIClientRpc(true);
         Debug.Log("Horde started!");
     }
 
@@ -72,6 +76,7 @@ public class HordeManager : NetworkBehaviour
 
         isHordeActive.Value = false;
         hordeTimer = 0.0f;
+        ToggleAdrenalineUIClientRpc(false);
         Debug.Log("Horde ended.");
     }
 
@@ -80,5 +85,11 @@ public class HordeManager : NetworkBehaviour
     void PlayHordeScreamClientRpc()
     {
         SFXManager.Singleton.PlaySound(hordeScreamSfx);
+    }
+
+    [ClientRpc]
+    void ToggleAdrenalineUIClientRpc(bool active)
+    {
+        adrenalineIndicator.SetActive(active);
     }
 }

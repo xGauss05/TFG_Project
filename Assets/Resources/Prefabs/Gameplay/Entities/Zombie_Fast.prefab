@@ -164,10 +164,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loseRadius: 30
   detectionRadius: 20
-  meleeRadius: 2
+  meleeRadius: 1.45
   movementSpeed: 7
   attackDamage: 7
   score: 100
+  despawnRadius: 200
   zombieAnimator: {fileID: 1711804235913271399}
   zombieAttackSfx: {fileID: 8300000, guid: 05d1b161910a9924d8a873e2c276fe17, type: 3}
   zombieScreechSfx: {fileID: 8300000, guid: 465ab330b4f3c3c41b27fe97760d4427, type: 3}
@@ -176,7 +177,8 @@ MonoBehaviour:
     m_InternalValue: 1
   currentHealth:
     m_InternalValue: 100
-  meleeHitboxPrefab: {fileID: 2700269903401608430, guid: 5408a08ee254fce4292fca0f8d842b27, type: 3}
+  meleeDelay: 1.2
+  meleeHitboxPrefab: {fileID: 2700269903401608430, guid: cbd4025cf90083f4197234f7bfa94087, type: 3}
   meleeSpawnpoint: {fileID: 7505009740887784750}
   ps_bloodSplatter: {fileID: 1303003753339649557, guid: 6dff77b2733a8e04ea0ac5c375c69bad, type: 3}
   isHorde: 0
@@ -205,7 +207,7 @@ Transform:
   m_GameObject: {fileID: 7852420071336358137}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0.65}
+  m_LocalPosition: {x: 0, y: 1, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

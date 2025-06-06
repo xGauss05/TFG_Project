@@ -37,6 +37,7 @@ public class BasicZombie : NetworkBehaviour, IDamageable
     public NetworkVariable<int> currentHealth = new NetworkVariable<int>(maxHealth);
 
     [Header("Zombie Melee properties")]
+    [SerializeField] float meleeDelay = 0.0f;
     [SerializeField] GameObject meleeHitboxPrefab;
     [SerializeField] Transform meleeSpawnpoint;
 
@@ -190,9 +191,9 @@ public class BasicZombie : NetworkBehaviour, IDamageable
         agent.ResetPath();
         if (!CheckAnimationState("Attack1") && !isAttacking)
         {
-            if (IsServer) StartCoroutine(SpawnMeleeHitbox());
-
             zombieAnimator.SetTrigger("Attack1");
+
+            if (IsServer) StartCoroutine(SpawnMeleeHitbox());
         }
         //Debug.Log("Basic Zombie Attack");
     }
@@ -200,6 +201,8 @@ public class BasicZombie : NetworkBehaviour, IDamageable
     IEnumerator SpawnMeleeHitbox()
     {
         isAttacking = true;
+
+        yield return new WaitForSeconds(meleeDelay);
 
         GameObject currentHitbox = Instantiate(meleeHitboxPrefab, meleeSpawnpoint.position, meleeSpawnpoint.rotation);
         currentHitbox.GetComponent<NetworkObject>().Spawn();
@@ -215,7 +218,7 @@ public class BasicZombie : NetworkBehaviour, IDamageable
             animatorStateInfo = zombieAnimator.GetCurrentAnimatorStateInfo(0);
         }
 
-        yield return new WaitForSeconds(animatorStateInfo.length);
+        yield return new WaitForSeconds(animatorStateInfo.length - meleeDelay);
 
         if (currentHitbox != null)
         {
@@ -231,6 +234,7 @@ public class BasicZombie : NetworkBehaviour, IDamageable
 
         isAttacking = false;
         currentState.Value = ZombieState.Idle;
+        if (!CheckAnimationState("Idle")) zombieAnimator.SetTrigger("Idle");
     }
 
     IEnumerator WaitForDeathAnimation()

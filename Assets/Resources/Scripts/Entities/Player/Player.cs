@@ -29,7 +29,7 @@ public class Player : NetworkBehaviour
     public NetworkVariable<int> currentHealth = new NetworkVariable<int>(
         maxHealth,
         NetworkVariableReadPermission.Everyone,
-        NetworkVariableWritePermission.Owner);
+        NetworkVariableWritePermission.Server);
     public NetworkVariable<FixedString64Bytes> steamName = new NetworkVariable<FixedString64Bytes>(
         default,
         NetworkVariableReadPermission.Everyone,

@@ -62,7 +62,7 @@ public class ZombieHordeSpawner : NetworkBehaviour
     {
         GameObject go = Instantiate(Zombie_Basic, transform.position, transform.rotation);
         BasicZombie bZombie = go.GetComponent<BasicZombie>();
-        bZombie.isHorde = true;
+        bZombie.aggressive = true;
 
         go.GetComponent<NetworkObject>().Spawn();
 

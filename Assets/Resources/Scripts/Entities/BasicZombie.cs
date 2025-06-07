@@ -48,34 +48,11 @@ public class BasicZombie : NetworkBehaviour, IDamageable
     bool zombieSpawned = false;
     bool isAttacking = false;
     bool isDead = false;
-    public bool isHorde = false;
+    public bool aggressive = false;
 
     // Helpers and Components
     NavMeshAgent agent;
     GameObject targetPlayer;
-
-    public override void OnNetworkSpawn()
-    {
-        if (!isHorde)
-        {
-            GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("ZombieSpawnpoint");
-
-            if (spawnPoints.Length > 0)
-            {
-                int randomIndex = Random.Range(0, spawnPoints.Length);
-                Transform spawnTransform = spawnPoints[randomIndex].transform;
-
-                // Set the Zombie spawn point to the Spawnpoint position
-                transform.position = spawnTransform.position;
-                transform.rotation = spawnTransform.rotation;
-            }
-            else
-            {
-                Debug.LogWarning("No zombie spawn points found. Spawning at default position.");
-                this.transform.position = new Vector3(0, 0, 0); // Default position
-            }
-        }
-    }
 
     void Start()
     {
@@ -117,7 +94,7 @@ public class BasicZombie : NetworkBehaviour, IDamageable
 
         targetPlayer = closestPlayer;
 
-        if (isHorde)
+        if (aggressive)
         {
             if (smallestDistance < meleeRadius)
             {
@@ -290,6 +267,8 @@ public class BasicZombie : NetworkBehaviour, IDamageable
     {
         if (currentHealth.Value <= 0 || isDead) return;
 
+        if (!aggressive) aggressive = true;
+
         currentHealth.Value -= damage;
         SpawnBloodEffectClientRpc();
 
@@ -375,6 +354,5 @@ public class BasicZombie : NetworkBehaviour, IDamageable
         Gizmos.DrawWireSphere(transform.position, loseRadius);
         Gizmos.DrawWireSphere(transform.position, meleeRadius);
     }
-
 
 }

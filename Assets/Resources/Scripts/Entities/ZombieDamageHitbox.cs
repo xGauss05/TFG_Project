@@ -19,17 +19,17 @@ public class ZombieDamageHitbox : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        SphereCollider sphere = GetComponent<SphereCollider>();
+        //SphereCollider sphere = GetComponent<SphereCollider>();
 
-        Gizmos.color = Color.red;
+        //Gizmos.color = Color.red;
 
-        Vector3 worldCenter = transform.TransformPoint(sphere.center);
-        float worldRadius = sphere.radius * Mathf.Max(
-            transform.lossyScale.x,
-            transform.lossyScale.y,
-            transform.lossyScale.z
-        );
+        //Vector3 worldCenter = transform.TransformPoint(sphere.center);
+        //float worldRadius = sphere.radius * Mathf.Max(
+        //    transform.lossyScale.x,
+        //    transform.lossyScale.y,
+        //    transform.lossyScale.z
+        //);
 
-        Gizmos.DrawWireSphere(worldCenter, worldRadius);
+        //Gizmos.DrawWireSphere(worldCenter, worldRadius);
     }
 }

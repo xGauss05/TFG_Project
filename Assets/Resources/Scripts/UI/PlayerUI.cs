@@ -28,7 +28,7 @@ public class PlayerUI : MonoBehaviour
 
     public void SetPlayer(Player p)
     {
-        Debug.Log($"Setting player to UI. Player name: {p.steamName.Value}");
+        //Debug.Log($"Setting player to UI. Player name: {p.steamName.Value}");
 
         if (player != null) UnsubscribeEvents();
 
@@ -36,7 +36,7 @@ public class PlayerUI : MonoBehaviour
 
         if (player == null) return;
 
-        Debug.Log($"Subscribing {p.steamName.Value} to UI events.");
+        //Debug.Log($"Subscribing {p.steamName.Value} to UI events.");
 
         player.currentHealth.OnValueChanged += (prev, curr) => OnHealthChanged(curr);
         player.inventory.Medkits.OnValueChanged += (prev, curr) => OnMedkitChanged(curr);
@@ -83,7 +83,7 @@ public class PlayerUI : MonoBehaviour
             yield return null;
         }
 
-        Debug.Log("No longer waiting for Gun.");
+        //Debug.Log("No longer waiting for Gun.");
         SubscribeToGun(player.inventory.currentGun);
     }
 

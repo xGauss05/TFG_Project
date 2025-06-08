@@ -10,6 +10,9 @@ using UnityEngine.SceneManagement;
 
 public class ExtractionZone : NetworkBehaviour
 {
+    [Header("Timer scores")]
+    [SerializeField] int score = 2000;
+
     public int playersInside;
     public int requiredPlayers;
 
@@ -47,6 +50,15 @@ public class ExtractionZone : NetworkBehaviour
         CheckExtraction();
     }
 
+    void OnTriggerStay(Collider other)
+    {
+        if (IsClient) return;
+
+        if (!other.CompareTag("Player")) { return; }
+
+        CheckExtraction();
+    }
+
     void OnTriggerExit(Collider other)
     {
         if (IsClient) return;
@@ -67,7 +79,18 @@ public class ExtractionZone : NetworkBehaviour
     {
         if (playersInside >= requiredPlayers && !safeDoor.isOpen)
         {
-            if (ScoreManager.Singleton != null) ScoreManager.Singleton.AddScore(2000);
+            if (ScoreManager.Singleton != null)
+            {
+                int scoreToUpload = score;
+
+                if (LevelManager.Singleton != null)
+                {
+                    scoreToUpload += LevelManager.Singleton.GetTimerScore();
+                    Debug.Log("Added timer score.");
+                }
+
+                ScoreManager.Singleton.AddScore(scoreToUpload);
+            }
 
             EndGame();
         }
@@ -87,6 +110,5 @@ public class ExtractionZone : NetworkBehaviour
         }
 
         NetworkManager.Singleton.SceneManager.LoadScene("1_MainMenu", LoadSceneMode.Single);
-        //NetworkManager.Singleton.Shutdown();
     }
 }

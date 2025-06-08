@@ -932,7 +932,7 @@ GameObject:
   - component: {fileID: 1513191382}
   - component: {fileID: 1513191384}
   m_Layer: 0
-  m_Name: BasicZombieSpawner
+  m_Name: ZombieIdleManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -987,10 +987,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Zombie_Basic: {fileID: 609194813430149826, guid: 6d3c800ad03aaee4da14042dbd2db603, type: 3}
-  Medkit: {fileID: 9112024627195489059, guid: 36f734ad474426a4abeada838b528439, type: 3}
-  AmmoBox: {fileID: 2933228936658766195, guid: 7396be217327e9543b0c12c99979ebe2, type: 3}
-  Shotgun: {fileID: 270225949823634018, guid: 8e4ee3ce86cce964da40a63ecf93d601, type: 3}
-  AssaultRifle: {fileID: 748548883179134076, guid: 6eb7ce7f05651144c99dc20012d199fe, type: 3}
+  Zombie_Fast: {fileID: 1831807057716872682, guid: 841e4eaa6139e6f4eb6fcb5572c9a59d, type: 3}
+  Zombie_Boss: {fileID: 6172361777949345897, guid: c4a70de9a1eca4e49a26ed36365d4956, type: 3}
 --- !u!1 &1539084938
 GameObject:
   m_ObjectHideFlags: 0

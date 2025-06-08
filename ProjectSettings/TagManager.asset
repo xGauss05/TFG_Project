@@ -5,8 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - CinemachineTarget
-  - ZombieSpawnpoint
   - PlayerSpawnpoint
+  - BasicZombieSpawnpoint
+  - FastZombieSpawnpoint
+  - BossZombieSpawnpoint
   layers:
   - Default
   - TransparentFX

@@ -10,8 +10,6 @@ public abstract class PickupItem : NetworkBehaviour
     [SerializeField] float upDownSpeed = 0.5f;
     [SerializeField] float rotSpeed = 10.0f;
 
-    public bool useRandomSpawnPoint = true;
-
     public abstract void OnPickup(Player player);
 
     void OnTriggerEnter(Collider other)
@@ -27,31 +25,6 @@ public abstract class PickupItem : NetworkBehaviour
                 DespawnServerRpc();
                 //Debug.Log("Item pickup!");
             }
-        }
-    }
-
-    public override void OnNetworkSpawn()
-    {
-        if (IsServer && useRandomSpawnPoint)
-        {
-            // Currently testing for ZombieSpawnpoints
-            GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("ZombieSpawnpoint");
-
-            if (spawnPoints.Length > 0)
-            {
-                int randomIndex = Random.Range(0, spawnPoints.Length);
-                Transform spawnTransform = spawnPoints[randomIndex].transform;
-
-                // Set the PickupItem spawn point to the Spawnpoint position
-                transform.position = spawnTransform.position;
-                transform.rotation = spawnTransform.rotation;
-            }
-            else
-            {
-                Debug.LogWarning("No zombie spawn points found. Spawning at default position.");
-                transform.position = new Vector3(0, 0, 0); // Default position
-            }
-
         }
     }
 

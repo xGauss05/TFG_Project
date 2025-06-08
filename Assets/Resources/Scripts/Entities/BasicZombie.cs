@@ -20,7 +20,8 @@ public class BasicZombie : NetworkBehaviour, IDamageable
     [SerializeField] float movementSpeed = 0.25f;
     public int attackDamage = 5;
     const int maxHealth = 50;
-    const int score = 50;
+    [SerializeField] int score = 50;
+    [SerializeField] float despawnRadius = 200.0f;
 
     [Header("Zombie Animator")]
     [SerializeField] Animator zombieAnimator;
@@ -36,6 +37,7 @@ public class BasicZombie : NetworkBehaviour, IDamageable
     public NetworkVariable<int> currentHealth = new NetworkVariable<int>(maxHealth);
 
     [Header("Zombie Melee properties")]
+    [SerializeField] float meleeDelay = 0.0f;
     [SerializeField] GameObject meleeHitboxPrefab;
     [SerializeField] Transform meleeSpawnpoint;
 
@@ -46,33 +48,12 @@ public class BasicZombie : NetworkBehaviour, IDamageable
     bool zombieSpawned = false;
     bool isAttacking = false;
     bool isDead = false;
+    public bool aggressive = false;
 
     // Helpers and Components
     NavMeshAgent agent;
     GameObject targetPlayer;
 
-    public override void OnNetworkSpawn()
-    {
-        GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("ZombieSpawnpoint");
-
-        if (spawnPoints.Length > 0)
-        {
-            int randomIndex = Random.Range(0, spawnPoints.Length);
-            Transform spawnTransform = spawnPoints[randomIndex].transform;
-
-            // Set the Zombie spawn point to the Spawnpoint position
-            transform.position = spawnTransform.position;
-            transform.rotation = spawnTransform.rotation;
-        }
-        else
-        {
-            Debug.LogWarning("No zombie spawn points found. Spawning at default position.");
-            this.transform.position = new Vector3(0, 0, 0); // Default position
-        }
-
-    }
-
-    // Start is called before the first frame update
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -81,11 +62,11 @@ public class BasicZombie : NetworkBehaviour, IDamageable
         StartCoroutine(WaitForSpawnAnimation());
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (!IsHost || !zombieSpawned || isDead) return;
 
+        DespawnChecker();
         CheckState();
         ExecuteState();
     }
@@ -113,18 +94,32 @@ public class BasicZombie : NetworkBehaviour, IDamageable
 
         targetPlayer = closestPlayer;
 
-        if (smallestDistance < meleeRadius)
+        if (aggressive)
         {
-            currentState.Value = ZombieState.Melee;
+            if (smallestDistance < meleeRadius)
+            {
+                currentState.Value = ZombieState.Melee;
+            }
+            else if (currentState.Value != ZombieState.Chase && currentState.Value != ZombieState.Melee)
+            {
+                currentState.Value = ZombieState.Chase;
+            }
         }
-        else if (currentState.Value != ZombieState.Chase && smallestDistance < detectionRadius)
+        else
         {
-            currentState.Value = ZombieState.Chase;
-        }
-        else if (currentState.Value != ZombieState.Idle && smallestDistance > loseRadius)
-        {
-            agent.SetDestination(transform.position);
-            currentState.Value = ZombieState.Idle;
+            if (smallestDistance < meleeRadius)
+            {
+                currentState.Value = ZombieState.Melee;
+            }
+            else if (currentState.Value != ZombieState.Chase && smallestDistance < detectionRadius)
+            {
+                currentState.Value = ZombieState.Chase;
+            }
+            else if (currentState.Value != ZombieState.Idle && smallestDistance > loseRadius)
+            {
+                agent.SetDestination(transform.position);
+                currentState.Value = ZombieState.Idle;
+            }
         }
     }
 
@@ -173,9 +168,9 @@ public class BasicZombie : NetworkBehaviour, IDamageable
         agent.ResetPath();
         if (!CheckAnimationState("Attack1") && !isAttacking)
         {
-            if (IsServer) StartCoroutine(SpawnMeleeHitbox());
-
             zombieAnimator.SetTrigger("Attack1");
+
+            if (IsServer) StartCoroutine(SpawnMeleeHitbox());
         }
         //Debug.Log("Basic Zombie Attack");
     }
@@ -183,6 +178,8 @@ public class BasicZombie : NetworkBehaviour, IDamageable
     IEnumerator SpawnMeleeHitbox()
     {
         isAttacking = true;
+
+        yield return new WaitForSeconds(meleeDelay);
 
         GameObject currentHitbox = Instantiate(meleeHitboxPrefab, meleeSpawnpoint.position, meleeSpawnpoint.rotation);
         currentHitbox.GetComponent<NetworkObject>().Spawn();
@@ -198,7 +195,7 @@ public class BasicZombie : NetworkBehaviour, IDamageable
             animatorStateInfo = zombieAnimator.GetCurrentAnimatorStateInfo(0);
         }
 
-        yield return new WaitForSeconds(animatorStateInfo.length);
+        yield return new WaitForSeconds(animatorStateInfo.length - meleeDelay);
 
         if (currentHitbox != null)
         {
@@ -213,6 +210,8 @@ public class BasicZombie : NetworkBehaviour, IDamageable
         }
 
         isAttacking = false;
+        currentState.Value = ZombieState.Idle;
+        if (!CheckAnimationState("Idle")) zombieAnimator.SetTrigger("Idle");
     }
 
     IEnumerator WaitForDeathAnimation()
@@ -268,6 +267,8 @@ public class BasicZombie : NetworkBehaviour, IDamageable
     {
         if (currentHealth.Value <= 0 || isDead) return;
 
+        if (!aggressive) aggressive = true;
+
         currentHealth.Value -= damage;
         SpawnBloodEffectClientRpc();
 
@@ -283,6 +284,32 @@ public class BasicZombie : NetworkBehaviour, IDamageable
             if (IsServer && ScoreManager.Singleton != null) ScoreManager.Singleton.AddScore(score);
 
             StartCoroutine(WaitForDeathAnimation());
+        }
+    }
+
+    void DespawnChecker()
+    {
+        if (IsServer)
+        {
+            GameObject[] foundPlayers = GameObject.FindGameObjectsWithTag("Player");
+            if (foundPlayers.Length == 0) return;
+
+            float smallestDistance = float.MaxValue;
+
+            foreach (var player in foundPlayers)
+            {
+                float distance = Vector3.Distance(transform.position, player.transform.position);
+
+                if (distance < smallestDistance)
+                {
+                    smallestDistance = distance;
+                }
+            }
+
+            if (smallestDistance > despawnRadius)
+            {
+                this.NetworkObject.Despawn();
+            }
         }
     }
 
@@ -327,6 +354,5 @@ public class BasicZombie : NetworkBehaviour, IDamageable
         Gizmos.DrawWireSphere(transform.position, loseRadius);
         Gizmos.DrawWireSphere(transform.position, meleeRadius);
     }
-
 
 }

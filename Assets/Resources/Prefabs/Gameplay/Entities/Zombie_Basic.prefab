@@ -120,8 +120,10 @@ MonoBehaviour:
   loseRadius: 15
   detectionRadius: 10
   meleeRadius: 2
-  movementSpeed: 3.5
+  movementSpeed: 4
   attackDamage: 5
+  score: 50
+  despawnRadius: 200
   zombieAnimator: {fileID: 9048280090246497628}
   zombieAttackSfx: {fileID: 8300000, guid: 05d1b161910a9924d8a873e2c276fe17, type: 3}
   zombieScreechSfx: {fileID: 8300000, guid: 465ab330b4f3c3c41b27fe97760d4427, type: 3}
@@ -130,9 +132,11 @@ MonoBehaviour:
     m_InternalValue: 1
   currentHealth:
     m_InternalValue: 100
+  meleeDelay: 0.3
   meleeHitboxPrefab: {fileID: 2700269903401608430, guid: 5408a08ee254fce4292fca0f8d842b27, type: 3}
   meleeSpawnpoint: {fileID: 5235445558112577416}
   ps_bloodSplatter: {fileID: 1303003753339649557, guid: 6dff77b2733a8e04ea0ac5c375c69bad, type: 3}
+  aggressive: 0
 --- !u!114 &5562070844906338869
 MonoBehaviour:
   m_ObjectHideFlags: 0

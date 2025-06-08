@@ -16,11 +16,6 @@ public class Box : NetworkBehaviour, IDamageable
     [Header("Box Audios")]
     [SerializeField] AudioClip boxDestroySfx;
 
-    public override void OnNetworkSpawn()
-    {
-
-    }
-
     public void TakeDamage(int damage)
     {
         if (IsServer)
@@ -49,34 +44,27 @@ public class Box : NetworkBehaviour, IDamageable
                 float roll = Random.value;
                 GameObject prefabToDrop = null;
 
-                if (roll < 0.05f)
+                if (roll < 0.10f)
                 {
                     prefabToDrop = Resources.Load<GameObject>("Prefabs/Gameplay/Items/PickUpItems/PickUp_AssaultRifle");
                 }
-                else if (roll < 0.10f)
+                else if (roll < 0.20f)
                 {
                     prefabToDrop = Resources.Load<GameObject>("Prefabs/Gameplay/Items/PickUpItems/PickUp_Shotgun");
                 }
-                else if (roll < 0.15f)
+                else if (roll < 0.40f)
                 {
                     prefabToDrop = Resources.Load<GameObject>("Prefabs/Gameplay/Items/PickUpItems/PickUp_Medkit");
                 }
-                else if (roll < 0.20f)
+                else if (roll < 0.60f)
                 {
                     prefabToDrop = Resources.Load<GameObject>("Prefabs/Gameplay/Items/PickUpItems/PickUp_AmmoBox");
                 }
 
                 if (prefabToDrop != null)
                 {
-                    GameObject gunToDrop = Instantiate(prefabToDrop, transform.position, transform.rotation);
-                    PickupItem pickup = gunToDrop.GetComponent<PickupItem>();
-
-                    if (pickup != null)
-                    {
-                        pickup.useRandomSpawnPoint = false;
-                    }
-
-                    gunToDrop.GetComponent<NetworkObject>().Spawn();
+                    GameObject itemToDrop = Instantiate(prefabToDrop, transform.position, transform.rotation);
+                    itemToDrop.GetComponent<NetworkObject>().Spawn();
                 }
             }
 
@@ -84,7 +72,7 @@ public class Box : NetworkBehaviour, IDamageable
         }
     }
 
-    // Client RPC functions
+    // Client RPC functions -------------------------------------------------------------------------------------------
     [ClientRpc]
     public void PlayBoxDestroyedClientRpc()
     {

@@ -230,25 +230,28 @@ public class SteamManager : MonoBehaviour
         }
         currentPlayers.Clear();
 
-        foreach (var player in LobbyReference.Singleton.currentLobby?.Members)
+        if (LobbyReference.Singleton.currentLobby != null)
         {
-            GameObject playerItem = Instantiate(playerInfoPrefab, LobbyPlayersList.transform);
-            PlayerInfoUI playerInfo = playerItem.GetComponentInChildren<PlayerInfoUI>();
-
-            playerInfo.playerName.text = player.Name;
-
-            Steamworks.Data.Image? image = await player.GetLargeAvatarAsync();
-
-            if (image != null)
+            foreach (var player in LobbyReference.Singleton.currentLobby?.Members)
             {
-                Texture2D tex2d = new Texture2D((int)image.Value.Width, (int)image.Value.Height, TextureFormat.RGBA32, false);
-                tex2d.LoadRawTextureData(image.Value.Data);
-                tex2d.Apply();
+                GameObject playerItem = Instantiate(playerInfoPrefab, LobbyPlayersList.transform);
+                PlayerInfoUI playerInfo = playerItem.GetComponentInChildren<PlayerInfoUI>();
 
-                playerInfo.playerImage.texture = tex2d;
+                playerInfo.playerName.text = player.Name;
+
+                Steamworks.Data.Image? image = await player.GetLargeAvatarAsync();
+
+                if (image != null)
+                {
+                    Texture2D tex2d = new Texture2D((int)image.Value.Width, (int)image.Value.Height, TextureFormat.RGBA32, false);
+                    tex2d.LoadRawTextureData(image.Value.Data);
+                    tex2d.Apply();
+
+                    playerInfo.playerImage.texture = tex2d;
+                }
+
+                currentPlayers.Add(playerItem);
             }
-
-            currentPlayers.Add(playerItem);
         }
 
         Canvas.ForceUpdateCanvases();

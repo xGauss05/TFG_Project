@@ -52,11 +52,6 @@ public class Car : NetworkBehaviour, IDamageable
         {
             PlayCarExplosionClientRpc();
 
-            if (HordeManager.Singleton != null)
-            {
-                HordeManager.Singleton.StartHorde();
-            }
-
             if (IsServer && ScoreManager.Singleton != null) ScoreManager.Singleton.AddScore(score);
 
             NetworkObject.Despawn();

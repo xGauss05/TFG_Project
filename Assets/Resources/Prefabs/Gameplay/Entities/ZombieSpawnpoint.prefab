@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4341839515562905284}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: ZombieSpawnpoint
   m_TagString: ZombieSpawnpoint
   m_Icon: {fileID: 0}

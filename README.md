@@ -43,6 +43,7 @@ It is recommended to add Lights Out.exe at Steam, by Add a Game... > Add a Non-S
 | <code>1</code> | Equip Pistol |
 | <code>2</code> | Equip Assault Rifle |
 | <code>3</code> | Equip Shotgun |
+| <code>4</code> | Use Medkit |
 | <code>MOUSE LMB</code> | Select button / Shoot |
 | <code>ENTER</code> | Chat InGame or Lobby |
 

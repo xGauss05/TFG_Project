@@ -34,6 +34,10 @@ public class Player : NetworkBehaviour
         default,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Owner);
+    public NetworkVariable<bool> isDead = new NetworkVariable<bool>(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
 
     [Header("Player Gun properties")]
     [SerializeField] Billboard billboard;
@@ -44,15 +48,18 @@ public class Player : NetworkBehaviour
     [SerializeField] GameObject ps_bloodSplatter;
 
     // Flags for logic handling
-    bool isDead = false;
     bool isChatting = false;
 
     // Helpers and Components
+    [Header("Player Helpers and Components")]
     public Inventory inventory;
     [SerializeField] GameObject pistolObject;
     [SerializeField] GameObject assaultRifleObject;
     [SerializeField] GameObject shotgunObject;
     Door doorNearby;
+    Player deadPlayerNearby;
+    float reviveProgress = 0.0f;
+    const float reviveDuration = 3.0f;
 
     // Unity Event functions ------------------------------------------------------------------------------------------
     #region Unity Event functions
@@ -117,7 +124,7 @@ public class Player : NetworkBehaviour
 
     void Update()
     {
-        if (!IsOwner || !IsSpawned || isDead) return;
+        if (!IsOwner || !IsSpawned || isDead.Value) return;
 
         if (IsOwner)
         {
@@ -132,6 +139,12 @@ public class Player : NetworkBehaviour
         {
             doorNearby = door;
         }
+
+        Player player = other.GetComponent<Player>();
+        if (player != null && player.isDead.Value)
+        {
+            deadPlayerNearby = player;
+        }
     }
 
     void OnTriggerExit(Collider other)
@@ -140,6 +153,12 @@ public class Player : NetworkBehaviour
         if (door != null && doorNearby == door)
         {
             doorNearby = null;
+        }
+
+        Player player = other.GetComponent<Player>();
+        if (player != null && deadPlayerNearby == player)
+        {
+            deadPlayerNearby = null;
         }
     }
     #endregion
@@ -155,7 +174,7 @@ public class Player : NetworkBehaviour
         }
 
         if (isChatting) return;
-        
+
         // Change cursor mode
         if (Input.GetKey(KeyCode.LeftAlt))
         {
@@ -176,10 +195,26 @@ public class Player : NetworkBehaviour
             TryReload();
         }
 
-        // Interact
+        // Interact Door
         if (Input.GetKeyDown(KeyCode.E))
         {
             TryToggleDoor(doorNearby);
+        }
+
+        // Revive Players
+        if (Input.GetKey(KeyCode.E))
+        {
+            reviveProgress += Time.deltaTime;
+
+            if (reviveProgress >= reviveDuration)
+            {
+                TryRevivePlayer();
+            }
+        }
+
+        if (Input.GetKeyUp(KeyCode.E))
+        {
+            reviveProgress = 0.0f;
         }
 
         // Player movement
@@ -220,6 +255,23 @@ public class Player : NetworkBehaviour
             TryMedkit();
         }
 
+    }
+
+    void TryRevivePlayer()
+    {
+        float reviveRadius = 2.0f; // puedes ajustar el radio de búsqueda
+        Collider[] hits = Physics.OverlapSphere(transform.position, reviveRadius);
+
+        foreach (Collider hit in hits)
+        {
+            Player targetPlayer = hit.GetComponent<Player>();
+            if (targetPlayer != null && targetPlayer != this && targetPlayer.isDead.Value)
+            {
+                // Encontrado un jugador muerto dentro del rango, pedir al server que lo reviva
+                RevivePlayerServerRpc(targetPlayer.NetworkObject);
+                return;
+            }
+        }
     }
 
     void Move(PlayerAction actions, float deltaTime)
@@ -453,7 +505,7 @@ public class Player : NetworkBehaviour
         if (currentHealth.Value <= 0)
         {
             currentHealth.Value = 0;
-            isDead = true;
+            isDead.Value = true;
             Debug.Log($"Player {steamName.Value} dead!");
         }
     }
@@ -481,6 +533,21 @@ public class Player : NetworkBehaviour
     {
         ToggleDoorClientRpc(doorRef);
     }
-    #endregion
 
+    [ServerRpc(RequireOwnership = false)]
+    void RevivePlayerServerRpc(NetworkObjectReference playerTargetRef)
+    {
+        if (playerTargetRef.TryGet(out NetworkObject nObject))
+        {
+            Player targetPlayer = nObject.GetComponent<Player>();
+
+            if (targetPlayer != null && targetPlayer.isDead.Value)
+            {
+                int healthAmount = (int)maxHealth * 30 / 100;
+                targetPlayer.currentHealth.Value = healthAmount;
+                targetPlayer.isDead.Value = false;
+            }
+        }
+    }
+    #endregion
 }

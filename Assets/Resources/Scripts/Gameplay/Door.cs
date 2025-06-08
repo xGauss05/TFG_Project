@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class Door : NetworkBehaviour
 {
-    [SerializeField] BoxCollider triggerA;
-    [SerializeField] BoxCollider triggerB;
     [SerializeField] Transform doorTransform;
     [SerializeField] float openAngle = 90f;
     [SerializeField] float openSpeed = 2f;

@@ -165,7 +165,7 @@ MonoBehaviour:
   loseRadius: 30
   detectionRadius: 20
   meleeRadius: 1.45
-  movementSpeed: 7
+  movementSpeed: 7.5
   attackDamage: 7
   score: 100
   despawnRadius: 200
@@ -181,7 +181,7 @@ MonoBehaviour:
   meleeHitboxPrefab: {fileID: 2700269903401608430, guid: cbd4025cf90083f4197234f7bfa94087, type: 3}
   meleeSpawnpoint: {fileID: 7505009740887784750}
   ps_bloodSplatter: {fileID: 1303003753339649557, guid: 6dff77b2733a8e04ea0ac5c375c69bad, type: 3}
-  isHorde: 0
+  aggressive: 0
 --- !u!1 &7852420071336358137
 GameObject:
   m_ObjectHideFlags: 0

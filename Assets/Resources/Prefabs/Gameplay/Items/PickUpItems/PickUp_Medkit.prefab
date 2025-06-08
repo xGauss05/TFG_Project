@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7223737378419809446}
   - component: {fileID: 4707930281134781295}
   - component: {fileID: 7377230421753505665}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: PickUp_Medkit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -73,7 +73,6 @@ MonoBehaviour:
   endY: 1.5
   upDownSpeed: 0.5
   rotSpeed: 10
-  useRandomSpawnPoint: 1
 --- !u!135 &4707930281134781295
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -137,6 +136,10 @@ PrefabInstance:
     - target: {fileID: 1279140426991430450, guid: 360690a7c06559a4f927c76899139848, type: 3}
       propertyPath: m_Name
       value: FirstAidKit_Red
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279140426991430450, guid: 360690a7c06559a4f927c76899139848, type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2853930486529300769, guid: 360690a7c06559a4f927c76899139848, type: 3}
       propertyPath: m_LocalScale.x

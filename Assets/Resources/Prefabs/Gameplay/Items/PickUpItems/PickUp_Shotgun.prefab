@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2232219047066140648}
   - component: {fileID: 1959242685298713701}
   - component: {fileID: 1780693229355247124}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: PickUp_Shotgun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 835926
+  GlobalObjectIdHash: 1462860793
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -73,7 +73,6 @@ MonoBehaviour:
   endY: 1.5
   upDownSpeed: 0.5
   rotSpeed: 10
-  useRandomSpawnPoint: 1
 --- !u!135 &1959242685298713701
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -134,6 +133,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2951755038850719713}
     m_Modifications:
+    - target: {fileID: 294514309403931233, guid: 01fdab2e3c9dde44191c95c192b204ed, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 345426851393320835, guid: 01fdab2e3c9dde44191c95c192b204ed, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 645454593880250709, guid: 01fdab2e3c9dde44191c95c192b204ed, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2517627701987118346, guid: 01fdab2e3c9dde44191c95c192b204ed, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2524269841540085575, guid: 01fdab2e3c9dde44191c95c192b204ed, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 2592109398234381758, guid: 01fdab2e3c9dde44191c95c192b204ed, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -177,6 +196,38 @@ PrefabInstance:
     - target: {fileID: 2932640980190783236, guid: 01fdab2e3c9dde44191c95c192b204ed, type: 3}
       propertyPath: m_Name
       value: ShotGun_C
+      objectReference: {fileID: 0}
+    - target: {fileID: 2932640980190783236, guid: 01fdab2e3c9dde44191c95c192b204ed, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3691993328751055396, guid: 01fdab2e3c9dde44191c95c192b204ed, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6126221863640560942, guid: 01fdab2e3c9dde44191c95c192b204ed, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6741530120725657472, guid: 01fdab2e3c9dde44191c95c192b204ed, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8340658956126513826, guid: 01fdab2e3c9dde44191c95c192b204ed, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8349890950187046361, guid: 01fdab2e3c9dde44191c95c192b204ed, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8708760426953384471, guid: 01fdab2e3c9dde44191c95c192b204ed, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8788295243218693655, guid: 01fdab2e3c9dde44191c95c192b204ed, type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

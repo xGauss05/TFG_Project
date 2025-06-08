@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: -8517554578786365713}
   - component: {fileID: 4663665556721681681}
   - component: {fileID: 2170468354242421330}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: PickUp_AmmoBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -73,7 +73,6 @@ MonoBehaviour:
   endY: 1.5
   upDownSpeed: 0.5
   rotSpeed: 10
-  useRandomSpawnPoint: 1
   ammoAmount: 10
 --- !u!135 &4663665556721681681
 SphereCollider:
@@ -178,6 +177,18 @@ PrefabInstance:
     - target: {fileID: -927199367670048503, guid: 45fb3b613218da844b047d1f9349e0d6, type: 3}
       propertyPath: m_Name
       value: mesh
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 45fb3b613218da844b047d1f9349e0d6, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6080596665305963236, guid: 45fb3b613218da844b047d1f9349e0d6, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152493775193411352, guid: 45fb3b613218da844b047d1f9349e0d6, type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

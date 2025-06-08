@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1548314331716853169}
   - component: {fileID: -2754853749520751330}
   - component: {fileID: 5057900224162620258}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: PickUp_AssaultRifle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -73,7 +73,6 @@ MonoBehaviour:
   endY: 1.5
   upDownSpeed: 0.5
   rotSpeed: 10
-  useRandomSpawnPoint: 1
 --- !u!135 &-2754853749520751330
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -134,6 +133,34 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7240189377474844299}
     m_Modifications:
+    - target: {fileID: 320468712745320707, guid: 34d9918439c82da478947f5832aed8b9, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 680695220488662085, guid: 34d9918439c82da478947f5832aed8b9, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 897488429848154712, guid: 34d9918439c82da478947f5832aed8b9, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2869225439176319424, guid: 34d9918439c82da478947f5832aed8b9, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3330036771757304508, guid: 34d9918439c82da478947f5832aed8b9, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378089200406636538, guid: 34d9918439c82da478947f5832aed8b9, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3413278398017338526, guid: 34d9918439c82da478947f5832aed8b9, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3557320247793090291, guid: 34d9918439c82da478947f5832aed8b9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -177,6 +204,30 @@ PrefabInstance:
     - target: {fileID: 4185518912306324553, guid: 34d9918439c82da478947f5832aed8b9, type: 3}
       propertyPath: m_Name
       value: AR_A_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4185518912306324553, guid: 34d9918439c82da478947f5832aed8b9, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4638949467097366829, guid: 34d9918439c82da478947f5832aed8b9, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6452371806086536003, guid: 34d9918439c82da478947f5832aed8b9, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7105054624255696399, guid: 34d9918439c82da478947f5832aed8b9, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8186281911719701307, guid: 34d9918439c82da478947f5832aed8b9, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069808470590087953, guid: 34d9918439c82da478947f5832aed8b9, type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

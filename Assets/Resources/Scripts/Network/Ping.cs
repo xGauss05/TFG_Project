@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class Ping : MonoBehaviour
+public class Ping : NetworkBehaviour
 {
     [Header("Ping settings")]
     [SerializeField] float updateInterval = 0.5f;
@@ -11,24 +11,30 @@ public class Ping : MonoBehaviour
     // Helpers
     float timer = 0.0f;
 
-    public ulong rtt { get; private set; } = 0;
+    public float rtt { get; private set; } = 0;
 
     void Update()
     {
+        if (!IsClient || !IsOwner) return;
 
         timer += Time.deltaTime;
 
         if (timer >= updateInterval)
         {
-            UpdatePing();
+            SendPingServerRpc(Time.realtimeSinceStartup);
             timer = 0f;
         }
     }
 
-    void UpdatePing()
+    [ServerRpc]
+    void SendPingServerRpc(float clientTime)
     {
-        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsClient) return;
+        ReturnPingClientRpc(clientTime);
+    }
 
-        rtt = NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(NetworkManager.Singleton.NetworkConfig.NetworkTransport.ServerClientId);
+    [ClientRpc]
+    void ReturnPingClientRpc(float clientTime)
+    {
+        rtt = (ulong)Mathf.Abs(Time.realtimeSinceStartup - clientTime);
     }
 }

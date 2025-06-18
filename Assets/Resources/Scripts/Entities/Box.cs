@@ -16,6 +16,9 @@ public class Box : NetworkBehaviour, IDamageable
     [Header("Box Audios")]
     [SerializeField] AudioClip boxDestroySfx;
 
+    [Header("Box Particles")]
+    [SerializeField] GameObject ps_boxDestroyed;
+
     public void TakeDamage(int damage)
     {
         if (IsServer)
@@ -36,6 +39,7 @@ public class Box : NetworkBehaviour, IDamageable
         if (currentHealth.Value <= 0)
         {
             PlayBoxDestroyedClientRpc();
+            SpawnBoxEffectClientRpc();
 
             if (IsServer && ScoreManager.Singleton != null) ScoreManager.Singleton.AddScore(score);
 
@@ -77,6 +81,15 @@ public class Box : NetworkBehaviour, IDamageable
     public void PlayBoxDestroyedClientRpc()
     {
         SFXManager.Singleton.PlaySound(boxDestroySfx);
+    }
+
+    [ClientRpc]
+    void SpawnBoxEffectClientRpc()
+    {
+        if (ps_boxDestroyed == null) return;
+
+        GameObject box_particle = Instantiate(ps_boxDestroyed, transform.position + Vector3.up * 0.5f, Quaternion.identity);
+        Destroy(box_particle, 0.5f);
     }
 
     // Server RPC functions -------------------------------------------------------------------------------------------

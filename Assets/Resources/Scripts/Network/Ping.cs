@@ -26,15 +26,18 @@ public class Ping : NetworkBehaviour
         }
     }
 
+    // Client RPC functions -------------------------------------------------------------------------------------------
+    [ClientRpc]
+    void ReturnPingClientRpc(float clientTime)
+    {
+        rtt = (ulong)Mathf.Abs(Time.realtimeSinceStartup - clientTime);
+    }
+
+    // Server RPC functions -------------------------------------------------------------------------------------------
     [ServerRpc]
     void SendPingServerRpc(float clientTime)
     {
         ReturnPingClientRpc(clientTime);
     }
 
-    [ClientRpc]
-    void ReturnPingClientRpc(float clientTime)
-    {
-        rtt = (ulong)Mathf.Abs(Time.realtimeSinceStartup - clientTime);
-    }
 }

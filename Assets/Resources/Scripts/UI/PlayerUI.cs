@@ -8,6 +8,7 @@ public class PlayerUI : MonoBehaviour
 {
     [Header("References")]
     public Slider healthSlider;
+    public Slider reviverSlider;
     public TextMeshProUGUI healthText;
     public TextMeshProUGUI medkitText;
     public TextMeshProUGUI currentAmmoText;
@@ -41,6 +42,7 @@ public class PlayerUI : MonoBehaviour
         player.currentHealth.OnValueChanged += (prev, curr) => OnHealthChanged(curr);
         player.inventory.Medkits.OnValueChanged += (prev, curr) => OnMedkitChanged(curr);
         player.inventory.currentGunType.OnValueChanged += (prev, curr) => OnGunChanged(curr);
+
         StartCoroutine(WaitForGun());
         //player.inventory.OnGunChanged += OnGunChanged;
 
@@ -86,7 +88,6 @@ public class PlayerUI : MonoBehaviour
         //Debug.Log("No longer waiting for Gun.");
         SubscribeToGun(player.inventory.currentGun);
     }
-
 
     void OnMedkitChanged(int count)
     {
@@ -138,6 +139,24 @@ public class PlayerUI : MonoBehaviour
         else
         {
             healthSlider.fillRect.GetComponent<Image>().color = Color.red;
+        }
+    }
+
+    public void ToggleReviveSlider(bool toggle)
+    {
+        if (toggle)
+        {
+            if (!reviverSlider.gameObject.activeSelf)
+            {
+                reviverSlider.gameObject.SetActive(true);
+            }
+        }
+        else
+        {
+            if (reviverSlider.gameObject.activeSelf)
+            {
+                reviverSlider.gameObject.SetActive(false);
+            }
         }
     }
 }

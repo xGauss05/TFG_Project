@@ -60,7 +60,8 @@ public class Player : NetworkBehaviour
     [SerializeField] GameObject shotgunObject;
     Door doorNearby;
     Player deadPlayerNearby;
-    float reviveProgress = 0.0f;
+    PlayerUI playerUI;
+    public float reviveProgress = 0.0f;
     const float reviveDuration = 3.0f;
 
     // Unity Event functions ------------------------------------------------------------------------------------------
@@ -115,10 +116,14 @@ public class Player : NetworkBehaviour
         {
             EquipGunServerRpc(GunBase.Type.Pistol);
 
-            var playerUI = FindObjectOfType<PlayerUI>();
-            if (playerUI != null)
+            var ui = FindObjectOfType<PlayerUI>();
+            if (ui != null)
             {
+                playerUI = ui;
                 playerUI.SetPlayer(this);
+                playerUI.reviverSlider.maxValue = reviveDuration;
+                playerUI.reviverSlider.minValue = 0.0f;
+                playerUI.reviverSlider.value = reviveProgress;
             }
 
         }
@@ -204,19 +209,29 @@ public class Player : NetworkBehaviour
         }
 
         // Revive Players
-        if (Input.GetKey(KeyCode.E))
+        if (deadPlayerNearby != null)
         {
-            reviveProgress += Time.deltaTime;
-
-            if (reviveProgress >= reviveDuration)
+            if (Input.GetKeyUp(KeyCode.E))
             {
-                TryRevivePlayer();
+                reviveProgress = 0.0f;
+                playerUI.ToggleReviveSlider(false);
+            }
+
+            if (Input.GetKey(KeyCode.E))
+            {
+                playerUI.ToggleReviveSlider(true);
+                reviveProgress += Time.deltaTime;
+                playerUI.reviverSlider.value = reviveProgress;
+
+                if (reviveProgress >= reviveDuration)
+                {
+                    TryRevivePlayer();
+                }
             }
         }
-
-        if (Input.GetKeyUp(KeyCode.E))
+        else
         {
-            reviveProgress = 0.0f;
+            playerUI.ToggleReviveSlider(false);
         }
 
         // Player movement

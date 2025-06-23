@@ -3608,12 +3608,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   graphGenerator: {fileID: 2112105029}
   gridSize: 100
-  startRoom: {fileID: 1304055328224172964, guid: 54bf88b7d930f924a8ac1cfd3f9dfe39, type: 3}
-  goalRoom: {fileID: 1304055328224172964, guid: fce1d8c263e1f4a458d24faead2b883b, type: 3}
-  normalRoom: {fileID: 1304055328224172964, guid: dbbc876593b116d42b9f974a77ef9e6c, type: 3}
-  OnLevelGenerationComplete:
-    m_PersistentCalls:
-      m_Calls: []
+  startRoom: {fileID: 5561013600320419608, guid: 3eb3f019d15f81b498a1a9d8ed2b5a23, type: 3}
+  goalRoom: {fileID: 5561013600320419608, guid: b9bead923c6e75c49b8d75192683d65b, type: 3}
+  normalRoom: {fileID: 5561013600320419608, guid: f2fbf26ba7912c3409eb330eed1eafa9, type: 3}
+  straightCorridor: {fileID: 5561013600320419608, guid: 0d52ebcd81af78447bec7a85a099285e, type: 3}
+  shoulderCorridor: {fileID: 5561013600320419608, guid: 410b0ac597228f54fb7641bf6205c851, type: 3}
 --- !u!114 &2112105029
 MonoBehaviour:
   m_ObjectHideFlags: 0

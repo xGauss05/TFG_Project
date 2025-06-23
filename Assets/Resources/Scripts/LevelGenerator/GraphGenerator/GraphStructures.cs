@@ -10,7 +10,8 @@ public enum NodeType
     Lock,
     Key,
     CollapsingBridge,
-    OneWayDrop
+    OneWayDrop,
+    Corridor
 }
 
 public struct NodeRelation

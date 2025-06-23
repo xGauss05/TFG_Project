@@ -54,7 +54,7 @@ public class SteamManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.F1))
         {
             var lobby = LobbyReference.Singleton.currentLobby;
             if (lobby != null)

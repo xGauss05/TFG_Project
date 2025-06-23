@@ -36,14 +36,6 @@ public class LeaderboardManager : MonoBehaviour
         RequestLeaderboard();
     }
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.U))
-        {
-            UploadScore(0);
-        }
-    }
-
     async void RequestLeaderboard()
     {
         Leaderboard? lb = await SteamUserStats.FindOrCreateLeaderboardAsync(gameRanking,

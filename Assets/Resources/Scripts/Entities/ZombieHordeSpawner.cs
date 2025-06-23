@@ -72,4 +72,13 @@ public class ZombieHordeSpawner : NetworkBehaviour
     {
         spawnCount = 0;
     }
+
+    public void AddSpawnCount(int count)
+    {
+        if (spawnCount > 0)
+        {
+            spawnCount -= count;
+            //Debug.Log($"Spawn count increased by {count}!");
+        }
+    }
 }

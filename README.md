@@ -20,14 +20,15 @@ It is recommended to add Lights Out.exe at Steam, by Add a Game... > Add a Non-S
 - Shows a list of players in the current Lobby
 - Chat with the other player in the current Lobby
 - Loads the Gameplay scene for each Client connected
-- Zombies can attack Players
+- Zombies that can attack Players
 - Shoot them down with your Gun to defend yourself
-- Boxes that can drop goodies for the players
+- Boxes and Cars that can drop goodies for the players if destroyed
 - Reach the extraction zone (Green zone) to finish the level
 - Point system and Ranking
 - Timer that shows how long the game lasted
 - Ping, to check what is the current ping towards the Client-Host
 - Be careful with the Zombie Hordes...
+- Zombie variations, from a regular zombie to a boss zombie
   
 ## Controls
 | Key | Description |
@@ -37,19 +38,17 @@ It is recommended to add Lights Out.exe at Steam, by Add a Game... > Add a Non-S
 | <code>A</code> | Left movement | 
 | <code>D</code> | Right movement | 
 | <code>R</code> | Reload Gun | 
-| <code>E</code> | Toggle Door / Revive Dead player | 
+| <code>E</code> | Toggle Door / Hold to Revive Dead player | 
 | <code>Z</code> | Change perspective (In 3rd person) |
 | <code>V</code> | Toggle 1st/3rd person |
 | <code>1</code> | Equip Pistol |
 | <code>2</code> | Equip Assault Rifle |
 | <code>3</code> | Equip Shotgun |
 | <code>4</code> | Use Medkit |
+| <code>F1</code> | Open Steam overlay (In Lobby only) |
 | <code>MOUSE LMB</code> | Select button / Shoot |
 | <code>ENTER</code> | Chat InGame or Lobby |
 
 ## Developers and their Thesis
 + [Jonathan Cacay Llanes](https://github.com/xGauss05): Development of an Online Videogame using Steamworks API
 + [Ethan Martín Parra](https://github.com/Ethanm-0371): Adaptation of Cyclic Level Generation to 3D Environments
-
-## License
-This project is licensed under an unmodified MIT license, which is an OSI-certified license that allows static linking with closed source software. Check [LICENSE](LICENSE) for further details.

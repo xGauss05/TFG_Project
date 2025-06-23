@@ -183,6 +183,7 @@ public class LevelGenerator : MonoBehaviour
             GameObject roomInstance = Instantiate(selectedRoomPrefab, GridToWorld(posInGrid.x, posInGrid.y), Quaternion.identity);
             placedRooms.Add(roomInstance.GetComponent<GeneratorRoom>());
 
+            List<Transform> objsToUnparent = new List<Transform>();
             foreach (Transform child in roomInstance.transform)
             {
                 if (spawnerTags.Contains(child.tag))
@@ -190,14 +191,21 @@ public class LevelGenerator : MonoBehaviour
                     spawners.Add(child);
                 }
 
+                Debug.Log(child.name);
+
                 if (!child.gameObject.isStatic)
                 {
-                    child.SetParent(null);
-
-                    objectsToSpawn.Add(child.GetComponent<Unity.Netcode.NetworkObject>());
-                    //Unity.Netcode.NetworkObject objToSpawn = child.GetComponent<Unity.Netcode.NetworkObject>();
-                    //objToSpawn.Spawn();
+                    objsToUnparent.Add(child);
                 }
+            }
+
+            foreach (var GO in objsToUnparent)
+            {
+                GO.SetParent(null);
+
+                //objectsToSpawn.Add(child.GetComponent<Unity.Netcode.NetworkObject>());
+                Unity.Netcode.NetworkObject objToSpawn = GO.GetComponent<Unity.Netcode.NetworkObject>();
+                objToSpawn.Spawn();
             }
         }
 
@@ -428,6 +436,8 @@ public class LevelGenerator : MonoBehaviour
         List<GeneratorRoom> placedRooms = PlaceRooms(positions, spawners, objectsToSpawn);
 
         PlaceCorridors(placedRooms, positions);
+
+        GetComponent<Unity.AI.Navigation.NavMeshSurface>().BuildNavMesh();
 
         OnLevelGenerationComplete?.Invoke(spawners, objectsToSpawn);
     }

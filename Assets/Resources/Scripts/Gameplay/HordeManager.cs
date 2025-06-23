@@ -69,7 +69,21 @@ public class HordeManager : NetworkBehaviour
     {
         yield return new WaitForSeconds(1.0f);
 
-        isHordeActive.Value = true;
+        if (isHordeActive.Value == true)
+        {
+            foreach (ZombieHordeSpawner spawner in hordeSpawners)
+            {
+                if (spawner != null)
+                {
+                    spawner.AddSpawnCount(1);
+                }
+            }
+        }
+        else
+        {
+            isHordeActive.Value = true;
+        }
+
         hordeTimer = 0.0f;
         PlayHordeScreamClientRpc();
         ToggleAdrenalineUIClientRpc(true);

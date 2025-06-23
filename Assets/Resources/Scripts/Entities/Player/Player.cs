@@ -24,6 +24,7 @@ public class Player : NetworkBehaviour
 
     [Header("Player Audios")]
     [SerializeField] AudioClip playerHurtSfx;
+    [SerializeField] AudioClip playerHealSfx;
 
     [Header("Player Network variables")]
     public NetworkVariable<int> currentHealth = new NetworkVariable<int>(
@@ -45,6 +46,7 @@ public class Player : NetworkBehaviour
     public Transform camPivot;
 
     [Header("Player Particles")]
+    [SerializeField] GameObject ps_heal;
     [SerializeField] GameObject ps_bloodSplatter;
 
     // Flags for logic handling
@@ -58,7 +60,8 @@ public class Player : NetworkBehaviour
     [SerializeField] GameObject shotgunObject;
     Door doorNearby;
     Player deadPlayerNearby;
-    float reviveProgress = 0.0f;
+    PlayerUI playerUI;
+    public float reviveProgress = 0.0f;
     const float reviveDuration = 3.0f;
 
     // Unity Event functions ------------------------------------------------------------------------------------------
@@ -113,10 +116,14 @@ public class Player : NetworkBehaviour
         {
             EquipGunServerRpc(GunBase.Type.Pistol);
 
-            var playerUI = FindObjectOfType<PlayerUI>();
-            if (playerUI != null)
+            var ui = FindObjectOfType<PlayerUI>();
+            if (ui != null)
             {
+                playerUI = ui;
                 playerUI.SetPlayer(this);
+                playerUI.reviverSlider.maxValue = reviveDuration;
+                playerUI.reviverSlider.minValue = 0.0f;
+                playerUI.reviverSlider.value = reviveProgress;
             }
 
         }
@@ -202,19 +209,29 @@ public class Player : NetworkBehaviour
         }
 
         // Revive Players
-        if (Input.GetKey(KeyCode.E))
+        if (deadPlayerNearby != null)
         {
-            reviveProgress += Time.deltaTime;
-
-            if (reviveProgress >= reviveDuration)
+            if (Input.GetKeyUp(KeyCode.E))
             {
-                TryRevivePlayer();
+                reviveProgress = 0.0f;
+                playerUI.ToggleReviveSlider(false);
+            }
+
+            if (Input.GetKey(KeyCode.E))
+            {
+                playerUI.ToggleReviveSlider(true);
+                reviveProgress += Time.deltaTime;
+                playerUI.reviverSlider.value = reviveProgress;
+
+                if (reviveProgress >= reviveDuration)
+                {
+                    TryRevivePlayer();
+                }
             }
         }
-
-        if (Input.GetKeyUp(KeyCode.E))
+        else
         {
-            reviveProgress = 0.0f;
+            playerUI.ToggleReviveSlider(false);
         }
 
         // Player movement
@@ -250,28 +267,11 @@ public class Player : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha3) && !inventory.currentGun.isReloading) TryChangeGun(GunBase.Type.Shotgun);
 
         // Use Medkit
-        if (Input.GetKeyDown(KeyCode.Alpha4))
+        if (Input.GetKeyDown(KeyCode.Alpha4) && currentHealth.Value < 100)
         {
             TryMedkit();
         }
 
-    }
-
-    void TryRevivePlayer()
-    {
-        float reviveRadius = 2.0f; // puedes ajustar el radio de búsqueda
-        Collider[] hits = Physics.OverlapSphere(transform.position, reviveRadius);
-
-        foreach (Collider hit in hits)
-        {
-            Player targetPlayer = hit.GetComponent<Player>();
-            if (targetPlayer != null && targetPlayer != this && targetPlayer.isDead.Value)
-            {
-                // Encontrado un jugador muerto dentro del rango, pedir al server que lo reviva
-                RevivePlayerServerRpc(targetPlayer.NetworkObject);
-                return;
-            }
-        }
     }
 
     void Move(PlayerAction actions, float deltaTime)
@@ -338,13 +338,15 @@ public class Player : NetworkBehaviour
     {
         if (inventory.UseMedkit())
         {
-            Debug.Log($"Before {currentHealth.Value}");
+            //Debug.Log($"Before {currentHealth.Value}");
             int healthAmount = (int)(maxHealth - currentHealth.Value) * 80 / 100;
             currentHealth.Value += healthAmount;
+            PlayHealSFXClientRpc();
+            SpawnHealEffectClientRpc();
 
             if (IsServer && ScoreManager.Singleton != null) ScoreManager.Singleton.SubstractScore(healthAmount);
 
-            Debug.Log($"After {currentHealth.Value}");
+            //Debug.Log($"After {currentHealth.Value}");
         }
     }
 
@@ -413,6 +415,24 @@ public class Player : NetworkBehaviour
         }
     }
 
+    void TryRevivePlayer()
+    {
+        float reviveRadius = 2.0f;
+        Collider[] hits = Physics.OverlapSphere(transform.position, reviveRadius);
+
+        foreach (Collider hit in hits)
+        {
+            Player targetPlayer = hit.GetComponent<Player>();
+            if (targetPlayer != null && targetPlayer != this && targetPlayer.isDead.Value)
+            {
+                PlayHealSFXClientRpc();
+                SpawnHealEffectClientRpc();
+                RevivePlayerServerRpc(targetPlayer.NetworkObject);
+                return;
+            }
+        }
+    }
+
     void OnNameChanged(FixedString64Bytes prev, FixedString64Bytes current)
     {
         billboard.SetName(current);
@@ -439,6 +459,12 @@ public class Player : NetworkBehaviour
     void PlayHurtSFXClientRpc()
     {
         SFXManager.Singleton.PlaySound(playerHurtSfx);
+    }
+
+    [ClientRpc]
+    void PlayHealSFXClientRpc()
+    {
+        SFXManager.Singleton.PlaySound(playerHealSfx);
     }
 
     [ClientRpc]
@@ -480,6 +506,15 @@ public class Player : NetworkBehaviour
 
         GameObject blood = Instantiate(ps_bloodSplatter, transform.position + Vector3.up * 1.0f, Quaternion.identity);
         Destroy(blood, 0.5f);
+    }
+
+    [ClientRpc]
+    void SpawnHealEffectClientRpc()
+    {
+        if (ps_heal == null) return;
+
+        GameObject heal = Instantiate(ps_heal, transform.position + Vector3.up * 1.0f, Quaternion.identity);
+        Destroy(heal, 0.5f);
     }
     #endregion
 

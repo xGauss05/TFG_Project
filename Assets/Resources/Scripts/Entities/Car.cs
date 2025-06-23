@@ -52,12 +52,36 @@ public class Car : NetworkBehaviour, IDamageable
         {
             PlayCarExplosionClientRpc();
 
-            if (HordeManager.Singleton != null)
-            {
-                HordeManager.Singleton.StartHorde();
-            }
-
             if (IsServer && ScoreManager.Singleton != null) ScoreManager.Singleton.AddScore(score);
+
+            if (IsServer)
+            {
+                float roll = Random.value;
+                GameObject prefabToDrop = null;
+
+                if (roll < 0.10f)
+                {
+                    prefabToDrop = Resources.Load<GameObject>("Prefabs/Gameplay/Items/PickUpItems/PickUp_AssaultRifle");
+                }
+                else if (roll < 0.20f)
+                {
+                    prefabToDrop = Resources.Load<GameObject>("Prefabs/Gameplay/Items/PickUpItems/PickUp_Shotgun");
+                }
+                else if (roll < 0.40f)
+                {
+                    prefabToDrop = Resources.Load<GameObject>("Prefabs/Gameplay/Items/PickUpItems/PickUp_Medkit");
+                }
+                else if (roll < 0.60f)
+                {
+                    prefabToDrop = Resources.Load<GameObject>("Prefabs/Gameplay/Items/PickUpItems/PickUp_AmmoBox");
+                }
+
+                if (prefabToDrop != null)
+                {
+                    GameObject itemToDrop = Instantiate(prefabToDrop, transform.position, transform.rotation);
+                    itemToDrop.GetComponent<NetworkObject>().Spawn();
+                }
+            }
 
             NetworkObject.Despawn();
         }

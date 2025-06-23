@@ -77,16 +77,28 @@ public class ExtractionZone : NetworkBehaviour
 
     void CheckExtraction()
     {
-        if (playersInside >= requiredPlayers && !safeDoor.isOpen)
+        Player[] players = FindObjectsOfType<Player>();
+        int deadPlayers = 0;
+        for (int i = 0; i < players.Length; i++)
+        {
+            if (players[i].isDead != null && players[i].isDead.Value)
+            {
+                deadPlayers++;
+            }
+        }
+
+        if (playersInside >= (requiredPlayers - deadPlayers) && !safeDoor.isOpen)
         {
             if (ScoreManager.Singleton != null)
             {
-                int scoreToUpload = score;
+                // Level end score
+                int scoreToUpload = score - (score * deadPlayers / requiredPlayers);
 
+                // Timer based score
                 if (LevelManager.Singleton != null)
                 {
                     scoreToUpload += LevelManager.Singleton.GetTimerScore();
-                    Debug.Log("Added timer score.");
+                    //Debug.Log("Added timer score.");
                 }
 
                 ScoreManager.Singleton.AddScore(scoreToUpload);
@@ -109,6 +121,7 @@ public class ExtractionZone : NetworkBehaviour
             }
         }
 
+        ScoreManager.Singleton.SubmitScore();
         NetworkManager.Singleton.SceneManager.LoadScene("1_MainMenu", LoadSceneMode.Single);
     }
 }

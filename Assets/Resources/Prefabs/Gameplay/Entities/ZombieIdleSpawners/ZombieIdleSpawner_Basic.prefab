@@ -50,7 +50,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1674819268700206388, guid: e4aec5cbfabe9f449a86597f7e82cc70, type: 3}
       propertyPath: m_Name
-      value: ZombieIdleSpawner
+      value: ZombieIdleSpawner_Basic
+      objectReference: {fileID: 0}
+    - target: {fileID: 1674819268700206388, guid: e4aec5cbfabe9f449a86597f7e82cc70, type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

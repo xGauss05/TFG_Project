@@ -104,6 +104,7 @@ MonoBehaviour:
   currentHealth:
     m_InternalValue: 10
   boxDestroySfx: {fileID: 8300000, guid: e2ac275ac10176a4e859a2efeb3330f6, type: 3}
+  ps_boxDestroyed: {fileID: 1303003753339649557, guid: c46743e5f9aebcb43a240d414b3e74a1, type: 3}
 --- !u!65 &1337583059908058407
 BoxCollider:
   m_ObjectHideFlags: 0

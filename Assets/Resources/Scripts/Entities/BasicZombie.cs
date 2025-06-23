@@ -275,8 +275,18 @@ public class BasicZombie : NetworkBehaviour, IDamageable
         if (currentHealth.Value <= 0)
         {
             isDead = true;
-            if (!CheckAnimationState("Death")) zombieAnimator.SetTrigger("Death");
+            if (!CheckAnimationState("Death"))
+            {
+                zombieAnimator.SetTrigger("Death");
 
+                Collider[] colliders = GetComponentsInChildren<Collider>();
+                foreach (var col in colliders)
+                {
+                    col.enabled = false;
+                }
+            }
+
+            DisableCollidersClientRpc();
             //Debug.Log("Basic Zombie Death");
 
             agent.ResetPath();
@@ -339,6 +349,16 @@ public class BasicZombie : NetworkBehaviour, IDamageable
 
         GameObject blood = Instantiate(ps_bloodSplatter, transform.position + Vector3.up * 1.0f, Quaternion.identity);
         Destroy(blood, 0.5f);
+    }
+
+    [ClientRpc]
+    void DisableCollidersClientRpc()
+    {
+        Collider[] colliders = GetComponentsInChildren<Collider>();
+        foreach (var col in colliders)
+        {
+            col.enabled = false;
+        }
     }
 
     // Server RPC functions -------------------------------------------------------------------------------------------

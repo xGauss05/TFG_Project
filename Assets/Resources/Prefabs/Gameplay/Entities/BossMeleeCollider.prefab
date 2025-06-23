@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2659134986413206600}
   - component: {fileID: 4971653426479268490}
   - component: {fileID: 4150351782049654419}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: BossMeleeCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -80,7 +80,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1917986051
+  GlobalObjectIdHash: 2932253121
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1

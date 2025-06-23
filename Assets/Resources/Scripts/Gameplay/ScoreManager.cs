@@ -11,12 +11,6 @@ public class ScoreManager : NetworkBehaviour
     [Header("ScoreManager Network variables")]
     public NetworkVariable<int> score = new NetworkVariable<int>(0);
 
-    void OnDisable()
-    {
-        // Upload score to the Leaderboard
-        LeaderboardManager.Singleton.UploadScore(score.Value);
-    }
-
     void Awake()
     {
         #region Singleton
@@ -50,5 +44,10 @@ public class ScoreManager : NetworkBehaviour
             score.Value -= value;
         }
         Debug.Log($"Current score: {score.Value}.");
+    }
+
+    public void SubmitScore()
+    {
+        LeaderboardManager.Singleton.UploadScore(score.Value);
     }
 }

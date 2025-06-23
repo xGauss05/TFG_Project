@@ -13,9 +13,9 @@ public class PingUI : MonoBehaviour
     {
         if (ping == null || pingText == null) return;
 
-        int rtt = (int)ping.rtt;
+        int rtt = (int)ping.rtt / 2;
 
-        if (rtt <= 80) pingText.color = Color.green;
+        if (rtt <= 100) pingText.color = Color.green;
         else if (rtt <= 150) pingText.color = Color.yellow;
         else pingText.color = Color.red;
 

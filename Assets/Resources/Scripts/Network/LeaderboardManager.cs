@@ -36,14 +36,6 @@ public class LeaderboardManager : MonoBehaviour
         RequestLeaderboard();
     }
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.U))
-        {
-            UploadScore(0);
-        }
-    }
-
     async void RequestLeaderboard()
     {
         Leaderboard? lb = await SteamUserStats.FindOrCreateLeaderboardAsync(gameRanking,
@@ -64,12 +56,8 @@ public class LeaderboardManager : MonoBehaviour
 
     public async Task<LeaderboardEntry[]> DownloadTopScores()
     {
+        RequestLeaderboard();
         LeaderboardEntry[] entries = await leaderboard.GetScoresAsync(10);
-
-        //foreach (var entry in entries)
-        //{
-        //    Debug.Log($"{entry.GlobalRank}: {entry.User.Name} - {entry.Score}");
-        //}
 
         return entries;
     }

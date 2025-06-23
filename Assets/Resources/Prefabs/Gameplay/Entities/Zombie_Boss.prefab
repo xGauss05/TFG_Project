@@ -83,7 +83,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3113082193
+  GlobalObjectIdHash: 2547330859
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -143,9 +143,9 @@ MonoBehaviour:
   score: 5000
   despawnRadius: 200
   zombieAnimator: {fileID: 1798021492885543846}
-  zombieAttackSfx: {fileID: 0}
-  zombieScreechSfx: {fileID: 0}
-  zombieDeathSfx: {fileID: 0}
+  zombieAttackSfx: {fileID: 8300000, guid: bee1d2059a8aaab47a7ea57406ca13aa, type: 3}
+  zombieScreechSfx: {fileID: 8300000, guid: 465ab330b4f3c3c41b27fe97760d4427, type: 3}
+  zombieDeathSfx: {fileID: 8300000, guid: 167185cd11ad06747a6fac97d773fdc3, type: 3}
   currentState:
     m_InternalValue: 1
   currentHealth:
@@ -154,7 +154,7 @@ MonoBehaviour:
   meleeHitboxPrefab: {fileID: 2700269903401608430, guid: 3fae3c886872532428d77fc20043260c, type: 3}
   meleeSpawnpoint: {fileID: 4767352463306879324}
   ps_bloodSplatter: {fileID: 1303003753339649557, guid: 6dff77b2733a8e04ea0ac5c375c69bad, type: 3}
-  isHorde: 0
+  aggressive: 0
 --- !u!136 &7745382119461277528
 CapsuleCollider:
   m_ObjectHideFlags: 0

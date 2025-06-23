@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 876148721350643675}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: ZombieIdleSpawner_Template
   m_TagString: BasicZombieSpawnpoint
   m_Icon: {fileID: 0}

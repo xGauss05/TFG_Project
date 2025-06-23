@@ -25,6 +25,7 @@ public class LevelManager : NetworkBehaviour
 
     // Flags for logic handling
     bool stopTimer = false;
+    bool gameEnded = false;
 
     void Awake()
     {
@@ -52,12 +53,14 @@ public class LevelManager : NetworkBehaviour
 
     void Update()
     {
-        if (IsServer && !stopTimer)
+        if (IsServer && !stopTimer && !gameEnded)
         {
             timer.Value += Time.deltaTime;
+            CheckPlayersAlive();
         }
 
         UpdateTimerUI();
+        CheckConnection();  
     }
 
     void UpdateTimerUI()
@@ -74,4 +77,36 @@ public class LevelManager : NetworkBehaviour
         return Mathf.Max(0, Mathf.RoundToInt(score));
     }
 
+    void CheckPlayersAlive()
+    {
+        Player[] players = FindObjectsOfType<Player>();
+
+        if (players.Length == 0) return;
+
+        bool allDead = true;
+        for (int i = 0; i < players.Length; i++)
+        {
+            if (!players[i].isDead.Value)
+            {
+                allDead = false;
+                break;
+            }
+        }
+
+        if (allDead)
+        {
+            gameEnded = true;
+            NetworkManager.Singleton.SceneManager.LoadScene("1_MainMenu", LoadSceneMode.Single);
+        }
+    }
+
+    void CheckConnection()
+    {
+        if (!IsHost && NetworkManager.Singleton != null && !NetworkManager.Singleton.IsConnectedClient && !gameEnded)
+        {
+            gameEnded = true;
+            LobbyReference.Singleton.currentLobby = null;
+            SceneManager.LoadScene("1_MainMenu", LoadSceneMode.Single);
+        }
+    }
 }

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2659134986413206600}
   - component: {fileID: 4971653426479268490}
   - component: {fileID: 4150351782049654419}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: ZombieMeleeCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}

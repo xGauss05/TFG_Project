@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1462860793
+  GlobalObjectIdHash: 835926
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -73,6 +73,7 @@ MonoBehaviour:
   endY: 1.5
   upDownSpeed: 0.5
   rotSpeed: 10
+  pickupSfx: {fileID: 8300000, guid: 6f359220c569a1e4aaeec7796ea75e3a, type: 3}
 --- !u!135 &1959242685298713701
 SphereCollider:
   m_ObjectHideFlags: 0

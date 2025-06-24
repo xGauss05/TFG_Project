@@ -5,10 +5,14 @@ using Unity.Netcode;
 
 public abstract class PickupItem : NetworkBehaviour
 {
+    [Header("PickUp Item Parameters")]
     [SerializeField] float startY = 0.0f;
     [SerializeField] float endY = 1.5f;
     [SerializeField] float upDownSpeed = 0.5f;
     [SerializeField] float rotSpeed = 10.0f;
+
+    [Header("PickUp Audios")]
+    [SerializeField] AudioClip pickupSfx;
 
     public abstract void OnPickup(Player player);
 
@@ -22,6 +26,15 @@ public abstract class PickupItem : NetworkBehaviour
             if (player != null)
             {
                 OnPickup(player);
+
+                PlayPickupSfxClientRpc(new ClientRpcParams
+                {
+                    Send = new ClientRpcSendParams
+                    {
+                        TargetClientIds = new[] { player.OwnerClientId }
+                    }
+                });
+
                 DespawnServerRpc();
                 //Debug.Log("Item pickup!");
             }
@@ -35,6 +48,12 @@ public abstract class PickupItem : NetworkBehaviour
 
         Vector3 rot = new Vector3(0, rotSpeed * Time.deltaTime, 0);
         gameObject.transform.Rotate(rot);
+    }
+
+    [ClientRpc]
+    void PlayPickupSfxClientRpc(ClientRpcParams rpcParams = default)
+    {
+        SFXManager.Singleton.PlaySound(pickupSfx);
     }
 
     [ServerRpc]

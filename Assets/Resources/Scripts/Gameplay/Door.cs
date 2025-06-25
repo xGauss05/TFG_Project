@@ -26,6 +26,14 @@ public class Door : NetworkBehaviour
         openRotation = closedRotation * Quaternion.Euler(0, 0, openAngle);
     }
 
+    public override void OnNetworkSpawn()
+    {
+        if (!IsServer) return; 
+
+        ExtractionZone eZone = FindObjectOfType<ExtractionZone>();
+        eZone.SetDoor(this);
+    }
+
     public void Toggle()
     {
         if (isOpen)

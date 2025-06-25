@@ -124,4 +124,9 @@ public class ExtractionZone : NetworkBehaviour
         ScoreManager.Singleton.SubmitScore();
         NetworkManager.Singleton.SceneManager.LoadScene("1_MainMenu", LoadSceneMode.Single);
     }
+
+    public void SetDoor(Door door)
+    {
+        safeDoor = door;
+    }
 }

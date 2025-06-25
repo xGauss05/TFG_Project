@@ -9,6 +9,14 @@ TagManager:
   - BasicZombieSpawnpoint
   - FastZombieSpawnpoint
   - BossZombieSpawnpoint
+  - BoxSpawn
+  - MedkitSpawn
+  - AmmoBoxSpawn
+  - CarSpawn
+  - CarAlarmSpawn
+  - ShotgunSpawn
+  - AssaultRifleSpawn
+  - DoorSpawn
   layers:
   - Default
   - TransparentFX

@@ -6,7 +6,6 @@ using UnityEngine.Events;
 public class GraphGenerator : MonoBehaviour
 {
     [SerializeField] TextAsset initialGraphJson;
-    [SerializeField] int seed = 0;
 
     [SerializeField] List<ReplacementStep> stepsToFollow = new List<ReplacementStep>();
 
@@ -18,7 +17,7 @@ public class GraphGenerator : MonoBehaviour
         activeGraph = new Graph(JsonUtility.FromJson<Graph_Data>(initialGraphJson.text));
     }
 
-    private void Start()
+    public void StartLevelGeneration(int seed)
     {
         if (seed == 0) { seed = Random.Range(int.MinValue, int.MaxValue); }
 

@@ -21,13 +21,23 @@ public class PlayerSpawner : NetworkBehaviour
 
     void SceneLoaded(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
-        if (IsHost && sceneName == "2_Gameplay")
+        if (IsHost && sceneName == "LevelGenerator")
         {
-            foreach (ulong id in clientsCompleted)
+            GameObject.Find("LevelGenerator").GetComponent<LevelGenerator>().OnLevelGenerationComplete += (_,_) => 
             {
-                GameObject player = Instantiate(Player);
-                player.GetComponent<NetworkObject>().SpawnAsPlayerObject(id, true);
-            }
+                OnLevelGenerated(clientsCompleted); }
+            ;
         }
+    }
+
+    void OnLevelGenerated(List<ulong> clientsCompleted)
+    {
+        foreach (ulong id in clientsCompleted)
+        {
+            GameObject player = Instantiate(Player);
+            player.GetComponent<NetworkObject>().SpawnAsPlayerObject(id, true);
+        }
+
+        GameObject.Find("LevelGenerator").GetComponent<LevelGenerator>().OnLevelGenerationComplete -= (_, _) => { OnLevelGenerated(clientsCompleted); };
     }
 }

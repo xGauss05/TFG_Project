@@ -4,7 +4,6 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.SceneManagement;
 using TMPro;
-using System;
 
 public class LevelManager : NetworkBehaviour
 {
@@ -27,6 +26,8 @@ public class LevelManager : NetworkBehaviour
     bool stopTimer = false;
     bool gameEnded = false;
 
+    NetworkVariable<int> seed = new NetworkVariable<int>(default);
+
     void Awake()
     {
         #region Singleton
@@ -48,7 +49,15 @@ public class LevelManager : NetworkBehaviour
         if (IsServer)
         {
             timer.Value = 0f;
+            seed.Value = Random.Range(int.MinValue, int.MaxValue);
         }
+
+        
+        NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += (sceneName,_,_,_) =>
+        {
+            if (sceneName == "LevelGenerator")
+                GameObject.Find("LevelGenerator").GetComponent<GraphGenerator>().StartLevelGeneration(seed.Value);
+        };
     }
 
     void Update()

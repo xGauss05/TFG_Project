@@ -22,12 +22,19 @@ public class ZombieIdleSpawner : NetworkBehaviour
 
     void SceneLoaded(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
-        if (IsHost && sceneName == "2_Gameplay")
+        if (IsHost && sceneName == "LevelGenerator")
         {
-            SpawnZombiesWithTag("BasicZombieSpawnpoint", Zombie_Basic);
-            SpawnZombiesWithTag("FastZombieSpawnpoint", Zombie_Fast);
-            SpawnZombiesWithTag("BossZombieSpawnpoint", Zombie_Boss);
+            GameObject.Find("LevelGenerator").GetComponent<LevelGenerator>().OnLevelGenerationComplete += OnLevelGenerated;
         }
+    }
+
+    void OnLevelGenerated(List<Transform> spawners, List<Unity.Netcode.NetworkObject> objectsToSpawn)
+    {
+        SpawnZombiesWithTag("BasicZombieSpawnpoint", Zombie_Basic);
+        SpawnZombiesWithTag("FastZombieSpawnpoint", Zombie_Fast);
+        SpawnZombiesWithTag("BossZombieSpawnpoint", Zombie_Boss);
+
+        GameObject.Find("LevelGenerator").GetComponent<LevelGenerator>().OnLevelGenerationComplete -= OnLevelGenerated;
     }
 
     void SpawnZombiesWithTag(string spawnTag, GameObject zombiePrefab)

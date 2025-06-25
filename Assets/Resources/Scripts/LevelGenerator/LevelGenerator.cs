@@ -49,8 +49,9 @@ public class LevelGenerator : MonoBehaviour
 
     private void Awake()
     {
-        graphGenerator.OnGraphComplete.AddListener(GenerateLevel);
         grid = new Cell?[gridSize * 2, gridSize * 2];
+
+        graphGenerator.OnGraphComplete.AddListener(GenerateLevel);
     }
 
     public Vector2Int WorldToGrid(Vector3 worldPosition)
@@ -204,7 +205,7 @@ public class LevelGenerator : MonoBehaviour
                     spawners.Add(child);
                 }
 
-                Debug.Log(child.name);
+                //Debug.Log(child.name);
 
                 if (!child.gameObject.isStatic)
                 {
@@ -216,9 +217,7 @@ public class LevelGenerator : MonoBehaviour
             {
                 GO.SetParent(null);
 
-                //objectsToSpawn.Add(child.GetComponent<Unity.Netcode.NetworkObject>());
-                Unity.Netcode.NetworkObject objToSpawn = GO.GetComponent<Unity.Netcode.NetworkObject>();
-                objToSpawn.Spawn();
+                GO.GetComponent<Unity.Netcode.NetworkObject>().Spawn();
             }
         }
 
@@ -396,7 +395,7 @@ public class LevelGenerator : MonoBehaviour
                                                       new Position(pathFindingEnd.x, pathFindingEnd.y));
                 if (path.Length <= 0)
                 {
-                    Debug.LogError("Could not find suitable path");
+                    Debug.LogWarning("Could not find suitable path");
                 };
 
                 //Setting individual path cells
@@ -450,8 +449,19 @@ public class LevelGenerator : MonoBehaviour
 
         PlaceCorridors(placedRooms, positions);
 
-        GetComponent<Unity.AI.Navigation.NavMeshSurface>().BuildNavMesh();
+        if (LevelManager.Singleton.IsHost)
+        {
+            GetComponent<Unity.AI.Navigation.NavMeshSurface>().BuildNavMesh();
+            StartCoroutine(RegenerateNavmesh());
+        }
 
         OnLevelGenerationComplete?.Invoke(spawners, objectsToSpawn);
+    }
+
+    IEnumerator RegenerateNavmesh()
+    {
+        yield return new WaitForSeconds(3);
+
+        GetComponent<Unity.AI.Navigation.NavMeshSurface>().BuildNavMesh();
     }
 }

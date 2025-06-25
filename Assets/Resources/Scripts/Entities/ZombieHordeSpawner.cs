@@ -64,7 +64,7 @@ public class ZombieHordeSpawner : NetworkBehaviour
         BasicZombie bZombie = go.GetComponent<BasicZombie>();
         bZombie.aggressive = true;
 
-        go.GetComponent<NetworkObject>().Spawn();
+        go.GetComponent<NetworkObject>().Spawn(true);
 
     }
 

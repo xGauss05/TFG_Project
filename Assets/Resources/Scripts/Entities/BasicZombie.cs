@@ -182,7 +182,7 @@ public class BasicZombie : NetworkBehaviour, IDamageable
         yield return new WaitForSeconds(meleeDelay);
 
         GameObject currentHitbox = Instantiate(meleeHitboxPrefab, meleeSpawnpoint.position, meleeSpawnpoint.rotation);
-        currentHitbox.GetComponent<NetworkObject>().Spawn();
+        currentHitbox.GetComponent<NetworkObject>().Spawn(true);
 
         currentHitbox.GetComponent<ZombieDamageHitbox>().attacker = this;
 
@@ -201,7 +201,7 @@ public class BasicZombie : NetworkBehaviour, IDamageable
         {
             if (currentHitbox.TryGetComponent(out NetworkObject networkObj))
             {
-                networkObj.Despawn();
+                networkObj.Despawn(true);
             }
             else
             {
@@ -226,7 +226,7 @@ public class BasicZombie : NetworkBehaviour, IDamageable
 
         yield return new WaitForSeconds(animatorStateInfo.length);
 
-        NetworkObject.Despawn();
+        NetworkObject.Despawn(true);
     }
 
     IEnumerator WaitForSpawnAnimation()
@@ -318,7 +318,7 @@ public class BasicZombie : NetworkBehaviour, IDamageable
 
             if (smallestDistance > despawnRadius)
             {
-                this.NetworkObject.Despawn();
+                this.NetworkObject.Despawn(true);
             }
         }
     }

@@ -47,7 +47,7 @@ public class EntitySpawner : NetworkBehaviour
         foreach (var spawnPoint in spawnPoints)
         {
             GameObject entity = Instantiate(entityPrefab, spawnPoint.transform.position, spawnPoint.transform.rotation);
-            entity.GetComponent<NetworkObject>().Spawn();
+            entity.GetComponent<NetworkObject>().Spawn(true);
         }
     }
 }

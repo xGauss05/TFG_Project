@@ -37,7 +37,7 @@ public class ZombieIdleSpawner : NetworkBehaviour
         foreach (var spawnPoint in spawnPoints)
         {
             GameObject zombie = Instantiate(zombiePrefab, spawnPoint.transform.position, spawnPoint.transform.rotation);
-            zombie.GetComponent<NetworkObject>().Spawn();
+            zombie.GetComponent<NetworkObject>().Spawn(true);
         }
     }
 }

@@ -27,17 +27,24 @@ public class EntitySpawner : NetworkBehaviour
 
     void SceneLoaded(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
-        if (IsHost && sceneName == "2_Gameplay")
+        if (IsHost && sceneName == "LevelGenerator")
         {
-            SpawnEntityWithTag("AmmoBoxSpawn", AmmoBox);
-            SpawnEntityWithTag("AssaultRifleSpawn", AssaultRifle);
-            SpawnEntityWithTag("BoxSpawn", Box);
-            SpawnEntityWithTag("CarSpawn", Car);
-            SpawnEntityWithTag("CarAlarmSpawn", CarAlarmed);
-            SpawnEntityWithTag("DoorSpawn", Door);
-            SpawnEntityWithTag("MedkitSpawn", Medkit);
-            SpawnEntityWithTag("ShotgunSpawn", Shotgun);
+            GameObject.Find("LevelGenerator").GetComponent<LevelGenerator>().OnLevelGenerationComplete += OnLevelGenerated;
         }
+    }
+
+    void OnLevelGenerated(List<Transform> spawners, List<Unity.Netcode.NetworkObject> objectsToSpawn)
+    {
+        SpawnEntityWithTag("AmmoBoxSpawn", AmmoBox);
+        SpawnEntityWithTag("AssaultRifleSpawn", AssaultRifle);
+        SpawnEntityWithTag("BoxSpawn", Box);
+        SpawnEntityWithTag("CarSpawn", Car);
+        SpawnEntityWithTag("CarAlarmSpawn", CarAlarmed);
+        SpawnEntityWithTag("DoorSpawn", Door);
+        SpawnEntityWithTag("MedkitSpawn", Medkit);
+        SpawnEntityWithTag("ShotgunSpawn", Shotgun);
+
+        GameObject.Find("LevelGenerator").GetComponent<LevelGenerator>().OnLevelGenerationComplete -= OnLevelGenerated;
     }
 
     void SpawnEntityWithTag(string spawnTag, GameObject entityPrefab)

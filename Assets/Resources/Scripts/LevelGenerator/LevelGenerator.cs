@@ -213,12 +213,12 @@ public class LevelGenerator : MonoBehaviour
                 }
             }
 
-            foreach (var GO in objsToUnparent)
-            {
-                GO.SetParent(null);
+            //foreach (var GO in objsToUnparent)
+            //{
+            //    GO.SetParent(null);
 
-                GO.GetComponent<Unity.Netcode.NetworkObject>().Spawn();
-            }
+            //    GO.GetComponent<Unity.Netcode.NetworkObject>().Spawn();
+            //}
         }
 
         return placedRooms;

@@ -37,6 +37,10 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField] Object startRoom;
     [SerializeField] Object goalRoom;
     [SerializeField] Object normalRoom;
+    [SerializeField] Object lockRoom;
+    [SerializeField] Object keyRoom;
+    [SerializeField] Object collapsingBridgeRoom;
+    [SerializeField] Object oneWayDropRoom;
     [SerializeField] Object straightCorridor;
     [SerializeField] Object shoulderCorridor;
 
@@ -159,10 +163,19 @@ public class LevelGenerator : MonoBehaviour
         for (uint i = 0; i < activeGraph.nodes.Count; i++)
         {
             //Select the room you are going to place
-            GameObject selectedRoomPrefab = (GameObject)normalRoom;
+            GameObject selectedRoomPrefab;
 
-            if (activeGraph.nodes[i].type == NodeType.Start) selectedRoomPrefab = (GameObject)startRoom;
-            else if (activeGraph.nodes[i].type == NodeType.Goal) selectedRoomPrefab = (GameObject)goalRoom;
+            switch (activeGraph.nodes[i].type)
+            {
+                case NodeType.Start:            selectedRoomPrefab = (GameObject)startRoom; break;
+                case NodeType.Goal:             selectedRoomPrefab = (GameObject)goalRoom; break;
+                case NodeType.Room:             selectedRoomPrefab = (GameObject)normalRoom; break;
+                case NodeType.Lock:             selectedRoomPrefab = (GameObject)lockRoom; break;
+                case NodeType.Key:              selectedRoomPrefab = (GameObject)keyRoom; break;
+                case NodeType.CollapsingBridge: selectedRoomPrefab = (GameObject)collapsingBridgeRoom; break;
+                case NodeType.OneWayDrop:       selectedRoomPrefab = (GameObject)oneWayDropRoom; break;
+                default:                        selectedRoomPrefab = (GameObject)normalRoom; break;
+            }
 
             GeneratorRoom toSet = selectedRoomPrefab.GetComponent<GeneratorRoom>();
 

@@ -3953,6 +3953,10 @@ MonoBehaviour:
   startRoom: {fileID: 5561013600320419608, guid: 3eb3f019d15f81b498a1a9d8ed2b5a23, type: 3}
   goalRoom: {fileID: 5561013600320419608, guid: b9bead923c6e75c49b8d75192683d65b, type: 3}
   normalRoom: {fileID: 5561013600320419608, guid: f2fbf26ba7912c3409eb330eed1eafa9, type: 3}
+  lockRoom: {fileID: 5561013600320419608, guid: 2732477841b95ba48b1dbea20f791c24, type: 3}
+  keyRoom: {fileID: 5561013600320419608, guid: 291373f9061fb2d4c9b79bdd575fce96, type: 3}
+  collapsingBridgeRoom: {fileID: 5561013600320419608, guid: 378f7098b3dbafc46977083920574e3c, type: 3}
+  oneWayDropRoom: {fileID: 5561013600320419608, guid: 9c7ec5e061886f14fab7b1b994b0ca6e, type: 3}
   straightCorridor: {fileID: 5561013600320419608, guid: 0d52ebcd81af78447bec7a85a099285e, type: 3}
   shoulderCorridor: {fileID: 5561013600320419608, guid: 410b0ac597228f54fb7641bf6205c851, type: 3}
 --- !u!114 &2112105029
@@ -3997,7 +4001,7 @@ MonoBehaviour:
   m_Center: {x: 0, y: 2, z: 0}
   m_LayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
   m_UseGeometry: 1
   m_DefaultArea: 0
   m_GenerateLinks: 0
@@ -4006,7 +4010,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.13333334
+  m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 0}
   m_BuildHeightMesh: 0

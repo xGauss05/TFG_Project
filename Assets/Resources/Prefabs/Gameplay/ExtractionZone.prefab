@@ -120,5 +120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68ad1813defb9a54b89c75910465fb2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  score: 2000
   playersInside: 0
   requiredPlayers: 0
+  safeDoor: {fileID: 0}

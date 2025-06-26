@@ -31,6 +31,7 @@ public class LevelGenerator : MonoBehaviour
 
     public int gridSize = 100; //200 total, 100 positive 100 negative. 40 cells a row, 10 min size rooms max
     public Cell?[,] grid;
+    public Cell?[,] subwayGrid;
 
     //This should ideally be changed to lists of prefabs or a better way to initialize them
     [Space]
@@ -43,6 +44,9 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField] Object oneWayDropRoom;
     [SerializeField] Object straightCorridor;
     [SerializeField] Object shoulderCorridor;
+    [SerializeField] Object undergroundEntrance;
+    [SerializeField] Object straightUnderground;
+    [SerializeField] Object shoulderUnderground;
 
     public System.Action<List<Transform>, List<Unity.Netcode.NetworkObject>> OnLevelGenerationComplete;
 
@@ -50,6 +54,7 @@ public class LevelGenerator : MonoBehaviour
     private void Awake()
     {
         grid = new Cell?[gridSize * 2, gridSize * 2];
+        subwayGrid = new Cell?[gridSize * 2, gridSize * 2];
 
         graphGenerator.OnGraphComplete.AddListener(GenerateLevel);
     }
@@ -231,7 +236,7 @@ public class LevelGenerator : MonoBehaviour
                     { Direction.East,   Vector2Int.right},
                     { Direction.West,   Vector2Int.left}
                 };
-    short[,] MakeTilesFromGrid()
+    short[,] MakeTilesFromGrid(Cell?[,] gridToParse)
     {
         short[,] returnTileMap = new short[gridSize * 2, gridSize * 2];
 
@@ -239,11 +244,11 @@ public class LevelGenerator : MonoBehaviour
         {
             for (int j = 0; j < gridSize * 2; j++)
             {
-                if (grid[i, j] != null && grid[i, j].Value.type == NodeType.Corridor)
+                if (gridToParse[i, j] != null && gridToParse[i, j].Value.type == NodeType.Corridor)
                 {
                     returnTileMap[i, j] = 50; //Try to find a balanced value
                 }
-                else if (grid[i, j] != null)
+                else if (gridToParse[i, j] != null)
                 {
                     returnTileMap[i, j] = 0;
                 }
@@ -270,10 +275,10 @@ public class LevelGenerator : MonoBehaviour
             return new Direction();
     }
     //"Adjustment" parameters are variables to take into account and adjust the model based on the pivot of the object
-    Object GetCorridorShape(Vector2Int currentPosition, Vector2Int previousPosition, out Vector3 positionAdjustment, out Quaternion rotationAdjustment, Direction? firstCellDirection = null)
+    Object GetCorridorShape(Cell?[,] gridToCheck, Vector2Int currentPosition, Vector2Int previousPosition, out Vector3 positionAdjustment, out Quaternion rotationAdjustment, Direction? firstCellDirection = null)
     {
-        Direction? currentDirection = grid[currentPosition.x, currentPosition.y].Value.direction;
-        Direction? previousDirection = grid[previousPosition.x, previousPosition.y].Value.direction;
+        Direction? currentDirection = gridToCheck[currentPosition.x, currentPosition.y].Value.direction;
+        Direction? previousDirection = gridToCheck[previousPosition.x, previousPosition.y].Value.direction;
 
         if (firstCellDirection != null)
             previousDirection = firstCellDirection;
@@ -293,7 +298,8 @@ public class LevelGenerator : MonoBehaviour
                 positionAdjustment = Vector3.zero;
                 rotationAdjustment = Quaternion.identity;
             }
-            return straightCorridor;
+
+            return (gridToCheck == grid) ? straightCorridor : straightUnderground;
         }
         //Shoulder path
         else
@@ -325,7 +331,156 @@ public class LevelGenerator : MonoBehaviour
                 positionAdjustment = Vector3.zero;
                 rotationAdjustment = Quaternion.identity;
             }
-            return shoulderCorridor;
+            
+            return (gridToCheck == grid) ? shoulderCorridor : shoulderUnderground;
+        }
+    }
+    struct SubwayInfo
+    {
+        public Vector2Int pathfindingCellDelta; //what cell does the pathfinding use with respect to the entrance position
+        public Vector2Int gridFillerPivot; //where does the space the subway occupies on the grid start (world coords)
+        public Vector2Int positionDelta; //how much you must move from entrance to snap to grid after rotating
+        public float rotation;
+        public bool horizontal;
+
+        public SubwayInfo(Vector2Int pathfindingCellDelta, Vector2Int gridFillerPivot, Vector2Int positionDelta, float rotation, bool horizontal)
+        {
+            this.pathfindingCellDelta = pathfindingCellDelta;
+            this.gridFillerPivot = gridFillerPivot;
+            this.positionDelta = positionDelta;
+            this.rotation = rotation;
+            this.horizontal = horizontal;
+        }
+    }
+    SubwayInfo GetSubwayInfo(Direction entranceDirection, Vector2Int entrancePos)
+    {
+        switch (entranceDirection)
+        {
+            case Direction.North: return new SubwayInfo(pathfindingCellDelta: new Vector2Int(-3, -2), 
+                                                        gridFillerPivot: entrancePos + new Vector2Int(-3, -1), 
+                                                        positionDelta: Vector2Int.up, 
+                                                        horizontal: true,
+                                                        rotation: 0);
+
+            case Direction.South: return new SubwayInfo(pathfindingCellDelta: new Vector2Int(3, 2),
+                                                        gridFillerPivot: entrancePos + new Vector2Int(-2, 0),
+                                                        positionDelta: Vector2Int.left,
+                                                        horizontal: true,
+                                                        rotation: 180);
+
+            case Direction.East: return new SubwayInfo(pathfindingCellDelta: new Vector2Int(-2, 3),
+                                                       gridFillerPivot: entrancePos + new Vector2Int(-1, 0),
+                                                       positionDelta: Vector2Int.zero,
+                                                       horizontal: false,
+                                                       rotation: 90);
+
+            case Direction.West: return new SubwayInfo(pathfindingCellDelta: new Vector2Int(2, -3),
+                                                       gridFillerPivot: entrancePos + new Vector2Int(-1, -3),
+                                                       positionDelta: new Vector2Int(-1, 1),
+                                                       horizontal: false,
+                                                       rotation: -90);
+            default: return new SubwayInfo();
+        }
+    }
+    void PlaceTunnel(Entrance startingEntrance, Entrance endingEntrance, Vector2Int startEntrancePos, Vector2Int endEntrancePos)
+    {
+        //Starting Room
+        SubwayInfo startInfo = GetSubwayInfo(startingEntrance.direction, startEntrancePos);
+
+        Vector2Int startGlobalPos = startEntrancePos + startInfo.positionDelta;
+        Instantiate(undergroundEntrance, GridToWorld(startGlobalPos.x, startGlobalPos.y), Quaternion.Euler(0, startInfo.rotation, 0));
+
+        for (int i = 0; i < 3 + (startInfo.horizontal ? 1 : 0); i++)
+        {
+            for (int j = 0; j < 3 + (startInfo.horizontal ? 0 : 1); j++)
+            {
+                subwayGrid[startInfo.gridFillerPivot.x + i, startInfo.gridFillerPivot.y + j] = new Cell(NodeType.Room);
+            }
+        }
+
+        //Ending room
+        SubwayInfo endInfo = GetSubwayInfo(endingEntrance.direction, endEntrancePos);
+
+        Vector2Int endGlobalPos = endEntrancePos + endInfo.positionDelta;
+        Instantiate(undergroundEntrance, GridToWorld(endGlobalPos.x, endGlobalPos.y), Quaternion.Euler(0, endInfo.rotation, 0));
+
+        for (int i = 0; i < 3 + (endInfo.horizontal ? 1 : 0); i++)
+        {
+            for (int j = 0; j < 3 + (endInfo.horizontal ? 0 : 1); j++)
+            {
+                subwayGrid[endInfo.gridFillerPivot.x + i, endInfo.gridFillerPivot.y + j] = new Cell(NodeType.Room);
+            }
+        }
+
+        short[,] tiles = MakeTilesFromGrid(subwayGrid);
+
+        //Pathfinding is startEntrancePos + pathfindingStartingPosDelta
+        var pathfinderOptions = new AStar.Options.PathFinderOptions
+        {
+            PunishChangeDirection = true,
+            UseDiagonals = false,
+            Weighting = AStar.Options.Weighting.Negative,
+        };
+
+        var worldGrid = new WorldGrid(tiles);
+        var pathfinder = new PathFinder(worldGrid, pathfinderOptions);
+
+        Vector2Int pathFindingStart = startEntrancePos + startInfo.pathfindingCellDelta;
+        Vector2Int pathFindingEnd = endEntrancePos + endInfo.pathfindingCellDelta;
+
+        //Pathfinding execution
+        Position[] path = pathfinder.FindPath(new Position(pathFindingStart.x, pathFindingStart.y),
+                                              new Position(pathFindingEnd.x, pathFindingEnd.y));
+
+        if (path.Length <= 0)
+        {
+            Debug.LogWarning("Could not find suitable path");
+        };
+
+        //Setting individual path cells
+        for (int k = 0; k < path.Length; k++)
+        {
+            //Fill grid
+            Vector2Int currentPos = new Vector2Int(path[k].Row, path[k].Column);
+
+            if (k == path.Length - 1)
+            {
+                Vector2Int correction;
+                switch (endingEntrance.direction)
+                {
+                    case Direction.North:   correction = Vector2Int.up; break;
+                    case Direction.East:    correction = Vector2Int.right; break;
+                    case Direction.South:   correction = Vector2Int.down; break;
+                    case Direction.West:    correction = Vector2Int.left; break;
+                    default:                correction = Vector2Int.zero; break;
+                }
+
+                Vector2Int dir = (pathFindingEnd + correction) - currentPos;
+                subwayGrid[currentPos.x, currentPos.y] = new Cell(NodeType.Corridor, GetPathCellDirection(dir));
+            }
+            else
+            {
+                Vector2Int dir = new Vector2Int(path[k + 1].Row - currentPos.x, path[k + 1].Column - currentPos.y);
+                subwayGrid[currentPos.x, currentPos.y] = new Cell(NodeType.Corridor, GetPathCellDirection(dir));
+            }
+
+            //Instantiate
+            Vector3 posToAdd;
+            Quaternion rotation;
+            Object corridorToInstantiate;
+
+            if (k == 0)
+            {
+                Direction startDir = (Direction)(((int)startingEntrance.direction + 2) % 4); //Flip direction
+
+                corridorToInstantiate = GetCorridorShape(subwayGrid, currentPos, currentPos, out posToAdd, out rotation, startDir);
+            }
+            else
+            {
+                corridorToInstantiate = GetCorridorShape(subwayGrid, currentPos, new Vector2Int(path[k - 1].Row, path[k - 1].Column), out posToAdd, out rotation);
+            }
+
+            Instantiate(corridorToInstantiate, GridToWorld(currentPos.x, currentPos.y) + posToAdd + Vector3.down * 8.0f, rotation);
         }
     }
     void PlaceCorridors(List<GeneratorRoom> placedRooms, Dictionary<uint, Vector3> positions)
@@ -375,7 +530,7 @@ public class LevelGenerator : MonoBehaviour
                 Destroy(selectedEntranceEnd.blockage);
 
                 //Pathfinding Set Up
-                short[,] tiles = MakeTilesFromGrid();
+                short[,] tiles = MakeTilesFromGrid(grid);
 
                 var pathfinderOptions = new AStar.Options.PathFinderOptions
                 {
@@ -393,10 +548,24 @@ public class LevelGenerator : MonoBehaviour
                 //Pathfinding execution
                 Position[] path = pathfinder.FindPath(new Position(pathFindingStart.x, pathFindingStart.y),
                                                       new Position(pathFindingEnd.x, pathFindingEnd.y));
+
                 if (path.Length <= 0)
                 {
                     Debug.LogWarning("Could not find suitable path");
                 };
+
+                //Check if underground
+                bool underground = false;
+                foreach (var item in path)
+                {
+                    if (tiles[item.Row, item.Column] == 50)
+                    {
+                        Debug.Log("Corridor must be underground");
+                        PlaceTunnel(selectedEntranceStart, selectedEntranceEnd, selectedStartPos, selectedEndPos);
+                        underground = true;
+                    }
+                }
+                if (underground) continue;
 
                 //Setting individual path cells
                 for (int k = 0; k < path.Length; k++)
@@ -422,11 +591,11 @@ public class LevelGenerator : MonoBehaviour
 
                     if (k == 0)
                     {
-                        corridorToInstantiate = GetCorridorShape(currentPos, currentPos, out posToAdd, out rotation, selectedEntranceStart.direction);
+                        corridorToInstantiate = GetCorridorShape(grid, currentPos, currentPos, out posToAdd, out rotation, selectedEntranceStart.direction);
                     }
                     else
                     {
-                        corridorToInstantiate = GetCorridorShape(currentPos, new Vector2Int(path[k - 1].Row, path[k - 1].Column), out posToAdd, out rotation);
+                        corridorToInstantiate = GetCorridorShape(grid, currentPos, new Vector2Int(path[k - 1].Row, path[k - 1].Column), out posToAdd, out rotation);
                     }
 
                     Instantiate(corridorToInstantiate, GridToWorld(currentPos.x, currentPos.y) + posToAdd, rotation);

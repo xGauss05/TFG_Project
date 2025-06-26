@@ -50,6 +50,14 @@ public class LevelManager : NetworkBehaviour
         {
             timer.Value = 0f;
             seed.Value = Random.Range(int.MinValue, int.MaxValue);
+
+            //Subway case seeds
+            //seed.Value = -635693249; //(Solved)
+            //seed.Value = 1009756413; //(Solved)
+            //seed.Value = 906708187; //(Solved)
+            //seed.Value = -747945747;
+            //seed.Value = 1077991448;
+            //seed.Value = -1746262959;
         }
 
         

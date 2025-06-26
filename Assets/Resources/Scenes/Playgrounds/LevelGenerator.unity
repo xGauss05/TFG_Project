@@ -4052,6 +4052,9 @@ MonoBehaviour:
   oneWayDropRoom: {fileID: 5561013600320419608, guid: 9c7ec5e061886f14fab7b1b994b0ca6e, type: 3}
   straightCorridor: {fileID: 5561013600320419608, guid: 0d52ebcd81af78447bec7a85a099285e, type: 3}
   shoulderCorridor: {fileID: 5561013600320419608, guid: 410b0ac597228f54fb7641bf6205c851, type: 3}
+  undergroundEntrance: {fileID: 5311454816228636569, guid: fab0790e0897f3c4cb6e7a846a405e0d, type: 3}
+  straightUnderground: {fileID: 5561013600320419608, guid: 29e8f6f48f8e9f5489cfe2e345266d40, type: 3}
+  shoulderUnderground: {fileID: 5561013600320419608, guid: 6887e26669af15046b9760d3f07abcb5, type: 3}
 --- !u!114 &2112105029
 MonoBehaviour:
   m_ObjectHideFlags: 0

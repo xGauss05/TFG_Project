@@ -934,7 +934,7 @@ MonoBehaviour:
     localPosition: {x: -1, y: 3}
     blockage: {fileID: 9042992484198041280}
     unlocked: 0
-  - direction: 1
+  - direction: 2
     localPosition: {x: -1, y: 0}
     blockage: {fileID: 3245070840705693149}
     unlocked: 0

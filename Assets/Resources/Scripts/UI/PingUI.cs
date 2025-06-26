@@ -9,16 +9,23 @@ public class PingUI : MonoBehaviour
     [SerializeField] Ping ping;
     [SerializeField] TextMeshProUGUI pingText;
 
+    public void SetPing(Ping ping)
+    {
+        this.ping = ping;
+    }
+
     void Update()
     {
         if (ping == null || pingText == null) return;
 
-        int rtt = (int)ping.rtt / 2;
+        int pingMS = (int)ping.rtt / 2;
 
-        if (rtt <= 100) pingText.color = Color.green;
-        else if (rtt <= 150) pingText.color = Color.yellow;
+        if (pingMS <= 100) pingText.color = Color.green;
+        else if (pingMS <= 150) pingText.color = Color.yellow;
         else pingText.color = Color.red;
 
-        pingText.text = $"Ping: {rtt} ms";
+        pingText.text = $"Ping: {pingMS} ms\n" +
+            $"RTT: {(int)ping.rtt} ms\n" +
+            $"Packets Lost: {ping.GetPacketsLost()} ({ping.GetPacketLossPercentage()} %)";
     }
 }

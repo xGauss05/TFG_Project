@@ -13,6 +13,20 @@ public class Ping : NetworkBehaviour
 
     public float rtt { get; private set; } = 0;
 
+    int sentPings = 0;
+    int receivedPings = 0;
+    int lastPingId = 0;
+
+
+    void Start()
+    {
+        var ui = FindObjectOfType<PingUI>();
+        if (ui != null)
+        {
+            ui.SetPing(this);
+        }
+    }
+
     void Update()
     {
         if (!IsClient || !IsOwner) return;
@@ -21,23 +35,41 @@ public class Ping : NetworkBehaviour
 
         if (timer >= updateInterval)
         {
-            SendPingServerRpc(Time.realtimeSinceStartup);
+            lastPingId++;
+            SendPingServerRpc(Time.realtimeSinceStartup, lastPingId);
+            sentPings++;
             timer = 0f;
         }
     }
 
+    public float GetPacketLossPercentage()
+    {
+        if (sentPings == 0) return 0.0f;
+
+        return 100.0f * (1.0f - ((float)receivedPings / sentPings));
+    }
+
+    public int GetPacketsLost()
+    {
+        return sentPings - receivedPings;
+    }
+
     // Client RPC functions -------------------------------------------------------------------------------------------
     [ClientRpc]
-    void ReturnPingClientRpc(float clientTime)
+    void ReturnPingClientRpc(float clientTime, int pingId)
     {
-        rtt = (ulong)Mathf.Abs(Time.realtimeSinceStartup - clientTime);
+        if (pingId <= lastPingId)
+        {
+            receivedPings++;
+            rtt = Mathf.Abs(Time.realtimeSinceStartup - clientTime);
+        }
     }
 
     // Server RPC functions -------------------------------------------------------------------------------------------
     [ServerRpc]
-    void SendPingServerRpc(float clientTime)
+    void SendPingServerRpc(float clientTime, int pingId)
     {
-        ReturnPingClientRpc(clientTime);
+        ReturnPingClientRpc(clientTime, pingId);
     }
 
 }

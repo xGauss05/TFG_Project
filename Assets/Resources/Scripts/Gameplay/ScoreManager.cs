@@ -30,7 +30,7 @@ public class ScoreManager : NetworkBehaviour
     public void AddScore(int value)
     {
         score.Value += value;
-        Debug.Log($"Current score: {score.Value}.");
+        //Debug.Log($"Current score: {score.Value}.");
     }
 
     public void SubstractScore(int value)

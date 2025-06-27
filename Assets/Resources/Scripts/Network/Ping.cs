@@ -17,7 +17,6 @@ public class Ping : NetworkBehaviour
     int receivedPings = 0;
     int lastPingId = 0;
 
-
     void Start()
     {
         var ui = FindObjectOfType<PingUI>();
@@ -36,7 +35,7 @@ public class Ping : NetworkBehaviour
         if (timer >= updateInterval)
         {
             lastPingId++;
-            SendPingServerRpc(Time.realtimeSinceStartup, lastPingId);
+            SendPingServerRpc(Time.realtimeSinceStartup, lastPingId, OwnerClientId);
             sentPings++;
             timer = 0f;
         }
@@ -56,20 +55,26 @@ public class Ping : NetworkBehaviour
 
     // Client RPC functions -------------------------------------------------------------------------------------------
     [ClientRpc]
-    void ReturnPingClientRpc(float clientTime, int pingId)
+    void ReturnPingClientRpc(float clientTime, int pingId, ClientRpcParams rpcParams = default)
     {
         if (pingId <= lastPingId)
         {
             receivedPings++;
-            rtt = Mathf.Abs(Time.realtimeSinceStartup - clientTime);
+            rtt = Mathf.Abs(Time.realtimeSinceStartup - clientTime) * 1000;
         }
     }
 
     // Server RPC functions -------------------------------------------------------------------------------------------
     [ServerRpc]
-    void SendPingServerRpc(float clientTime, int pingId)
+    void SendPingServerRpc(float clientTime, int pingId, ulong clientId)
     {
-        ReturnPingClientRpc(clientTime, pingId);
+        ReturnPingClientRpc(clientTime, pingId, new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new[] { clientId }
+            }
+        });
     }
 
 }

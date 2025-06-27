@@ -107,7 +107,7 @@ MonoBehaviour:
   fireRate: 1.15
   gunShotSfx: {fileID: 8300000, guid: d71a8084425c3644599873dde32304bf, type: 3}
   emptyClipSfx: {fileID: 8300000, guid: 8f48ffbc4b451494490e3674b0559047, type: 3}
-  reloadSfx: {fileID: 8300000, guid: 81db3d35edc35ce47831bd97ec876290, type: 3}
+  reloadSfx: {fileID: 8300000, guid: 94c33eae7fa5ffc40ae4f9e9b82e649b, type: 3}
   pelletCount: 10
 --- !u!1001 &2790376506079648285
 PrefabInstance:

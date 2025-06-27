@@ -79,7 +79,7 @@ public class Car : NetworkBehaviour, IDamageable
                 if (prefabToDrop != null)
                 {
                     GameObject itemToDrop = Instantiate(prefabToDrop, transform.position, transform.rotation);
-                    itemToDrop.GetComponent<NetworkObject>().Spawn();
+                    itemToDrop.GetComponent<NetworkObject>().Spawn(true);
                 }
             }
 

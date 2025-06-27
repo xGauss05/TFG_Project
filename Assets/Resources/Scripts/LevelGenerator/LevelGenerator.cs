@@ -48,7 +48,7 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField] Object straightUnderground;
     [SerializeField] Object shoulderUnderground;
 
-    public System.Action<List<Transform>, List<Unity.Netcode.NetworkObject>> OnLevelGenerationComplete;
+    public System.Action OnLevelGenerationComplete;
 
 
     private void Awake()
@@ -160,10 +160,8 @@ public class LevelGenerator : MonoBehaviour
 
         return positions;
     }
-    List<GeneratorRoom> PlaceRooms(Dictionary<uint, Vector3> positions, List<Transform> spawners, List<Unity.Netcode.NetworkObject> objectsToSpawn)
+    List<GeneratorRoom> PlaceRooms(Dictionary<uint, Vector3> positions)
     {
-        List<string> spawnerTags = new List<string> { "PlayerSpawnpoint", "BasicZombieSpawnpoint", "FastZombieSpawnpoint", "BossZombieSpawnpoint", "ZombieSpawnpoint" };
-
         List<GeneratorRoom> placedRooms = new List<GeneratorRoom>();
 
         for (uint i = 0; i < activeGraph.nodes.Count; i++)
@@ -187,7 +185,7 @@ public class LevelGenerator : MonoBehaviour
 
             Vector2Int posInGrid = WorldToGrid(positions[i]);
 
-            //Check overlap?
+            //Check overlap
             GeneratorCollisionSolver.CheckOverlap(ref posInGrid, toSet.size, grid);
 
             //Once generation is solved, place physical rooms
@@ -205,37 +203,27 @@ public class LevelGenerator : MonoBehaviour
             List<Transform> objsToUnparent = new List<Transform>();
             foreach (Transform child in roomInstance.transform)
             {
-                if (spawnerTags.Contains(child.tag))
-                {
-                    spawners.Add(child);
-                }
-
-                //Debug.Log(child.name);
-
                 if (!child.gameObject.isStatic)
                 {
                     objsToUnparent.Add(child);
                 }
             }
-
-            //foreach (var GO in objsToUnparent)
-            //{
-            //    GO.SetParent(null);
-
-            //    GO.GetComponent<Unity.Netcode.NetworkObject>().Spawn();
-            //}
         }
 
         return placedRooms;
     }
 
-    Dictionary<Direction, Vector2Int> directionCoords = new Dictionary<Direction, Vector2Int>
-                {
-                    { Direction.North,  Vector2Int.up},
-                    { Direction.South,  Vector2Int.down},
-                    { Direction.East,   Vector2Int.right},
-                    { Direction.West,   Vector2Int.left}
-                };
+    Vector2Int GetDirectionCoords(Direction direction)
+    {
+        switch (direction)
+        {
+            case Direction.North:   return Vector2Int.up;
+            case Direction.East:    return Vector2Int.right;
+            case Direction.South:   return Vector2Int.down;
+            case Direction.West:    return Vector2Int.left;
+            default:                return Vector2Int.zero;
+        }
+    }
     short[,] MakeTilesFromGrid(Cell?[,] gridToParse)
     {
         short[,] returnTileMap = new short[gridSize * 2, gridSize * 2];
@@ -542,8 +530,8 @@ public class LevelGenerator : MonoBehaviour
                 var worldGrid = new WorldGrid(tiles);
                 var pathfinder = new PathFinder(worldGrid, pathfinderOptions);
 
-                Vector2Int pathFindingStart = selectedStartPos + directionCoords[selectedEntranceStart.direction];
-                Vector2Int pathFindingEnd = selectedEndPos + directionCoords[selectedEntranceEnd.direction];
+                Vector2Int pathFindingStart = selectedStartPos + GetDirectionCoords(selectedEntranceStart.direction);
+                Vector2Int pathFindingEnd = selectedEndPos + GetDirectionCoords(selectedEntranceEnd.direction);
 
                 //Pathfinding execution
                 Position[] path = pathfinder.FindPath(new Position(pathFindingStart.x, pathFindingStart.y),
@@ -611,10 +599,7 @@ public class LevelGenerator : MonoBehaviour
         //Generate layout positions
         Dictionary<uint, Vector3> positions = GenerateLayoutPositions();
 
-        List<Transform> spawners = new List<Transform>();
-        List<Unity.Netcode.NetworkObject> objectsToSpawn = new List<Unity.Netcode.NetworkObject>();
-
-        List<GeneratorRoom> placedRooms = PlaceRooms(positions, spawners, objectsToSpawn);
+        List<GeneratorRoom> placedRooms = PlaceRooms(positions);
 
         PlaceCorridors(placedRooms, positions);
 
@@ -624,7 +609,7 @@ public class LevelGenerator : MonoBehaviour
             StartCoroutine(RegenerateNavmesh());
         }
 
-        OnLevelGenerationComplete?.Invoke(spawners, objectsToSpawn);
+        OnLevelGenerationComplete?.Invoke();
     }
 
     IEnumerator RegenerateNavmesh()

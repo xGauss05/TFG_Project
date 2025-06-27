@@ -28,7 +28,7 @@ public class ZombieIdleSpawner : NetworkBehaviour
         }
     }
 
-    void OnLevelGenerated(List<Transform> spawners, List<Unity.Netcode.NetworkObject> objectsToSpawn)
+    void OnLevelGenerated()
     {
         SpawnZombiesWithTag("BasicZombieSpawnpoint", Zombie_Basic);
         SpawnZombiesWithTag("FastZombieSpawnpoint", Zombie_Fast);

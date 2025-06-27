@@ -33,7 +33,7 @@ public class EntitySpawner : NetworkBehaviour
         }
     }
 
-    void OnLevelGenerated(List<Transform> spawners, List<Unity.Netcode.NetworkObject> objectsToSpawn)
+    void OnLevelGenerated()
     {
         SpawnEntityWithTag("AmmoBoxSpawn", AmmoBox);
         SpawnEntityWithTag("AssaultRifleSpawn", AssaultRifle);

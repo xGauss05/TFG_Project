@@ -23,7 +23,7 @@ public class PlayerSpawner : NetworkBehaviour
     {
         if (IsHost && sceneName == "LevelGenerator")
         {
-            GameObject.Find("LevelGenerator").GetComponent<LevelGenerator>().OnLevelGenerationComplete += (_,_) => 
+            GameObject.Find("LevelGenerator").GetComponent<LevelGenerator>().OnLevelGenerationComplete += () => 
             {
                 OnLevelGenerated(clientsCompleted); }
             ;
@@ -38,6 +38,6 @@ public class PlayerSpawner : NetworkBehaviour
             player.GetComponent<NetworkObject>().SpawnAsPlayerObject(id, true);
         }
 
-        GameObject.Find("LevelGenerator").GetComponent<LevelGenerator>().OnLevelGenerationComplete -= (_, _) => { OnLevelGenerated(clientsCompleted); };
+        GameObject.Find("LevelGenerator").GetComponent<LevelGenerator>().OnLevelGenerationComplete -= () => { OnLevelGenerated(clientsCompleted); };
     }
 }

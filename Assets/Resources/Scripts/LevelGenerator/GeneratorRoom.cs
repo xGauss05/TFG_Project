@@ -20,7 +20,6 @@ public class Entrance
 }
 public class GeneratorRoom : MonoBehaviour
 {
-    public NodeType type;
     public Vector2Int size;
     public List<Entrance> entrances;
 

@@ -6,20 +6,17 @@ using AStar;
 public struct Cell
 {
     public NodeType type;
-    public Entrance? entrance;
     public Direction? direction;
 
     public Cell(NodeType type)
     {
         this.type = type;
-        entrance = null;
         direction = null;
     }
 
     public Cell(NodeType type, Direction direction)
     {
         this.type = type;
-        entrance = null;
         this.direction = direction;
     }
 }
@@ -199,15 +196,6 @@ public class LevelGenerator : MonoBehaviour
 
             GameObject roomInstance = Instantiate(selectedRoomPrefab, GridToWorld(posInGrid.x, posInGrid.y), Quaternion.identity);
             placedRooms.Add(roomInstance.GetComponent<GeneratorRoom>());
-
-            List<Transform> objsToUnparent = new List<Transform>();
-            foreach (Transform child in roomInstance.transform)
-            {
-                if (!child.gameObject.isStatic)
-                {
-                    objsToUnparent.Add(child);
-                }
-            }
         }
 
         return placedRooms;

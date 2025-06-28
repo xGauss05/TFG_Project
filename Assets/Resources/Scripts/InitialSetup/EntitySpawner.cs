@@ -14,6 +14,8 @@ public class EntitySpawner : NetworkBehaviour
     [SerializeField] GameObject Door;
     [SerializeField] GameObject Medkit;
     [SerializeField] GameObject Shotgun;
+    [SerializeField] GameObject Horde_BasicZombie;
+    [SerializeField] GameObject Horde_FastZombie;
 
     void Start()
     {
@@ -43,6 +45,8 @@ public class EntitySpawner : NetworkBehaviour
         SpawnEntityWithTag("DoorSpawn", Door);
         SpawnEntityWithTag("MedkitSpawn", Medkit);
         SpawnEntityWithTag("ShotgunSpawn", Shotgun);
+        SpawnEntityWithTag("Horde_BasicZombieSpawn", Horde_BasicZombie);
+        SpawnEntityWithTag("Horde_FastZombieSpawn", Horde_FastZombie);
 
         GameObject.Find("LevelGenerator").GetComponent<LevelGenerator>().OnLevelGenerationComplete -= OnLevelGenerated;
     }

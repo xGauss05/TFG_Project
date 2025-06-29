@@ -6,7 +6,7 @@ using UnityEngine;
 public class Ping : NetworkBehaviour
 {
     [Header("Ping settings")]
-    [SerializeField] float updateInterval = 0.5f;
+    [SerializeField] float updateInterval = 0.1f;
 
     // Helpers
     float timer = 0.0f;
@@ -39,6 +39,16 @@ public class Ping : NetworkBehaviour
             sentPings++;
             timer = 0f;
         }
+    }
+
+    public int GetPing()
+    {
+        return (int)(rtt / 2);
+    }
+
+    public int GetRtt()
+    {
+        return (int)rtt;
     }
 
     public float GetPacketLossPercentage()

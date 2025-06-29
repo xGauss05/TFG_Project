@@ -1,0 +1,16 @@
+{
+    "nodes": [
+        {
+            "id": 0,
+            "type": 0,
+            "neighbors": [
+                1
+            ]
+        },
+        {
+            "id": 1,
+            "type": 2,
+            "neighbors": []
+        }
+    ]
+}

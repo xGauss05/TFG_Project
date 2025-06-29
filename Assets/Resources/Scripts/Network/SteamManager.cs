@@ -218,7 +218,7 @@ public class SteamManager : MonoBehaviour
     {
         if (NetworkManager.Singleton.IsHost)
         {
-            NetworkManager.Singleton.SceneManager.LoadScene("2_Gameplay", LoadSceneMode.Single);
+            NetworkManager.Singleton.SceneManager.LoadScene("LevelGenerator", LoadSceneMode.Single);
         }
     }
 

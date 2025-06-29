@@ -14,7 +14,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Resources/Scenes/1_MainMenu.unity
     guid: b75ebe787d02d7b48a213e791d807005
-  - enabled: 1
+  - enabled: 0
     path: Assets/Resources/Scenes/2_Gameplay.unity
     guid: d68f677687f680f40bb095e345b72940
+  - enabled: 1
+    path: Assets/Resources/Scenes/Playgrounds/LevelGenerator.unity
+    guid: 7897bdc92811e6e4d9bf5eae93657112
   m_configObjects: {}

@@ -18,14 +18,12 @@ public class PingUI : MonoBehaviour
     {
         if (ping == null || pingText == null) return;
 
-        int pingMS = (int)(ping.rtt / 2);
-
-        if (pingMS <= 100) pingText.color = Color.green;
-        else if (pingMS <= 150) pingText.color = Color.yellow;
+        if (ping.GetPing() <= 100) pingText.color = Color.green;
+        else if (ping.GetPing() <= 150) pingText.color = Color.yellow;
         else pingText.color = Color.red;
 
-        pingText.text = $"Ping: {pingMS} ms\n" +
-            $"RTT: {(int)ping.rtt} ms\n" +
+        pingText.text = $"Ping: {ping.GetPing()} ms\n" +
+            $"RTT: {ping.GetRtt()} ms\n" +
             $"Packets Lost: {ping.GetPacketsLost()} ({ping.GetPacketLossPercentage()} %)";
     }
 }

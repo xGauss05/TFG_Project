@@ -4,7 +4,6 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.SceneManagement;
 using TMPro;
-using System;
 
 public class LevelManager : NetworkBehaviour
 {
@@ -27,6 +26,8 @@ public class LevelManager : NetworkBehaviour
     bool stopTimer = false;
     bool gameEnded = false;
 
+    NetworkVariable<int> seed = new NetworkVariable<int>(default);
+
     void Awake()
     {
         #region Singleton
@@ -48,7 +49,23 @@ public class LevelManager : NetworkBehaviour
         if (IsServer)
         {
             timer.Value = 0f;
+            seed.Value = Random.Range(int.MinValue, int.MaxValue);
+
+            //Subway case seeds
+            //seed.Value = -635693249; //(Solved)
+            //seed.Value = 1009756413; //(Solved)
+            //seed.Value = 906708187; //(Solved)
+            //seed.Value = -747945747;
+            //seed.Value = 1077991448;
+            //seed.Value = -1746262959;
         }
+
+        
+        NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += (sceneName,_,_,_) =>
+        {
+            if (sceneName == "LevelGenerator")
+                GameObject.Find("LevelGenerator").GetComponent<GraphGenerator>().StartLevelGeneration(seed.Value);
+        };
     }
 
     void Update()

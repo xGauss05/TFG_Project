@@ -17,11 +17,13 @@ TagManager:
   - ShotgunSpawn
   - AssaultRifleSpawn
   - DoorSpawn
+  - Horde_BasicZombieSpawn
+  - Horde_FastZombieSpawn
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Players
   - Water
   - UI
   - 

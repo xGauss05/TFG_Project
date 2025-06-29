@@ -123,6 +123,8 @@ public class ExtractionZone : NetworkBehaviour
 
         ScoreManager.Singleton.SubmitScore();
         NetworkManager.Singleton.SceneManager.LoadScene("1_MainMenu", LoadSceneMode.Single);
+        LobbyReference.Singleton.currentLobby = null;
+        NetworkManager.Singleton.Shutdown();
     }
 
     public void SetDoor(Door door)

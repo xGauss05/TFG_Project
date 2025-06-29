@@ -3,6 +3,9 @@
 ## Repository
 https://github.com/xGauss05/TFG_Project
 
+## Unity Project
+Install the 2022.3.44f1 version.
+
 ## Before playing
 Only works on Windows.
 Make sure you have the Steam app installed on your PC and logged in.

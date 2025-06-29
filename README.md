@@ -26,9 +26,10 @@ It is recommended to add Lights Out.exe at Steam, by Add a Game... > Add a Non-S
 - Reach the extraction zone (Green zone) to finish the level
 - Point system and Ranking
 - Timer that shows how long the game lasted
-- Ping, to check what is the current ping towards the Client-Host
+- Ping, RTT and Packet Loss diagnostics in real time
 - Be careful with the Zombie Hordes...
 - Zombie variations, from a regular zombie to a boss zombie
+- Cyclic level generation! A random level is generated everytime a game is started
   
 ## Controls
 | Key | Description |

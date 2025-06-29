@@ -49,6 +49,7 @@ It is recommended to add Lights Out.exe at Steam, by Add a Game... > Add a Non-S
 | <code>F1</code> | Open Steam overlay (In Lobby only) |
 | <code>MOUSE LMB</code> | Select button / Shoot |
 | <code>ENTER</code> | Chat InGame or Lobby |
+| <code>L-ALT</code> | Lock mouse InGame |
 
 ## Developers and their Thesis
 + [Jonathan Cacay Llanes](https://github.com/xGauss05): Development of an Online Videogame using Steamworks API

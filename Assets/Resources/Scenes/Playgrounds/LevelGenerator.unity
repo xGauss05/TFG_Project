@@ -4047,6 +4047,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   graphGenerator: {fileID: 2112105029}
   gridSize: 100
+  cellSize: 10
   startRoom: {fileID: 5561013600320419608, guid: 3eb3f019d15f81b498a1a9d8ed2b5a23, type: 3}
   goalRoom: {fileID: 5561013600320419608, guid: b9bead923c6e75c49b8d75192683d65b, type: 3}
   normalRoom: {fileID: 5561013600320419608, guid: f2fbf26ba7912c3409eb330eed1eafa9, type: 3}
@@ -4056,7 +4057,7 @@ MonoBehaviour:
   oneWayDropRoom: {fileID: 5561013600320419608, guid: 9c7ec5e061886f14fab7b1b994b0ca6e, type: 3}
   straightCorridor: {fileID: 5561013600320419608, guid: 0d52ebcd81af78447bec7a85a099285e, type: 3}
   shoulderCorridor: {fileID: 5561013600320419608, guid: 410b0ac597228f54fb7641bf6205c851, type: 3}
-  undergroundEntrance: {fileID: 5311454816228636569, guid: fab0790e0897f3c4cb6e7a846a405e0d, type: 3}
+  undergroundEntrance: {fileID: 5754585802228369946, guid: c52854529180cd24ea11ecfd574fe16c, type: 3}
   straightUnderground: {fileID: 5561013600320419608, guid: 29e8f6f48f8e9f5489cfe2e345266d40, type: 3}
   shoulderUnderground: {fileID: 5561013600320419608, guid: 6887e26669af15046b9760d3f07abcb5, type: 3}
 --- !u!114 &2112105029
@@ -4100,7 +4101,7 @@ MonoBehaviour:
   m_Center: {x: 0, y: 2, z: 0}
   m_LayerMask:
     serializedVersion: 2
-    m_Bits: 55
+    m_Bits: 39
   m_UseGeometry: 1
   m_DefaultArea: 0
   m_GenerateLinks: 0

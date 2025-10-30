@@ -51,6 +51,9 @@ public class LevelManager : NetworkBehaviour
             timer.Value = 0f;
             seed.Value = Random.Range(int.MinValue, int.MaxValue);
 
+            //seed.Value = 138039638; // Actually very good, could be used for showcase
+            //seed.Value = -854881847; // Very bad
+            //seed.Value = 1948372592; // Simple but with subway
             //Subway case seeds
             //seed.Value = -635693249; //(Solved)
             //seed.Value = 1009756413; //(Solved)
@@ -58,6 +61,7 @@ public class LevelManager : NetworkBehaviour
             //seed.Value = -747945747;
             //seed.Value = 1077991448;
             //seed.Value = -1746262959;
+            //seed.Value = -1614188986;
         }
 
         

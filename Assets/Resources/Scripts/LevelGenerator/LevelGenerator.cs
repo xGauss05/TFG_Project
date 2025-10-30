@@ -27,6 +27,7 @@ public class LevelGenerator : MonoBehaviour
     Graph activeGraph;
 
     public int gridSize = 100; //200 total, 100 positive 100 negative. 40 cells a row, 10 min size rooms max
+    public int cellSize = 10; //5x5 meters/units per cell
     public Cell?[,] grid;
     public Cell?[,] subwayGrid;
 
@@ -58,16 +59,16 @@ public class LevelGenerator : MonoBehaviour
 
     public Vector2Int WorldToGrid(Vector3 worldPosition)
     {
-        Vector3 gridAlignedPosition = new Vector3(Mathf.Round(worldPosition.x / 5.0f) * 5,
-                                                  Mathf.Round(worldPosition.y / 5.0f) * 5,
-                                                  Mathf.Round(worldPosition.z / 5.0f) * 5); //5 is the size of each cell
+        Vector3 gridAlignedPosition = new Vector3(Mathf.Round(worldPosition.x / cellSize) * cellSize,
+                                                  Mathf.Round(worldPosition.y / cellSize) * cellSize,
+                                                  Mathf.Round(worldPosition.z / cellSize) * cellSize);
 
         //Negative world values will start at index 0, and positive world values will start at index gridSize
-        return new Vector2Int(((int)gridAlignedPosition.x / 5) + gridSize, ((int)gridAlignedPosition.z / 5) + gridSize);
+        return new Vector2Int(((int)gridAlignedPosition.x / (int)cellSize) + gridSize, ((int)gridAlignedPosition.z / (int)cellSize) + gridSize);
     }
     public Vector3 GridToWorld(int x, int y)
     {
-        return new Vector3((x - gridSize) * 5f, 0, (y - gridSize) * 5f);
+        return new Vector3((x - gridSize) * cellSize, 0, (y - gridSize) * cellSize);
     }
 
     Vector2Int GenerateRandomPosition()
@@ -265,7 +266,7 @@ public class LevelGenerator : MonoBehaviour
             //Vertical
             if (currentDirection == Direction.North || currentDirection == Direction.South)
             {
-                positionAdjustment = Vector3.left * 5;
+                positionAdjustment = Vector3.left * cellSize;
                 rotationAdjustment = Quaternion.Euler(0, 90, 0);
             }
             //Horizontal
@@ -284,21 +285,21 @@ public class LevelGenerator : MonoBehaviour
             if (previousDirection == Direction.North && currentDirection == Direction.East ||
                 previousDirection == Direction.West && currentDirection == Direction.South)
             {
-                positionAdjustment = Vector3.left * 5;
+                positionAdjustment = Vector3.left * cellSize;
                 rotationAdjustment = Quaternion.Euler(0, 90, 0);
             }
             //Down-left
             else if (previousDirection == Direction.South && currentDirection == Direction.West ||
                      previousDirection == Direction.East && currentDirection == Direction.North)
             {
-                positionAdjustment = Vector3.forward * 5;
+                positionAdjustment = Vector3.forward * cellSize;
                 rotationAdjustment = Quaternion.Euler(0, -90, 0);
             }
             //Up-left
             else if (previousDirection == Direction.North && currentDirection == Direction.West ||
                      previousDirection == Direction.East && currentDirection == Direction.South)
             {
-                positionAdjustment = Vector3.forward * 5 + Vector3.left * 5;
+                positionAdjustment = Vector3.forward * cellSize + Vector3.left * cellSize;
                 rotationAdjustment = Quaternion.Euler(0, 180, 0);
             }
             //Down-right
@@ -332,8 +333,8 @@ public class LevelGenerator : MonoBehaviour
     {
         switch (entranceDirection)
         {
-            case Direction.North: return new SubwayInfo(pathfindingCellDelta: new Vector2Int(-3, -2), 
-                                                        gridFillerPivot: entrancePos + new Vector2Int(-3, -1), 
+            case Direction.North: return new SubwayInfo(pathfindingCellDelta: new Vector2Int(-1, -1), 
+                                                        gridFillerPivot: entrancePos + new Vector2Int(-1, 0), 
                                                         positionDelta: Vector2Int.up, 
                                                         horizontal: true,
                                                         rotation: 0);
@@ -344,14 +345,14 @@ public class LevelGenerator : MonoBehaviour
                                                         horizontal: true,
                                                         rotation: 180);
 
-            case Direction.East: return new SubwayInfo(pathfindingCellDelta: new Vector2Int(-2, 3),
-                                                       gridFillerPivot: entrancePos + new Vector2Int(-1, 0),
+            case Direction.East: return new SubwayInfo(pathfindingCellDelta: new Vector2Int(-1, 1),
+                                                       gridFillerPivot: entrancePos + new Vector2Int(0, 0),
                                                        positionDelta: Vector2Int.zero,
                                                        horizontal: false,
                                                        rotation: 90);
 
-            case Direction.West: return new SubwayInfo(pathfindingCellDelta: new Vector2Int(2, -3),
-                                                       gridFillerPivot: entrancePos + new Vector2Int(-1, -3),
+            case Direction.West: return new SubwayInfo(pathfindingCellDelta: new Vector2Int(1, -1),
+                                                       gridFillerPivot: entrancePos + new Vector2Int(-1, -1),
                                                        positionDelta: new Vector2Int(-1, 1),
                                                        horizontal: false,
                                                        rotation: -90);
@@ -366,9 +367,9 @@ public class LevelGenerator : MonoBehaviour
         Vector2Int startGlobalPos = startEntrancePos + startInfo.positionDelta;
         Instantiate(undergroundEntrance, GridToWorld(startGlobalPos.x, startGlobalPos.y), Quaternion.Euler(0, startInfo.rotation, 0));
 
-        for (int i = 0; i < 3 + (startInfo.horizontal ? 1 : 0); i++)
+        for (int i = 0; i < 2; i++)
         {
-            for (int j = 0; j < 3 + (startInfo.horizontal ? 0 : 1); j++)
+            for (int j = 0; j < 2; j++)
             {
                 subwayGrid[startInfo.gridFillerPivot.x + i, startInfo.gridFillerPivot.y + j] = new Cell(NodeType.Room);
             }
@@ -380,9 +381,9 @@ public class LevelGenerator : MonoBehaviour
         Vector2Int endGlobalPos = endEntrancePos + endInfo.positionDelta;
         Instantiate(undergroundEntrance, GridToWorld(endGlobalPos.x, endGlobalPos.y), Quaternion.Euler(0, endInfo.rotation, 0));
 
-        for (int i = 0; i < 3 + (endInfo.horizontal ? 1 : 0); i++)
+        for (int i = 0; i < 2; i++)
         {
-            for (int j = 0; j < 3 + (endInfo.horizontal ? 0 : 1); j++)
+            for (int j = 0; j < 2; j++)
             {
                 subwayGrid[endInfo.gridFillerPivot.x + i, endInfo.gridFillerPivot.y + j] = new Cell(NodeType.Room);
             }

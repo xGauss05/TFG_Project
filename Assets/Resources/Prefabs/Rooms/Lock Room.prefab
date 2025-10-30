@@ -1166,18 +1166,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 900cd2460fe76c14180bd3b761ae898c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  size: {x: 4, y: 4}
+  size: {x: 2, y: 2}
   entrances:
   - direction: 0
-    localPosition: {x: -1, y: 3}
+    localPosition: {x: 0, y: 1}
     blockage: {fileID: 9042992484198041280}
     unlocked: 0
   - direction: 2
-    localPosition: {x: -1, y: 0}
+    localPosition: {x: 0, y: 0}
     blockage: {fileID: 3245070840705693149}
     unlocked: 0
   - direction: 3
-    localPosition: {x: -3, y: 0}
+    localPosition: {x: -1, y: 0}
     blockage: {fileID: 7666429878031279433}
     unlocked: 0
 --- !u!1 &5988045278894497389

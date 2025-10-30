@@ -1139,11 +1139,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 900cd2460fe76c14180bd3b761ae898c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 0
-  size: {x: 4, y: 4}
+  size: {x: 2, y: 2}
   entrances:
   - direction: 3
-    localPosition: {x: -3, y: 3}
+    localPosition: {x: -1, y: 1}
     blockage: {fileID: 3467586078636727530}
     unlocked: 0
   - direction: 1
